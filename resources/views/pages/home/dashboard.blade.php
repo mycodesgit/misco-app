@@ -8,14 +8,14 @@
     <div class="row">
         <div class="col-12">
             <div class="mb-4">
-                
+
                 <!-- Dashboard Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
                         <h1 class="h4 fw-bold mb-1">Dashboard Overview</h1>
                         <p class="text-muted small mb-0">Track your daily task progress and activity metrics across the year.</p>
                     </div>
-                    
+
                     <!-- Controls & Status Bar -->
                     <div class="d-flex align-items-center gap-2">
                         <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2">
@@ -34,22 +34,19 @@
 
                 <!-- Stats & Welcome Grid -->
                 <div class="row g-3 mb-4">
-                    
+
                     <!-- Welcome Hero Card (col-md-6) -->
                     <div class="col-md-4">
                         <div class="card overflow-hidden h-100 position-relative welcome-hero-card">
                             <div class="card-body p-4 d-flex flex-column justify-content-between position-relative z-1">
                                 <div>
                                     <div class="d-flex align-items-center gap-2 mb-2">
-                                        <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-1">
-                                            <i class="bi bi-person-workspace me-1"></i> Personnel Portal
-                                        </span>
                                         <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 small">
                                             <i class="bi bi-circle-fill me-1 small"></i> Active Session
                                         </span>
                                     </div>
                                     <h3 class="fw-bold mb-2">
-                                        Welcome back, {{ auth()->user()->name ?? 'Personnel' }}! 👋
+                                        Welcome, {{ auth()->user()->fname ?? 'Personnel' }}! 👋
                                     </h3>
                                     <p class="text-secondary mb-3 fs-6">
                                         You've completed <strong class="text-dark dark-text-light">94.2%</strong> of your assigned tasks this month. Keep up the consistent pace!
@@ -57,7 +54,7 @@
                                 </div>
 
                                 <div class="pt-2">
-                                    <a href="#" class="btn btn-primary btn-sm rounded-pill px-3 me-2">
+                                    <a href="#" class="btn btn-success btn-sm rounded-pill px-3 me-2">
                                         <i class="bi bi-plus-lg me-1"></i> New Activity
                                     </a>
                                     <a href="#" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
@@ -67,7 +64,7 @@
                             </div>
                             <!-- Decorative SVG background pattern -->
                             <div class="hero-bg-accent position-absolute end-0 bottom-0 pointer-events-none me-3 mb-2">
-                                
+
                             </div>
                         </div>
                     </div>
@@ -91,17 +88,17 @@
                                     // Build structure grouped by Month -> Weeks -> Days
                                     $yearStart = \Carbon\Carbon::createFromDate($selectedYear, 1, 1);
                                     $yearEnd = \Carbon\Carbon::createFromDate($selectedYear, 12, 31);
-                                    
+
                                     $monthsData = [];
-                                    
+
                                     for ($m = 1; $m <= 12; $m++) {
                                         $monthStart = \Carbon\Carbon::createFromDate($selectedYear, $m, 1);
                                         $monthEnd = $monthStart->copy()->endOfMonth();
-                                        
+
                                         // Find first Monday on or prior to month start
                                         $curr = $monthStart->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
                                         $weeks = [];
-                                        
+
                                         while ($curr->lte($monthEnd)) {
                                             $weekDays = [];
                                             for ($d = 0; $d < 7; $d++) {
@@ -124,7 +121,7 @@
                                             }
                                             $weeks[] = $weekDays;
                                         }
-                                        
+
                                         $monthsData[$m] = [
                                             'name' => $monthStart->format('M'),
                                             'weeks' => $weeks
@@ -135,7 +132,7 @@
                                 <!-- Heatmap Container -->
                                 <div class="table-responsive">
                                     <div class="activity-heatmap">
-                                        
+
                                         <div class="heatmap-grid-wrapper">
                                             <!-- Days Label Column -->
                                             <div class="days-label text-muted">
@@ -186,7 +183,7 @@
 
                                     </div>
                                 </div>
-        
+
                                 <!-- Legend -->
                                 <div class="d-flex justify-content-end align-items-center gap-2 mt-3 text-muted small">
                                     <span>Less</span>
@@ -203,122 +200,125 @@
 
                     <!-- Top Performers & Category Leaderboard (col-md-4) -->
                     <div class="col-md-4">
-                        
+
                         <!-- Top Ticket Resolvers Leaderboard (Podium Style) -->
-                        <div class="card card-animate mb-3">
-                            <div class="card-header pt-3 d-flex justify-content-between align-items-center">
-                                <h6 class="fw-bold">
-                                    <i class="ti ti-trophy me-1"></i> Leaderboard
-                                </h6>
+                        <div class="card card-animate mb-3 overflow-hidden">
+                            <!-- Card Header -->
+                            <div class="card-header pt-3 px-3 pb-2 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="p-2 bg-warning bg-opacity-10 rounded-3 text-warning d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                        <i class="ti ti-trophy fs-6"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-0">Leaderboard</h6>
+                                </div>
                                 <!-- Timeframe Pills -->
-                                <ul class="nav nav-pills nav-pills-custom gap-1 mb-1">
+                                <ul class="nav nav-pills nav-pills-custom gap-1">
                                     <li class="nav-item">
-                                        <a class="nav-link active" href="#">Daily</a>
+                                        <a class="nav-link active px-2.5 py-1" href="#">Daily</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link text-muted" href="#">Monthly</a>
+                                        <a class="nav-link text-muted px-2.5 py-1" href="#">Monthly</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link text-muted" href="#">All time</a>
+                                        <a class="nav-link text-muted px-2.5 py-1" href="#">All time</a>
                                     </li>
                                 </ul>
                             </div>
-                            
+
                             <div class="card-body p-3">
                                 <!-- Top 3 Podium Layout -->
-                                <div class="row align-items-end text-center mb-4 pt-2">
-                                    
+                                <div class="row align-items-end text-center mb-4 pt-3 pb-3 rounded-4 mx-0 podium-wrapper">
+
                                     <!-- Rank 2 (Left) -->
-                                    <div class="col-4">
+                                    <div class="col-4 px-1">
                                         <div class="podium-item">
                                             <div class="position-relative d-inline-block mb-2">
-                                                <div class="avatar-podium border border-2 border-primary rounded-circle mx-auto d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary fw-bold">
+                                                <div class="avatar-podium border border-2 border-primary rounded-circle mx-auto d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary fw-bold shadow-sm">
                                                     MA
                                                 </div>
-                                                <span class="badge bg-primary rounded-circle position-absolute bottom-0 start-50 translate-middle-x badge-rank">2</span>
+                                                <span class="badge bg-primary rounded-circle position-absolute start-50 translate-middle-x badge-rank">2</span>
                                             </div>
                                             <h6 class="mb-0 fw-semibold text-truncate small">Masuma</h6>
-                                            <small class="text-muted d-block" style="font-size: 0.7rem;">1,490 pts</small>
+                                            <small class="text-muted d-block fw-medium text-nowrap" style="font-size: 0.7rem;">1,490 pts</small>
                                         </div>
                                     </div>
 
                                     <!-- Rank 1 (Center - Elevated) -->
-                                    <div class="col-4">
-                                        <div class="podium-item">
-                                            <i class="ti ti-crown text-warning fs-5 d-block mb-1"></i>
+                                    <div class="col-4 px-1">
+                                        <div class="podium-item podium-item-top">
                                             <div class="position-relative d-inline-block mb-2">
-                                                <div class="avatar-podium avatar-podium-lg border border-3 border-warning rounded-circle mx-auto d-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning fw-bold shadow-sm">
+                                                <i class="ti ti-crown text-warning fs-5 position-absolute top-0 start-50 translate-middle-x crown-icon"></i>
+                                                <div class="avatar-podium avatar-podium-lg border border-3 border-warning rounded-circle mx-auto d-flex align-items-center justify-content-center bg-warning bg-opacity-15 text-dark fw-bold shadow">
                                                     HS
                                                 </div>
-                                                <span class="badge bg-warning text-dark rounded-circle position-absolute bottom-0 start-50 translate-middle-x badge-rank">1</span>
+                                                <span class="badge bg-warning text-dark rounded-circle position-absolute start-50 translate-middle-x badge-rank fw-bold">1</span>
                                             </div>
                                             <h6 class="mb-0 fw-bold text-truncate small">Hasan Sajjad</h6>
-                                            <small class="text-warning fw-semibold d-block" style="font-size: 0.72rem;">1,800 pts</small>
+                                            <small class="text-warning-emphasis fw-bold d-block text-nowrap" style="font-size: 0.72rem;">1,800 pts</small>
                                         </div>
                                     </div>
 
                                     <!-- Rank 3 (Right) -->
-                                    <div class="col-4">
+                                    <div class="col-4 px-1">
                                         <div class="podium-item">
                                             <div class="position-relative d-inline-block mb-2">
-                                                <div class="avatar-podium border border-2 border-info rounded-circle mx-auto d-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info fw-bold">
+                                                <div class="avatar-podium border border-2 border-info rounded-circle mx-auto d-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info fw-bold shadow-sm">
                                                     TN
                                                 </div>
-                                                <span class="badge bg-info rounded-circle position-absolute bottom-0 start-50 translate-middle-x badge-rank">3</span>
+                                                <span class="badge bg-info rounded-circle position-absolute start-50 translate-middle-x badge-rank">3</span>
                                             </div>
                                             <h6 class="mb-0 fw-semibold text-truncate small">Tanim</h6>
-                                            <small class="text-muted d-block" style="font-size: 0.7rem;">1,205 pts</small>
+                                            <small class="text-muted d-block fw-medium text-nowrap" style="font-size: 0.7rem;">1,205 pts</small>
                                         </div>
                                     </div>
 
                                 </div>
 
                                 <!-- Leaderboard Table Header -->
-                                <div class="d-flex justify-content-between px-2 pb-1 text-muted small fw-semibold border-bottom" style="font-size: 0.7rem;">
+                                <div class="d-flex justify-content-between px-2 pb-2 text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">
                                     <span>Rank & Player</span>
                                     <span>Points</span>
                                 </div>
 
                                 <!-- Remaining Rankings List (Rank 4+) -->
-                                <div class="list-group list-group-flush mt-2 gap-1">
-                                    
+                                <div class="list-group list-group-flush gap-1">
+
                                     <!-- Rank 4 -->
-                                    <div class="list-group-item rounded-3 border-0 bg-light-subtle d-flex align-items-center justify-content-between p-2">
+                                    <div class="list-group-item rounded-3 border-0 bg-opacity-50 d-flex align-items-center justify-content-between p-2">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="fw-bold text-muted small ms-1" style="width: 14px;">4</span>
-                                            <div class="avatar-circle-xs bg-primary text-white fw-bold">SA</div>
+                                            <span class="fw-bold text-muted small text-center" style="width: 14px; font-size: 0.75rem;">4</span>
+                                            <div class="avatar-circle-xs bg-primary text-white fw-bold shadow-sm">SA</div>
                                             <span class="fw-medium small text-truncate" style="max-width: 120px;">Sadia Afrin</span>
                                         </div>
-                                        <span class="fw-semibold small">1,000 pts</span>
+                                        <span class="fw-semibold small text-secondary">1,000 pts</span>
                                     </div>
 
                                     <!-- Rank 5 -->
-                                    <div class="list-group-item rounded-3 border-0 bg-light-subtle d-flex align-items-center justify-content-between p-2">
+                                    <div class="list-group-item rounded-3 border-0 bg-opacity-50 d-flex align-items-center justify-content-between p-2">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="fw-bold text-muted small ms-1" style="width: 14px;">5</span>
-                                            <div class="avatar-circle-xs bg-success text-white fw-bold">RK</div>
+                                            <span class="fw-bold text-muted small text-center" style="width: 14px; font-size: 0.75rem;">5</span>
+                                            <div class="avatar-circle-xs bg-success text-white fw-bold shadow-sm">RK</div>
                                             <span class="fw-medium small text-truncate" style="max-width: 120px;">Rejaul karim</span>
                                         </div>
-                                        <span class="fw-semibold small">900 pts</span>
+                                        <span class="fw-semibold small text-secondary">900 pts</span>
                                     </div>
 
                                     <!-- Current User (Highlighted Rank 8) -->
-                                    <div class="list-group-item rounded-3 border border-primary bg-primary bg-opacity-10 d-flex align-items-center justify-content-between p-2">
+                                    <div class="list-group-item rounded-3 border border-success border-opacity-25 bg-success bg-opacity-10 d-flex align-items-center justify-content-between p-2 shadow-sm">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="fw-bold text-primary small ms-1" style="width: 14px;">8</span>
-                                            <div class="avatar-circle-xs bg-primary text-white fw-bold">SJ</div>
-                                            <div>
-                                                <span class="fw-bold small text-primary">Sajjad</span>
-                                                <span class="badge bg-primary px-1 py-0 ms-1" style="font-size: 0.6rem;">YOU</span>
+                                            <span class="fw-bold text-primary small text-center" style="width: 14px; font-size: 0.75rem;">8</span>
+                                            <div class="avatar-circle-xs bg-primary text-white fw-bold shadow-sm">SJ</div>
+                                            <div class="d-flex align-items-center gap-1">
+                                                <span class="fw-bold small">Sajjad</span>
+                                                <span class="badge bg-info text-white rounded-pill px-1.5 py-0.5" style="font-size: 0.55rem; letter-spacing: 0.3px;">YOU</span>
                                             </div>
                                         </div>
-                                        <span class="fw-bold text-primary small">720 pts</span>
+                                        <span class="fw-bold text-info small">720 pts</span>
                                     </div>
 
                                 </div>
                             </div>
                         </div>
-
                         <!-- Top Issue Categories -->
                         <div class="card card-animate">
                             <div class="card-header bg-transparent py-2 border-bottom d-flex justify-content-between align-items-center">
@@ -363,7 +363,7 @@
                     <!-- IT Ticketing Metric Cards (col-md-8 container) -->
                     <div class="col-md-8">
                         <div class="row g-3">
-                            
+
                             <!-- 1. Total Requests Received -->
                             <div class="col-sm-6 col-md-6">
                                 <div class="card card-animate">
@@ -446,7 +446,7 @@
 
                         </div>
                     </div>
-                    
+
                 </div>
 
             </div>
@@ -461,8 +461,12 @@
         }
 
         [data-bs-theme="dark"] .welcome-hero-card {
-            background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.2) 100%);
-            border-color: rgba(13, 110, 253, 0.3) !important;
+            background: linear-gradient(135deg, hsla(0, 5%, 85%, 0.102) 0%, rgba(92, 93, 93, 0.2) 100%);
+            border-color: #343a40 !important;
+        }
+
+        [data-bs-theme="dark"] .welcome-hero-card p{
+            color: #d0dbe6 !important;
         }
 
         [data-bs-theme="dark"] .dark-text-light {
@@ -538,25 +542,56 @@
         .heatmap-cell.level-3 { background-color: #26a641; }
         .heatmap-cell.level-4 { background-color: #39d353; }
 
+        /* Timeframe Navigation Pills */
+        .nav-pills-custom {
+            background-color: var(--bs-light, #f8f9fa);
+            padding: 3px;
+            border-radius: 10px;
+        }
+        [data-bs-theme="dark"] .nav-pills-custom {
+            background-color: #2f3338;
+        }
         .nav-pills-custom .nav-link {
-            border-radius: 20px;
+            border-radius: 10px;
             font-size: 0.72rem;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
         }
         .nav-pills-custom .nav-link.active {
-            background-color: var(--bs-primary);
-            color: #fff !important;
+            background-color: #65ab85;
+            color: var(--bs-dark, #212529) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         }
 
-        /* Podium Avatars */
+        /* Podium Items & Crown */
+        .podium-wrapper {
+            background-color: #17171708;
+        }
+        [data-bs-theme="dark"] .podium-wrapper {
+            background-color: #ffffff08;
+        }
+        [data-bs-theme="dark"] .podium-wrapper h6 {
+            color: #ffffff !important;
+        }
+        .podium-item-top {
+            transform: translateY(-20px);
+        }
+        .crown-icon {
+            margin-top: 5px;
+            filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.4));
+        }
+
+        /* Avatar Styles */
         .avatar-podium {
-            width: 46px;
-            height: 46px;
+            margin-top: 20px;
+            width: 48px;
+            height: 48px;
             font-size: 0.85rem;
         }
         .avatar-podium-lg {
             width: 58px;
             height: 58px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
         }
 
         /* Overlapping Rank Badge */
@@ -571,24 +606,26 @@
             box-shadow: 0 0 0 2px var(--bs-card-bg, #fff);
         }
 
-        /* Small list avatar */
+        /* List Items Avatar */
         .avatar-circle-xs {
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.65rem;
         }
+
+        /* List Group Item */
+        .list-group-item {
+            background-color: #17171708;
+        }
+        [data-bs-theme="dark"] .list-group-item {
+            background-color: #ffffff08;
+            color: #ffffff
+        }
     </style>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        });
-    </script>
+
 @endsection

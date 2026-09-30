@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-12">
             <div class="mb-4">
-                
+
                 <!-- Page Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
@@ -29,7 +29,7 @@
 
                 <!-- 3-Column Helpdesk Layout -->
                 <div class="row g-3">
-                    
+
                     <!-- 1. Ticket Queue List (col-md-3) -->
                     <div class="col-md-3">
                         <div class="card h-100">
@@ -49,7 +49,7 @@
                             <!-- Tickets List -->
                             <div class="card-body p-0">
                                 <div class="list-group list-group-flush ticket-list-scroll">
-                                    
+
                                     <!-- Active Ticket Item -->
                                     <a href="#" class="list-group-item list-group-item-action p-3 active border-bottom">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
@@ -106,7 +106,7 @@
                     <!-- 2. Active Ticket Chat Box (col-md-6) -->
                     <div class="col-md-6">
                         <div class="card h-100 d-flex flex-column">
-                            
+
                             <!-- Chat Box Header -->
                             <div class="card-header bg-transparent p-3 border-bottom d-flex align-items-center justify-content-between">
                                 <div>
@@ -130,7 +130,7 @@
 
                             <!-- Chat Messages Body -->
                             <div class="card-body p-3 flex-grow-1 overflow-y-auto helpdesk-chat-area">
-                                
+
                                 <!-- Ticket Opening System Log -->
                                 <div class="text-center my-3">
                                     <span class="badge bg-light text-muted border px-3 py-1 fw-normal">
@@ -236,7 +236,7 @@
                                 <h6 class="mb-0 fw-bold"><i class="ti ti-info-circle me-1"></i> Ticket Metadata</h6>
                             </div>
                             <div class="card-body p-3">
-                                
+
                                 <!-- Quick Actions -->
                                 <div class="d-grid gap-2 mb-3">
                                     <button class="btn btn-success btn-sm">

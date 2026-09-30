@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>@yield('title')</title>
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('uilibs/images/cpsulogov4.png') }}">
@@ -28,7 +28,14 @@
     <link rel="stylesheet" href="{{ asset('uilibs/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
     <!-- fullCalendar -->
     <link rel="stylesheet" href="{{ asset('uilibs/plugins/fullcalendar/fullcalendar.css') }}">
-
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+            const theme = savedTheme || (systemPrefersLight ? 'light' : 'dark');
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
 </head>
 
 <body>
@@ -50,9 +57,20 @@
                 <button class="btn btn-sm btn-outline-secondary" onclick="togglePageFullscreen(this)">
                     <i class="ti ti-maximize me-1 zoom-icon"></i> <span class="zoom-text">Zoom</span>
                 </button>
+                <li>
+                    <label class="theme-switch" for="themeToggle">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="slider">
+                            <span class="slider-content">
+                                <i id="themeIcon" class="ti ti-moon"></i>
+                                <span id="themeLabel">Dark</span>
+                            </span>
+                        </span>
+                    </label>
+                </li>
                 <li class="ms-3 dropdown">
                     <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{{ asset('uilibs/images/user.png') }}" alt="" class="avatar avatar-sm rounded-circle" /> 
+                        <img src="{{ asset('uilibs/images/user.png') }}" alt="" class="avatar avatar-sm rounded-circle" />
                     </a>
                     <div class="dropdown-menu dropdown-menu-end p-0" style="min-width: 200px;">
                         <div>
@@ -60,7 +78,7 @@
                                 <img src="{{ asset('uilibs/images/user.png') }}" alt="" class="avatar avatar-md rounded-circle" />
                                 <div>
                                     <h5 class="mb-0 small"></h5>
-                                    
+                                    {{ Auth::guard('web')->user()->fname }} {{ Auth::guard('web')->user()->lname }}
                                 </div>
                             </div>
                             <div class="p-3 d-flex flex-column gap-1 medium lh-lg">
@@ -73,7 +91,7 @@
                                 <a href="#" class="text-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="ti ti-logout"></i><span> Signout</span>
                                 </a>
-                                <form id="logout-form" action="#" method="POST" style="display:none;">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
                                     @csrf
                                 </form>
                             </div>
@@ -147,6 +165,8 @@
     <!-- Validation JS -->
     <script src="{{ asset('uilibs/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('uilibs/plugins/jquery-validation/additional-methods.min.js') }}"></script>
+    <!-- Theme -->
+    <script src="{{ asset('uilibs/js/theme.js') }}"></script>
 
     <script>
         $(function () {
@@ -176,9 +196,9 @@
         // 1. Toggle Fullscreen Mode
         function togglePageFullscreen() {
             const docEl = document.documentElement;
-            const isFullscreen = document.fullscreenElement || 
-                                document.webkitFullscreenElement || 
-                                document.mozFullScreenElement || 
+            const isFullscreen = document.fullscreenElement ||
+                                document.webkitFullscreenElement ||
+                                document.mozFullScreenElement ||
                                 document.msFullscreenElement;
 
             if (!isFullscreen) {
@@ -218,9 +238,9 @@
 
         // 2. Update UI (Button Icons & Labels)
         function updateFullscreenUI() {
-            const isFullscreen = document.fullscreenElement || 
-                                document.webkitFullscreenElement || 
-                                document.mozFullScreenElement || 
+            const isFullscreen = document.fullscreenElement ||
+                                document.webkitFullscreenElement ||
+                                document.mozFullScreenElement ||
                                 document.msFullscreenElement;
 
             document.querySelectorAll('.zoom-icon').forEach(icon => {
@@ -240,7 +260,7 @@
         // 3. Auto-Restore Fullscreen After Refresh On First Click
         function checkFullscreenRestore() {
             const shouldBeFullscreen = localStorage.getItem('keep_fullscreen') === 'true';
-            
+
             if (shouldBeFullscreen) {
                 window.restoreClickPending = true;
 
@@ -266,6 +286,11 @@
         // Check state on page refresh
         document.addEventListener('DOMContentLoaded', checkFullscreenRestore);
     </script>
-    
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+
 </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\TicketDB;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,10 +17,23 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $table = 'users';
+    protected $primaryKey = 'id';
+
     protected $fillable = [
-        'name',
+        'campus_id',
+        'office_id',
+        'ustatus',
+        'lname',
+        'fname',
+        'mname',
         'email',
         'password',
+        'role',
+        'gender',
+        'posted_by',
+        'isAllowed',
+        'remember_token'
     ];
 
     /**
@@ -41,5 +54,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'ustatus'  => 'integer',
     ];
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
+    public function office()
+    {
+        return $this->belongsTo(Office::class, 'office_id');
+    }
 }
