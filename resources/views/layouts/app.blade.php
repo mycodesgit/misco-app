@@ -109,7 +109,7 @@
         <div class="logo-area">
             <div class="d-inline-flex">
                 <img src="{{ asset('uilibs/images/cpsulogov4.png') }}" alt="logo" width="24">
-                <span class="logo-text ms-2" style="font-weight: bold">PR</span>
+                <span class="logo-text ms-2" style="font-weight: bold">Ticketing</span>
             </div>
         </div>
         @include('includes.sidebar')

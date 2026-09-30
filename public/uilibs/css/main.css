@@ -31016,11 +31016,19 @@ fieldset:disabled .btn {
 }
 .sidebar.collapsed {
     width: 60px;
+    overflow: visible !important;
+}
+.sidebar.collapsed .nav-link:hover {
+    background-color: transparent !important;
+}
+.sidebar.collapsed .nav-link i:hover {
+    color: #65ac86 !important;
 }
 .sidebar.collapsed .nav-link {
     margin: 0;
     background-color: transparent;
     padding: 8px 18px;
+    position: relative;
 }
 .sidebar.collapsed .nav-text,
 .sidebar.collapsed .logo-text {
