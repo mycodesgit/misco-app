@@ -2,6 +2,7 @@
     $current_route=request()->route()->getName();
 
     $dashActive = in_array($current_route, ['dashboard.index']) ? 'active' : '';
+    $ticketsActive = in_array($current_route, ['tickets.index', 'tickets.store']) ? 'active' : '';
 @endphp
 
 <ul class="nav flex-column">
@@ -14,7 +15,7 @@
         </a>
     </li>
     <li>
-        <a class="nav-link" href="#" data-tooltip="All Tickets">
+        <a class="nav-link {{ $ticketsActive }}" href="{{ route('tickets.index') }}" data-tooltip="All Tickets">
             <i class="ti ti-ticket"></i><span class="nav-text">All Tickets</span>
         </a>
     </li>

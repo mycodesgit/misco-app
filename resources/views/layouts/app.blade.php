@@ -55,7 +55,7 @@
             <ul class="list-unstyled d-flex align-items-center mb-0 gap-1">
                 <!-- Dropdown -->
                 <button class="btn btn-sm btn-outline-secondary" onclick="togglePageFullscreen(this)">
-                    <i class="ti ti-maximize me-1 zoom-icon"></i> <span class="zoom-text">Zoom</span>
+                    <i class="ti ti-maximize zoom-icon"></i>
                 </button>
                 <li>
                     <label class="theme-switch" for="themeToggle">

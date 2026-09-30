@@ -18188,7 +18188,7 @@
     --bs-border-style: solid;
     --bs-border-color: #e5e5e5;
     --bs-border-color-translucent: #e5e5e5;
-    --bs-border-radius: 0.95rem;
+    --bs-border-radius: 0.375rem;
     --bs-border-radius-sm: 0.25rem;
     --bs-border-radius-lg: 0.5rem;
     --bs-border-radius-xl: 1rem;
@@ -31018,10 +31018,14 @@ fieldset:disabled .btn {
     width: 60px;
     overflow: visible !important;
 }
+.sidebar.collapsed .nav-link.active {
+    color: #000000;
+    color: #65ac86 !important;
+}
 .sidebar.collapsed .nav-link:hover {
     background-color: transparent !important;
 }
-.sidebar.collapsed .nav-link i:hover {
+.sidebar.collapsed .nav-link:hover {
     color: #65ac86 !important;
 }
 .sidebar.collapsed .nav-link {
@@ -40239,5 +40243,13 @@ html.theme-transitioning *:after {
 
 [data-bs-theme="dark"] .card-body-bg-color {
     background-color: #2b3035 !important;
+}
+
+.card-body-content-bg-color {
+    background-color: #f8f8f8 !important;
+}
+
+[data-bs-theme="dark"] .card-body-content-bg-color {
+    background-color: #262a2d !important;
 }
 

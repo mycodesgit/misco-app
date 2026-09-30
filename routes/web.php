@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TicketRequestController;
 use App\Http\Controllers\LogoutController;
 
 use App\Http\Controllers\MonitoringDashboardController;
@@ -26,13 +27,16 @@ Route::group(['middleware'=>['guest']],function(){
 
     Route::get('/login',[LoginController::class,'getLogin'])->name('getLogin');
     Route::post('/login',[LoginController::class,'postLogin'])->name('postLogin');
-
-
 });
 
 Route::group(['middleware'=>['login_auth']],function(){
     Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard.index');
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+
+    Route::prefix('/tickets')->group(function () {
+        Route::get('/request/view/all',[TicketRequestController::class,'index'])->name('tickets.index');
+        Route::get('/request/view/details',[TicketRequestController::class,'store'])->name('tickets.store');
+    });
 
     Route::get('/dashboard/monitoring',[MonitoringDashboardController::class,'index'])->name('monitoring-dashboard.index');
 });
