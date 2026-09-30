@@ -31,7 +31,7 @@ Route::group(['middleware'=>['guest']],function(){
 });
 
 Route::group(['middleware'=>['login_auth']],function(){
-    Route::get('/dashboard',[MonitoringDashboardController::class,'index'])->name('dashboard.index');
+    Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard.index');
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard/monitoring',[MonitoringDashboardController::class,'index'])->name('monitoring-dashboard.index');

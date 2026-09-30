@@ -1,7 +1,7 @@
 @php
     $current_route=request()->route()->getName();
 
-    $monitoringActive = in_array($current_route, ['monitoring-dashboard.index']) ? 'active' : '';
+    $dashActive = in_array($current_route, ['dashboard.index']) ? 'active' : '';
 @endphp
 
 <ul class="nav flex-column">
@@ -9,7 +9,7 @@
         <small class="nav-text text-muted">Main Navigation</small>
     </li>
     <li>
-        <a class="nav-link {{ $monitoringActive }}" href="{{ route('monitoring-dashboard.index') }}">
+        <a class="nav-link {{ $dashActive }}" href="{{ route('dashboard.index') }}">
             <i class="ti ti-layout-grid"></i><span class="nav-text">Dashboard</span>
         </a>
     </li>

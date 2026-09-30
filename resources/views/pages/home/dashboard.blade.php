@@ -321,11 +321,11 @@
                         </div>
                         <!-- Top Issue Categories -->
                         <div class="card card-animate">
-                            <div class="card-header bg-transparent py-2 border-bottom d-flex justify-content-between align-items-center">
-                                <h6 class="fw-bold mb-0 text-dark small">
+                            <div class="card-header bg-transparent pt-3 border-bottom d-flex justify-content-between align-items-center">
+                                <h6 class="fw-bold small">
                                     <i class="ti ti-chart-pie me-1"></i> Top Ticket Categories
                                 </h6>
-                                <span class="badge bg-light text-muted border">Volume</span>
+                                <span class="badge bg-light text-dark border">Volume</span>
                             </div>
                             <div class="card-body p-3">
                                 <div class="mb-2">
@@ -362,10 +362,109 @@
 
                     <!-- IT Ticketing Metric Cards (col-md-8 container) -->
                     <div class="col-md-8">
-                        <div class="row g-3">
+                        <div class="row g-3 mb-3">
+                            <!-- 1. New Ticket -->
+                            <div class="col-md-4">
+                                <div class="card card-animate">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="text-muted fw-semibold">New Ticket</span>
+                                                <h3 class="fw-bold mb-0 mt-1">2</h3>
+                                            </div>
+                                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                                                <i class="ti ti-ticket fs-4"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 small text-muted">
+                                            <span class="text-primary fw-semibold"><i class="ti ti-ticket me-1"></i></span> Today's Request
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <!-- 1. Total Requests Received -->
-                            <div class="col-sm-6 col-md-6">
+                            <!-- 2. Pending Requests -->
+                            <div class="col-md-4">
+                                <div class="card card-animate">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="text-muted small fw-semibold">Pending Ticket</span>
+                                                <h3 class="fw-bold mb-0 mt-1 text-warning">12</h3>
+                                            </div>
+                                            <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle">
+                                                <i class="ti ti-clock fs-4"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 small text-muted">
+                                            <span class="text-danger fw-semibold"><i class="ti ti-alert-circle me-1"></i></span> 3 High Priority awaiting tech
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Work In Progress -->
+                            <div class="col-md-4">
+                                <div class="card card-animate">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="text-muted small fw-semibold">In Progress / Working</span>
+                                                <h3 class="fw-bold mb-0 mt-1 text-info">24</h3>
+                                            </div>
+                                            <div class="bg-info bg-opacity-10 text-info p-3 rounded-circle">
+                                                <i class="ti ti-progress fs-4"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 small text-muted">
+                                            <span class="text-info fw-semibold"><i class="ti ti-user-check me-1"></i></span> Assigned to IT personnel
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Resolved / Closed -->
+                            <div class="col-md-4">
+                                <div class="card card-animate">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="text-muted small fw-semibold">Resolved</span>
+                                                <h3 class="fw-bold mb-0 mt-1 text-success">312</h3>
+                                            </div>
+                                            <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle">
+                                                <i class="ti ti-circle-check fs-4"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 small text-muted">
+                                            <span class="text-success fw-semibold"><i class="ti ti-check me-1"></i></span> 89.6% resolution rate
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 5. Closed -->
+                            <div class="col-md-4">
+                                <div class="card card-animate">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="text-muted small fw-semibold">Closed</span>
+                                                <h3 class="fw-bold mb-0 mt-1 text-danger">312</h3>
+                                            </div>
+                                            <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-circle">
+                                                <i class="ti ti-circle-check fs-4"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 small text-muted">
+                                            <span class="text-danger fw-semibold"><i class="ti ti-check me-1"></i>89.6%</span> resolution rate
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 6. Total Request -->
+                            <div class="col-md-4">
                                 <div class="card card-animate">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center">
@@ -383,70 +482,50 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- 2. Pending Requests -->
-                            <div class="col-sm-6 col-md-6">
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-12">
                                 <div class="card card-animate">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <span class="text-muted small fw-semibold">Pending Requests</span>
-                                                <h3 class="fw-bold mb-0 mt-1 text-warning">12</h3>
-                                            </div>
-                                            <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle">
-                                                <i class="ti ti-clock fs-4"></i>
-                                            </div>
-                                        </div>
-                                        <div class="mt-2 small text-muted">
-                                            <span class="text-danger fw-semibold"><i class="ti ti-alert-circle me-1"></i>3 High Priority</span> awaiting tech
-                                        </div>
+                                    <div class="card-header pt-3">
+                                        <h6 class="card-title">
+                                            <i class="ti ti-calendar"></i> Daily Tickets Created vs Resolved
+                                        </h6>
                                     </div>
+                                    <div class="card-body"></div>
                                 </div>
                             </div>
-
-                            <!-- 3. Work In Progress -->
-                            <div class="col-sm-6 col-md-6">
+                            <div class="col-md-12">
                                 <div class="card card-animate">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <span class="text-muted small fw-semibold">In Progress / Working</span>
-                                                <h3 class="fw-bold mb-0 mt-1 text-info">24</h3>
-                                            </div>
-                                            <div class="bg-info bg-opacity-10 text-info p-3 rounded-circle">
-                                                <i class="ti ti-progress fs-4"></i>
-                                            </div>
-                                        </div>
-                                        <div class="mt-2 small text-muted">
-                                            <span class="text-info fw-semibold"><i class="ti ti-user-check me-1"></i>Assigned</span> to IT personnel
-                                        </div>
+                                    <div class="card-header pt-3">
+                                        <h6 class="card-title">
+                                            <i class="ti ti-calendar"></i> Predicted Ticket Volume for the Next 5 Working Days
+                                        </h6>
                                     </div>
+                                    <div class="card-body"></div>
                                 </div>
                             </div>
-
-                            <!-- 4. Resolved / Closed -->
-                            <div class="col-sm-6 col-md-6">
+                            <div class="col-md-12">
                                 <div class="card card-animate">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <span class="text-muted small fw-semibold">Resolved & Closed</span>
-                                                <h3 class="fw-bold mb-0 mt-1 text-success">312</h3>
-                                            </div>
-                                            <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle">
-                                                <i class="ti ti-circle-check fs-4"></i>
-                                            </div>
-                                        </div>
-                                        <div class="mt-2 small text-muted">
-                                            <span class="text-success fw-semibold"><i class="ti ti-check me-1"></i>89.6%</span> resolution rate
-                                        </div>
+                                    <div class="card-header pt-3">
+                                        <h6 class="card-title">
+                                            <i class="ti ti-building"></i> Top 10 Offices/Colleges
+                                        </h6>
                                     </div>
+                                    <div class="card-body"></div>
                                 </div>
                             </div>
-
+                            <div class="col-md-12">
+                                <div class="card card-animate">
+                                    <div class="card-header pt-3">
+                                        <h6 class="card-title">
+                                            <i class="ti ti-building"></i> Average Ticket Performance of MIS Personnel
+                                        </h6>
+                                    </div>
+                                    <div class="card-body"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
                 </div>
 
             </div>

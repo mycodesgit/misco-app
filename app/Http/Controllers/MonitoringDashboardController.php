@@ -8,6 +8,6 @@ class MonitoringDashboardController extends Controller
 {
     public function index()
     {
-        return view('pages.home.dashboard');
+        return view('pages.monitor');
     }
 }
