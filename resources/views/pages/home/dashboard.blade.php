@@ -238,7 +238,7 @@
                                                 </div>
                                                 <span class="badge bg-primary rounded-circle position-absolute start-50 translate-middle-x badge-rank">2</span>
                                             </div>
-                                            <h6 class="mb-0 fw-semibold text-truncate small">Masuma</h6>
+                                            <h6 class="mb-0 fw-semibold text-truncate small">Mary Ann</h6>
                                             <small class="text-muted d-block fw-medium text-nowrap" style="font-size: 0.7rem;">1,490 pts</small>
                                         </div>
                                     </div>
@@ -253,7 +253,7 @@
                                                 </div>
                                                 <span class="badge bg-warning text-dark rounded-circle position-absolute start-50 translate-middle-x badge-rank fw-bold">1</span>
                                             </div>
-                                            <h6 class="mb-0 fw-bold text-truncate small">Hasan Sajjad</h6>
+                                            <h6 class="mb-0 fw-bold text-truncate small">Hazel Shawn</h6>
                                             <small class="text-warning-emphasis fw-bold d-block text-nowrap" style="font-size: 0.72rem;">1,800 pts</small>
                                         </div>
                                     </div>
@@ -267,7 +267,7 @@
                                                 </div>
                                                 <span class="badge bg-info rounded-circle position-absolute start-50 translate-middle-x badge-rank">3</span>
                                             </div>
-                                            <h6 class="mb-0 fw-semibold text-truncate small">Tanim</h6>
+                                            <h6 class="mb-0 fw-semibold text-truncate small">Troy Newton</h6>
                                             <small class="text-muted d-block fw-medium text-nowrap" style="font-size: 0.7rem;">1,205 pts</small>
                                         </div>
                                     </div>
@@ -287,8 +287,8 @@
                                     <div class="list-group-item rounded-3 border-0 bg-opacity-50 d-flex align-items-center justify-content-between p-2">
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="fw-bold text-muted small text-center" style="width: 14px; font-size: 0.75rem;">4</span>
-                                            <div class="avatar-circle-xs bg-primary text-white fw-bold shadow-sm">SA</div>
-                                            <span class="fw-medium small text-truncate" style="max-width: 120px;">Sadia Afrin</span>
+                                            <div class="avatar-circle-xs bg-primary text-white fw-bold shadow-sm">JD</div>
+                                            <span class="fw-medium small text-truncate" style="max-width: 120px;">John Doe</span>
                                         </div>
                                         <span class="fw-semibold small text-secondary">1,000 pts</span>
                                     </div>
@@ -298,7 +298,7 @@
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="fw-bold text-muted small text-center" style="width: 14px; font-size: 0.75rem;">5</span>
                                             <div class="avatar-circle-xs bg-success text-white fw-bold shadow-sm">RK</div>
-                                            <span class="fw-medium small text-truncate" style="max-width: 120px;">Rejaul karim</span>
+                                            <span class="fw-medium small text-truncate" style="max-width: 120px;">Rico Karl</span>
                                         </div>
                                         <span class="fw-semibold small text-secondary">900 pts</span>
                                     </div>
@@ -309,7 +309,7 @@
                                             <span class="fw-bold text-primary small text-center" style="width: 14px; font-size: 0.75rem;">8</span>
                                             <div class="avatar-circle-xs bg-primary text-white fw-bold shadow-sm">SJ</div>
                                             <div class="d-flex align-items-center gap-1">
-                                                <span class="fw-bold small">Sajjad</span>
+                                                <span class="fw-bold small">Shane Jane</span>
                                                 <span class="badge bg-info text-white rounded-pill px-1.5 py-0.5" style="font-size: 0.55rem; letter-spacing: 0.3px;">YOU</span>
                                             </div>
                                         </div>
