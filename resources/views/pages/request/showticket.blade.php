@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    All Tickets
+    Ticket Details
 @endsection
 
 @section('body')
@@ -12,7 +12,7 @@
                 <!-- Page Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div class="d-flex align-items-start gap-2">
-                        <a href="{{ url('/requests') }}" class="btn btn-light btn-sm" title="Back to Requests" aria-label="Back to Requests">
+                        <a href="{{ route('tickets.index') }}" class="btn btn-light btn-sm" title="Back to Requests" aria-label="Back to Requests">
                             <i class="ti ti-arrow-left"></i>
                         </a>
                         <div>
