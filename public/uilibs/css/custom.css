@@ -1,0 +1,364 @@
+.bottom-nav {
+    display: none;
+}
+
+@media (max-width: 991px) {
+    .bottom-nav {
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(37, 37, 37, 0);
+        backdrop-filter: blur(3px);
+        width: 90%;
+        max-width: 400px;
+        padding: 10px 0;
+        border-radius: 20px;
+        display: flex;
+        justify-content: space-around;
+        box-shadow: 0 6px 16px rgba(128, 128, 128, 0.404);
+        z-index: 999;
+    }
+
+    .bottom-nav a {
+        text-decoration: none !important;
+        color: inherit;
+        /* keep text/icon color the same */
+    }
+
+    .bottom-nav a:visited,
+    .bottom-nav a:active,
+    .bottom-nav a:focus {
+        text-decoration: none !important;
+    }
+
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 7pt;
+        color: #377858;
+        cursor: pointer;
+        transition: 0.2s;
+        padding: 5px;
+    }
+
+    .nav-item .icon {
+        font-size: 18px;
+        margin-bottom: 1px;
+        margin-top: 3px;
+    }
+
+    [data-bs-theme="dark"] .nav-item {
+        color: #fff;
+    }
+}
+
+@media (max-width: 991px) {
+    .main-sidebar.sidebar-style-2 {
+        display: none !important;
+    }
+
+    .togglebar {
+        display: none !important;
+    }
+}
+.btn:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
+.btn-app {
+    border-radius: 3px !important;
+    background-color: #f8f9fa !important;
+    border: 1px solid #ddd !important;
+    color: #1a5f3d !important;
+    font-size: 12px !important;
+    height: 60px !important;
+    margin: 0 0 10px 10px !important;
+    min-width: 80px !important;
+    padding: 15px 5px !important;
+    position: relative !important;
+    text-align: center !important;
+    font-family: "Poppins", sans-serif !important;
+}
+.btn-app:hover{
+    background-color: #1f794c !important;
+    border: 1px solid #ddd !important;
+    color: #ffffff !important;
+}
+.btn-app>.fa, .btn-app>.fab, .btn-app>.fad, .btn-app>.fal, .btn-app>.far, .btn-app>.fas, .btn-app>.ion, .btn-app>.svg-inline--fa {
+    display: block;
+    font-size: 20px;
+}
+.center-top {
+    position: fixed !important;
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+}
+
+.services-menu{
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) scale(.8);
+
+    background: rgba(37, 37, 37, 0);
+    backdrop-filter: blur(3px);
+    color: #377858;
+
+    display:flex;
+    gap:25px;
+    padding:12px 25px;
+    border-radius:20px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+
+    opacity:0;
+    pointer-events:none;
+    transition:0.25s;
+
+    z-index:998;
+}
+
+.services-menu.active{
+    opacity:1;
+    transform:translateX(-50%) scale(1);
+    pointer-events:auto;
+}
+
+.service-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    font-size:11px;
+    cursor:pointer;
+    color: #377858;
+}
+
+.service-item i{
+    font-size:18px;
+    margin-bottom:4px;
+}
+
+
+/*vertivcal scrollable*/
+::-webkit-scrollbar {
+    width: 3px !important;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1 !important;
+}
+::-webkit-scrollbar-thumb {
+    background: #888 !important;
+    border-radius: 3px !important;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #949494 !important;
+}
+
+
+/*horizontal scrollable*//* Make scrollbar thinner */
+::-webkit-scrollbar {
+  width: 3px;   /* vertical scrollbar */
+  height: 3px;  /* horizontal scrollbar */
+}
+
+/* Track (background) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.menu-container{
+    margin-top:56px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.menu-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    justify-content:left;
+}
+
+.menu-item{
+    width:88px;
+    height:58px;
+    background:#f5f6f7;
+    border:1px solid #ddd;
+    border-radius:8px;
+    text-decoration:none;
+    color:#2c3e50;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    transition:all 0.2s ease;
+}
+
+.menu-item.disabled{
+    background:#ccc;
+    color:#777;
+    border-color:#bbb;
+    pointer-events:none; /* prevents clicking */
+    cursor:not-allowed;
+    opacity:0.8;
+}
+
+.menu-item i{
+    font-size:20px;
+    color:#04401f;
+    margin-top: 5px;
+}
+
+.menu-item span{
+    font-size:12px;
+    margin-top:3px;
+}
+
+.menu-item:hover{
+    background:#eaf4ee;
+    border-color:#04401f;
+    transform:translateY(-2px);
+}
+
+[data-bs-theme="dark"] .menu-item {
+    background-color: #2b3035 !important;
+    border-color: #343a40 !important;
+    color:#fafafa;
+}
+
+[data-bs-theme="dark"] .menu-item i {
+    color:#f9faf9;
+}
+
+.modal {
+    z-index: 9991;
+}
+
+@media (min-width: 992px) {
+
+    .modal-lg,
+    .modal-xl {
+        max-width: 800px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .modal-xl {
+        max-width: 1140px;
+    }
+    .modal-xxl {
+        max-width: 1240px;
+    }
+}
+
+.card-animate {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    transition: all 0.3s ease;
+}
+
+.card-animate.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.shadcn-calendar {
+    font-size: 0.85rem;
+}
+.shadcn-calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    color: var(--shadcn-text-main);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.shadcn-calendar-day:hover {
+    background-color: #f4f4f5;
+}
+.shadcn-calendar-day.active {
+    background-color: #18181b;
+    color: #ffffff;
+}
+.shadcn-calendar-day.muted {
+    color: #d4d4d8;
+}
+
+/* Container for the toggle switch */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 27px;
+}
+
+/* Hide original checkbox */
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Background track */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e4e6eb;
+    transition: background-color 0.3s ease;
+    border-radius: 30px;
+}
+
+/* Sliding knob content container */
+.slider-content {
+    position: absolute;
+    height: 20px;
+    width: 48px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #333;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Slide knob to the right when checked (Dark Mode) */
+input:checked + .slider .slider-content {
+    transform: translateX(24px);
+    background-color: #32363b;
+    color: #fff;
+}
+
+/* Dark background for track when active */
+input:checked + .slider {
+    background-color: #212529;
+}
