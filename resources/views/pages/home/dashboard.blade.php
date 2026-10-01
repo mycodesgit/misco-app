@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Dashboard
+    MIS Ticketing | Dashboard
 @endsection
 
 @section('body')

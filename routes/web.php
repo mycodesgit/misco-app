@@ -7,6 +7,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TicketRequestController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategorySubController;
+use App\Http\Controllers\OfficeController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\LogoutController;
 
 use App\Http\Controllers\MonitoringDashboardController;
@@ -51,6 +53,20 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::post('/sub/category/view/add',[CategorySubController::class,'create'])->name('subcategory.create');
         Route::post('/sub/category/view/update',[CategorySubController::class,'update'])->name('subcategory.update');
         Route::post('/sub/category/view/delete/{id}', [CategorySubController::class, 'delete'])->name('subcategory.delete');
+
+        Route::get('/office/list', [OfficeController::class, 'index'])->name('office.index');
+        Route::get('/office/list/fetch', [OfficeController::class, 'show'])->name('office.show');
+        Route::post('/office/list/add', [OfficeController::class, 'create'])->name('office.create');
+        Route::post('/office/list/update', [OfficeController::class, 'update'])->name('office.update');
+    });
+
+    Route::prefix('/users')->group(function () {
+        Route::get('/list/view/all',[UserController::class,'index'])->name('user.index');
+        Route::post('/list/view/add',[UserController::class,'create'])->name('user.create');
+        Route::get('/list/view/fetch',[UserController::class,'show'])->name('user.show');
+        Route::post('/list/view/update', [UserController::class, 'update'])->name('user.update');
+        Route::post('/list/updatePass', [UserController::class, 'userUpdatePassword'])->name('userUpdatePassword');
+        Route::post('list/updateStatusnow', [UserController::class, 'userUpdateStatus'])->name('userUpdateStatus');
     });
 
     Route::get('/dashboard/monitoring',[MonitoringDashboardController::class,'index'])->name('monitoring-dashboard.index');

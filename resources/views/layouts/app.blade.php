@@ -203,6 +203,12 @@
         @include('script.mnge.categoryjs')
         @include('script.mnge.categorysubjs')
     @endif
+    @if (request()->routeIs('office.index'))
+        @include('script.mnge.officejs')
+    @endif
+    @if (request()->routeIs('user.index'))
+        @include('script.usr.userjs')
+    @endif
 
 </body>
 </html>

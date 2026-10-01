@@ -3,7 +3,9 @@
 
     $dashActive = in_array($current_route, ['dashboard.index']) ? 'active' : '';
     $ticketsActive = in_array($current_route, ['tickets.index', 'tickets.store']) ? 'active' : '';
-    $categoryActive = in_array($current_route, ['category.index', 'tickets.store']) ? 'active' : '';
+    $categoryActive = in_array($current_route, ['category.index']) ? 'active' : '';
+    $officeActive = in_array($current_route, ['office.index']) ? 'active' : '';
+    $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
 @endphp
 
 <ul class="nav flex-column">
@@ -30,7 +32,7 @@
         <small class="nav-text text-muted">Control Management</small>
     </li>
     <li>
-        <a class="nav-link" href="#" data-tooltip="Offices">
+        <a class="nav-link {{ $officeActive }}" href="{{ route('office.index') }}" data-tooltip="Offices">
             <i class="ti ti-building"></i><span class="nav-text">Offices</span>
         </a>
     </li>
@@ -63,7 +65,7 @@
         <small class="nav-text text-muted">User Management</small>
     </li>
     <li>
-        <a class="nav-link" href="#" data-tooltip="Users">
+        <a class="nav-link {{$usersAllActive}}" href="{{ route('user.index') }}" data-tooltip="Users">
             <i class="ti ti-users"></i><span class="nav-text">Users</span>
         </a>
     </li>
