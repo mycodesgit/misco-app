@@ -199,5 +199,10 @@
         });
     </script>
 
+    @if (request()->routeIs('category.index'))
+        @include('script.mnge.categoryjs')
+        @include('script.mnge.categorysubjs')
+    @endif
+
 </body>
 </html>

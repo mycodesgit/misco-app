@@ -3,6 +3,7 @@
 
     $dashActive = in_array($current_route, ['dashboard.index']) ? 'active' : '';
     $ticketsActive = in_array($current_route, ['tickets.index', 'tickets.store']) ? 'active' : '';
+    $categoryActive = in_array($current_route, ['category.index', 'tickets.store']) ? 'active' : '';
 @endphp
 
 <ul class="nav flex-column">
@@ -34,7 +35,7 @@
         </a>
     </li>
     <li>
-        <a class="nav-link" href="#" data-tooltip="Categories">
+        <a class="nav-link {{ $categoryActive }}" href="{{ route('category.index') }}" data-tooltip="Categories">
             <i class="ti ti-server"></i><span class="nav-text">Categories</span>
         </a>
     </li>
