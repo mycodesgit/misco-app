@@ -42,7 +42,11 @@ class CategoryController extends Controller
             ]);
 
             $categoryName = $request->input('ticketcatname');
-            $existingCategory = Category::where('ticketcatname', $categoryName)->whereIn('status', [1, 2])->first();
+            $categoryType = $request->input('cattype');
+            $existingCategory = Category::where('ticketcatname', $categoryName)
+                    ->where('cattype', $categoryType)
+                    ->whereIn('status', [1, 2])
+                    ->first();
 
             if ($existingCategory) {
                 return response()->json(['error' => true, 'message' => 'Category already exists!'],  404);
@@ -52,6 +56,7 @@ class CategoryController extends Controller
                 $cat = Category::create([
                     'user_id' => Auth::user()->id,
                     'ticketcatname' => $request->input('ticketcatname'),
+                    'cattype' => $request->input('cattype'),
                 ]);
 
                 $userPayload = $cat->toArray();
@@ -75,7 +80,11 @@ class CategoryController extends Controller
 
         try {
             $categoryName = $request->input('ticketcatname');
-            $existingCategory = Category::where('ticketcatname', $categoryName)->where('id', '!=', $request->input('id'))->first();
+            $categoryType = $request->input('cattype');
+            $existingCategory = Category::where('ticketcatname', $categoryName)
+                    ->where('cattype', $categoryType)
+                    ->where('id', '!=', $request->input('id'))
+                    ->first();
 
             if ($existingCategory) {
                 return response()->json(['error' => true, 'message' => 'Category already exists!'], 200);
@@ -85,6 +94,7 @@ class CategoryController extends Controller
             $category->update([
                 'user_id' => Auth::user()->id,
                 'ticketcatname' => $categoryName,
+                'cattype' => $categoryType,
                 'status' => $request->input('status'),
             ]);
 

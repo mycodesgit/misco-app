@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('ticketcatname');
+            $table->enum('cattype', ['IT Support', 'Requester'])->default('IT Support');
             $table->enum('status', ['1', '2', '3'])->default('1');
             $table->timestamps();
         });

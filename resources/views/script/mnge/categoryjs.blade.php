@@ -57,6 +57,7 @@
             paging: true,
             "columns": [
                 {data: 'ticketcatname'},
+                {data: 'cattype'},
                 {data: 'status',
                     render: function(data, type, row) {
                         if (type === 'display') {
@@ -70,7 +71,7 @@
                     data: 'id',
                     render: function(data, type, row) {
                         if (type === 'display') {
-                            var buttons = '<button type="button" class="btn btn-sm btn-success btn-categoryedit mr-1 text-light" data-id="' + row.id + '" data-categoryname="' + row.ticketcatname + '" data-status="' + row.status + '" data-toggle="tooltip" data-placement="top" title="Edit Category.">';
+                            var buttons = '<button type="button" class="btn btn-sm btn-success btn-categoryedit mr-1 text-light" data-id="' + row.id + '" data-categoryname="' + row.ticketcatname + '" data-cattype="' + row.cattype + '" data-status="' + row.status + '" data-toggle="tooltip" data-placement="top" title="Edit Category.">';
                             buttons += '<i class="ti ti-pencil"></i> </button>' +'&nbsp;';
                             buttons += '<button type="button" value="' + data + '" class="btn btn-sm btn-danger category-delete" data-toggle="tooltip" data-placement="top" title="Delete Category."><i class="ti ti-trash"></i> </button>';
                             return buttons;
@@ -96,10 +97,12 @@
     $(document).on('click', '.btn-categoryedit', function() {
         var id = $(this).data('id');
         var categoryName = $(this).data('categoryname');
+        var categoryType = $(this).data('cattype');
         var isStatus = $(this).data('status');
 
         $('#editCategoryId').val(id);
         $('#editCategoryName').val(categoryName);
+        $('#editCategoryType').val(categoryType);
         $('#editIsStatus').val(isStatus);
 
         $('#editCategoryModal').modal('show');

@@ -15,6 +15,7 @@ class Category extends Model
     protected $fillable = [
         'user_id',
         'ticketcatname',
+        'cattype',
         'status',
     ];
     /**

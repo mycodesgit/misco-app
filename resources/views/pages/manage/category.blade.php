@@ -57,6 +57,14 @@
                                                             <label class="form-label fw-semibold">Category Name: <span class="text-danger">*</span></label>
                                                             <input type="text" name="ticketcatname" class="form-control form-control-sm" placeholder="Enter category name" required>
                                                         </div>
+                                                        <div class="col-md-12">
+                                                            <label class="form-label fw-semibold">Category Type: <span class="text-danger">*</span></label>
+                                                            <select name="cattype" class="form-control form-control-sm" required>
+                                                                <option value="">Select Category Type</option>
+                                                                <option value="Requester">Requester</option>
+                                                                <option value="IT Support">IT Support</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -85,6 +93,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Category</th>
+                                                            <th>Category Type</th>
                                                             <th>Status</th>
                                                             <th width="10%">Actions</th>
                                                         </tr>
@@ -192,6 +201,14 @@
                         <div class="col-md-12 mb-3">
                             <label for="editCategoryName" class="form-label fw-semibold">Category Name: <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="editCategoryName" name="ticketcatname" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="editCategoryType" class="form-label fw-semibold">Category Type: <span class="text-danger">*</span></label>
+                            <select name="cattype" id="editCategoryType" class="form-control" required>
+                                <option value="">Select Category Type</option>
+                                <option value="Requester">Requester</option>
+                                <option value="IT Support">IT Support</option>
+                            </select>
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="editIsStatus" class="form-label fw-semibold">Status: <span class="text-danger">*</span></label>
