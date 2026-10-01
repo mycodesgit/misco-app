@@ -58,7 +58,7 @@ class CategoryController extends Controller
 
                 $this->logAudit($request, 'Add_Category', $userPayload);
 
-                return response()->json(['success' => true, 'message' => 'Category stored successfully!'],  200);
+                return response()->json(['success' => true, 'message' => 'Category stored successfully!', 'data' => $cat],  200);
 
             } catch (\Exception $e) {
                 return response()->json(['error' => true, 'message' => 'Failed to store Category!'],  404);

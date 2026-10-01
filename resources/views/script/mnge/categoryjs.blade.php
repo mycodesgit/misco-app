@@ -17,7 +17,7 @@
                     if(response.success) {
                         toastr.success(response.message);
                         console.log(response);
-                        $(document).trigger('categoryAdded');
+                        $(document).trigger('categoryAdded', [response.data]);
                         $('#adCategory')[0].reset();
                     } else {
                         toastr.error(response.message);
@@ -29,6 +29,19 @@
                     toastr.error(errorMessage);
                 }
             });
+        });
+
+        $(document).on('categoryAdded', function(event, category) {
+            if (category && category.id) {
+                // Append the new option and select it automatically
+                var newOption = new Option(category.ticketcatname, category.id, true, true);
+
+                // Using ID selector
+                $('#categoryDropdown').append(newOption).trigger('change');
+
+                // OR if targeting by name attribute across multiple dropdowns:
+                // $('select[name="cat_id"]').append(newOption);
+            }
         });
 
         var dataTable = $('#categoryTable').DataTable({

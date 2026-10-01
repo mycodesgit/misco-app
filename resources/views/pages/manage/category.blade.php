@@ -116,7 +116,7 @@
                                                     <div class="row g-3">
                                                         <div class="col-md-12">
                                                             <label class="form-label fw-semibold">Category Name: <span class="text-danger">*</span></label>
-                                                            <select name="cat_id" class="form-control form-control-sm" required>
+                                                            <select name="cat_id" class="form-control form-control-sm" id="categoryDropdown" required>
                                                                 <option value="">Select Category</option>
                                                                 @foreach ($cat as $category)
                                                                     <option value="{{ $category->id }}">{{ $category->ticketcatname }}</option>
