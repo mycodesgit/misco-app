@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TicketRequestController;
+use App\Http\Controllers\DailyTaskController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategorySubController;
 use App\Http\Controllers\OfficeController;
@@ -40,6 +41,10 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::prefix('/tickets')->group(function () {
         Route::get('/request/view/all',[TicketRequestController::class,'index'])->name('tickets.index');
         Route::get('/request/view/details',[TicketRequestController::class,'store'])->name('tickets.store');
+    });
+
+    Route::prefix('/daily-task')->group(function () {
+        Route::get('/view', [DailyTaskController::class, 'index'])->name('daily-task.index');
     });
 
     Route::prefix('/manage')->group(function () {

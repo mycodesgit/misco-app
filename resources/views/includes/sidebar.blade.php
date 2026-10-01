@@ -3,6 +3,7 @@
 
     $dashActive = in_array($current_route, ['dashboard.index']) ? 'active' : '';
     $ticketsActive = in_array($current_route, ['tickets.index', 'tickets.store']) ? 'active' : '';
+    $dailyTaskActive = in_array($current_route, ['daily-task.index']) ? 'active' : '';
     $categoryActive = in_array($current_route, ['category.index']) ? 'active' : '';
     $officeActive = in_array($current_route, ['office.index']) ? 'active' : '';
     $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
@@ -23,7 +24,7 @@
         </a>
     </li>
     <li>
-        <a class="nav-link" href="#" data-tooltip="Daily Task">
+        <a class="nav-link {{ $dailyTaskActive }}" href="{{ route('daily-task.index') }}" data-tooltip="Daily Task">
             <i class="ti ti-calendar"></i><span class="nav-text">Daily Task</span>
         </a>
     </li>
