@@ -6,6 +6,7 @@
     $dailyTaskActive = in_array($current_route, ['daily-task.index']) ? 'active' : '';
     $categoryActive = in_array($current_route, ['category.index']) ? 'active' : '';
     $officeActive = in_array($current_route, ['office.index']) ? 'active' : '';
+    $accomplishmentActive = in_array($current_route, ['accomplishment-report.index']) ? 'active' : '';
     $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
 @endphp
 
@@ -47,7 +48,7 @@
         <small class="nav-text text-muted">Reports Generation</small>
     </li>
     <li>
-        <a class="nav-link" href="#" data-tooltip="Accomplishment">
+        <a class="nav-link {{ $accomplishmentActive }}" href="{{ route('accomplishment-report.index') }}" data-tooltip="Accomplishment">
             <i class="ti ti-file-type-pdf"></i><span class="nav-text">Accomplishment</span>
         </a>
     </li>

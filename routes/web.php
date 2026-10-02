@@ -9,6 +9,7 @@ use App\Http\Controllers\DailyTaskController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategorySubController;
 use App\Http\Controllers\OfficeController;
+use App\Http\Controllers\AccomplishmentReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LogoutController;
 
@@ -67,6 +68,11 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/office/list/fetch', [OfficeController::class, 'show'])->name('office.show');
         Route::post('/office/list/add', [OfficeController::class, 'create'])->name('office.create');
         Route::post('/office/list/update', [OfficeController::class, 'update'])->name('office.update');
+    });
+
+    Route::prefix('/reports')->group(function () {
+        Route::get('/accomplishment/generate', [AccomplishmentReportController::class, 'index'])->name('accomplishment-report.index');
+        Route::get('/accomplishment/preview', [AccomplishmentReportController::class, 'previewPdf'])->name('accomplishment.preview');
     });
 
     Route::prefix('/users')->group(function () {

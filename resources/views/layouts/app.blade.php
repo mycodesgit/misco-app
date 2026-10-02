@@ -22,6 +22,8 @@
     <!-- Select2 -->
     <link rel="stylesheet" href="{{ asset('uilibs/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('uilibs/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="{{ asset('uilibs/plugins/daterangepicker/daterangepicker.css') }}">
     <!-- DataTables  -->
     <link rel="stylesheet" href="{{ asset('uilibs/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('uilibs/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
@@ -162,6 +164,8 @@
     <script src="{{ asset('uilibs/plugins/select2/js/select2.full.min.js') }}"></script>
     <!-- ChartJS -->
     <script src="{{ asset('uilibs/plugins/chart.js/Chart.min.js') }}"></script>
+    <!-- date-range-picker -->
+    <script src="{{ asset('uilibs/plugins/daterangepicker/daterangepicker.js') }}"></script>
     <!-- Validation JS -->
     <script src="{{ asset('uilibs/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('uilibs/plugins/jquery-validation/additional-methods.min.js') }}"></script>
@@ -188,6 +192,46 @@
                 setTimeout(() => {
                     card.classList.add('show');
                 }, index * 90); // stagger effect
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DateRangePicker
+            $('#reservation').daterangepicker({
+                locale: {
+                    format: 'YYYY-MM-DD'
+                },
+                opens: 'right',
+                autoApply: true,
+                autoUpdateInput: true,
+            });
+
+            // Handle Form Submission to update iframe src
+            $('#reportForm').submit(function(event) {
+                event.preventDefault();
+
+                var dateRange = $('#reservation').val();
+                if (!dateRange) {
+                    toastr.warning('Please select a date range.');
+                    return;
+                }
+
+                // Split daterangepicker output "YYYY-MM-DD - YYYY-MM-DD"
+                var dates = dateRange.split(' - ');
+                var startDate = dates[0];
+                var endDate = dates[1];
+
+                // Build PDF view route with parameters
+                var pdfUrl = "{{ route('accomplishment.preview') }}" + "?start_date=" + startDate + "&end_date=" + endDate;
+
+                // Show PDF Container, Hide Placeholder
+                $('#noReportIcon').hide();
+                $('#pdfContainer').show();
+
+                // Set Iframe src
+                $('#pdfIframe').attr('src', pdfUrl);
             });
         });
     </script>
