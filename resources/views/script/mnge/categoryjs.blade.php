@@ -100,10 +100,20 @@
         var categoryType = $(this).data('cattype');
         var isStatus = $(this).data('status');
 
+        if (typeof categoryType === 'string') {
+            try {
+                categoryType = JSON.parse(categoryType); // Handles '["Requester","IT Support"]'
+            } catch (e) {
+                categoryType = categoryType.split(','); // Handles "Requester,IT Support"
+            }
+        }
+
         $('#editCategoryId').val(id);
         $('#editCategoryName').val(categoryName);
         $('#editCategoryType').val(categoryType);
         $('#editIsStatus').val(isStatus);
+
+        $('#editCategoryType').val(categoryType).trigger('change');
 
         $('#editCategoryModal').modal('show');
     });

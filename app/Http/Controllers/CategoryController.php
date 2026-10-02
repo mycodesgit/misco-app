@@ -82,7 +82,7 @@ class CategoryController extends Controller
             $categoryName = $request->input('ticketcatname');
             $categoryType = $request->input('cattype');
             $existingCategory = Category::where('ticketcatname', $categoryName)
-                    ->where('cattype', $categoryType)
+                    ->whereJsonContains('cattype', $categoryType)
                     ->where('id', '!=', $request->input('id'))
                     ->first();
 

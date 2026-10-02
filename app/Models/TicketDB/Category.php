@@ -23,6 +23,7 @@ class Category extends Model
      */
     protected $casts = [
         'status' => 'integer',
+        'cattype' => 'array',
     ];
 
     public function user()
