@@ -11,6 +11,7 @@ use App\Http\Controllers\CategorySubController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\AccomplishmentReportController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserRolesController;
 use App\Http\Controllers\LogoutController;
 
 use App\Http\Controllers\MonitoringDashboardController;
@@ -82,6 +83,13 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::post('/list/view/update', [UserController::class, 'update'])->name('user.update');
         Route::post('/list/updatePass', [UserController::class, 'userUpdatePassword'])->name('userUpdatePassword');
         Route::post('list/updateStatusnow', [UserController::class, 'userUpdateStatus'])->name('userUpdateStatus');
+    });
+
+    Route::prefix('/roles')->group(function () {
+        Route::get('/user/view/all',[UserRolesController::class,'index'])->name('roles.index');
+        Route::post('/user/view/add',[UserRolesController::class,'create'])->name('roles.create');
+        Route::get('/user/view/fetch',[UserRolesController::class,'show'])->name('roles.show');
+        Route::post('/user/view/update', [UserRolesController::class, 'update'])->name('roles.update');
     });
 
     Route::get('/dashboard/monitoring',[MonitoringDashboardController::class,'index'])->name('monitoring-dashboard.index');

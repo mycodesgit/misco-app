@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Jenssegers\Agent\Agent;
 
 use App\Models\TicketDB\User;
+use App\Models\TicketDB\UserRole;
 use App\Models\TicketDB\Office;
 use App\Models\TicketDB\AuditTrailUser;
 
@@ -23,8 +24,11 @@ class UserController extends Controller
     {
         $users = User::with('office')->get();
         $offices = Office::all();
+        $roles = UserRole::when(Auth::user()->role !== 'Administrator', function ($query) {
+            $query->where('rolename', '!=', 'Administrator');
+        })->get();
 
-        return view('pages.user.list', compact('users', 'offices'));
+        return view('pages.user.list', compact('users', 'offices', 'roles'));
     }
 
     public function create(Request $request)

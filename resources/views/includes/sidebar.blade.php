@@ -8,6 +8,7 @@
     $officeActive = in_array($current_route, ['office.index']) ? 'active' : '';
     $accomplishmentActive = in_array($current_route, ['accomplishment-report.index']) ? 'active' : '';
     $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
+    $rolesAllActive = in_array($current_route, ['roles.index']) ? 'active' : '';
 @endphp
 
 <ul class="nav flex-column">
@@ -63,12 +64,19 @@
         </a>
     </li>
 
-    <li class="px-4 py-2">
-        <small class="nav-text text-muted">User Management</small>
-    </li>
-    <li>
-        <a class="nav-link {{$usersAllActive}}" href="{{ route('user.index') }}" data-tooltip="Users">
-            <i class="ti ti-users"></i><span class="nav-text">Users</span>
-        </a>
-    </li>
+    @if(Auth::guard('web')->user()->role == 'Administrator')
+        <li class="px-4 py-2">
+            <small class="nav-text text-muted">User Management</small>
+        </li>
+        <li>
+            <a class="nav-link {{$usersAllActive}}" href="{{ route('user.index') }}" data-tooltip="Users">
+                <i class="ti ti-users"></i><span class="nav-text">Users</span>
+            </a>
+        </li>
+        <li>
+            <a class="nav-link {{ $rolesAllActive }}" href="{{ route('roles.index') }}">
+                <i class="ti ti-id-badge"></i><span class="nav-text">User Roles</span>
+            </a>
+        </li> 
+    @endif
 </ul>

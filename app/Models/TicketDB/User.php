@@ -60,6 +60,10 @@ class User extends Authenticatable
     {
         return $this->role === $role;
     }
+    public function isAdmin(): bool
+    {
+        return $this->role === 'Administrator'; 
+    }
     public function office()
     {
         return $this->belongsTo(Office::class, 'office_id');

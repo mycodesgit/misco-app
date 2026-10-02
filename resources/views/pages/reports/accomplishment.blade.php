@@ -12,7 +12,7 @@
                 <!-- Dashboard Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
-                        <h1 class="h4 fw-bold mb-1">IT Support Accomplishment Report</h1>
+                        <h1 class="h4 fw-bold mb-1">{{ auth()->user()->pageTitle('Ticketing Accomplishment Report') }}</h1>
                         <p class="text-muted small mb-0">Generate your accomplishment reports.</p>
                     </div>
                     <div class="d-flex gap-2">

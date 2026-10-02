@@ -168,11 +168,11 @@
                                 <label class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
                                 <select class="form-control form-control-sm" name="role" required>
                                     <option value="" selected disabled>--- Select Role ---</option>
-                                    @if(Auth::check() && Auth::user()->role == 'Administrator')
-                                        <option value="Administrator">Administrator</option>
-                                    @endif
-                                    <option value="IT Support">IT Support</option>
-                                    <option value="Requester">Requester</option>
+                                    @foreach ($roles as $role)
+                                        <option value="{{ $role->rolename }}">
+                                            {{ $role->rolename }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -292,11 +292,11 @@
                                 <label for="editrole" class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
                                 <select name="role" class="form-control form-control-sm" id="editrole" required>
                                     <option value="">--- Select Role ---</option>
-                                    @if(Auth::check() && Auth::user()->role == 'Administrator')
-                                        <option value="Administrator">Administrator</option>
-                                    @endif
-                                    <option value="IT Support">IT Support</option>
-                                    <option value="Requester">Requester</option>
+                                    @foreach ($roles as $role)
+                                        <option value="{{ $role->rolename }}">
+                                            {{ $role->rolename }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
 
