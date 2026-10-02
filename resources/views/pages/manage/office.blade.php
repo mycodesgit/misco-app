@@ -90,7 +90,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h6 class="modal-title" id="editOfficeModalLabel">Edit Office Name</h6>
+                    <h6 class="modal-title" id="editOfficeModalLabel"><i class="ti ti-pencil"></i> Edit Office Name</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="editOfficeForm">

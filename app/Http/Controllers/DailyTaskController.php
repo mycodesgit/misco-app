@@ -31,10 +31,22 @@ class DailyTaskController extends Controller
         return view('pages.task.daily', compact('cat', 'subcat'));
     }
 
-    public function show()
+    public function show(Request $request)
     {
-        $data = DailyTask::with(['user', 'category', 'subcategory'])
-            ->get();
+        $query = DailyTask::with(['user', 'category', 'subcategory']);
+
+        // Filter by month if selected
+        if ($request->has('month') && !empty($request->month)) {
+            $month = $request->month;
+            $year = now()->year;
+
+            $query->where(function($q) use ($month, $year) {
+                $q->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+            });
+        }
+
+        $data = $query->orderBy('id', 'DESC')->get();
 
         return response()->json(['data' => $data]);
     }

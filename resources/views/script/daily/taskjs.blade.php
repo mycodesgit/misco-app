@@ -102,11 +102,18 @@
             });
         });
 
+        var currentMonth = ("0" + (new Date().getMonth() + 1)).slice(-2);
+        $('#filterMonth').val(currentMonth);
+
         // --- DATATABLE INITIALIZATION ---
         var dataTable = $('#dailyTaskTable').DataTable({
             "ajax": {
                 "url": dailyTaskReadRoute,
                 "type": "GET",
+                "data": function (d) {
+                    // Pass selected month to backend
+                    d.month = $('#filterMonth').val();
+                }
             },
             destroy: true,
             info: true,
@@ -178,6 +185,11 @@
             "createdRow": function (row, data, index) {
                 $(row).attr('id', 'tr-' + data.id);
             }
+        });
+
+        // Reload DataTables when month filter changes
+        $('#filterMonth').on('change', function() {
+            dataTable.ajax.reload();
         });
 
         $(document).on('dailyTaskAdded', function() {
