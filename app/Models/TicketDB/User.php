@@ -70,7 +70,9 @@ class User extends Authenticatable
     }
     public function pageTitle(string $title): string
     {
-        $prefix = $this->office->office_abbr ?? 'N/A';
+        $prefix = ($this->role === 'Requester') 
+        ? $this->role 
+        : ($this->office->office_abbr ?? 'N/A');
 
         return trim("{$prefix} {$title}");   
     }

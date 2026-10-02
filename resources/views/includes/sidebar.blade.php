@@ -20,49 +20,57 @@
             <i class="ti ti-layout-grid"></i><span class="nav-text">Dashboard</span>
         </a>
     </li>
-    <li>
-        <a class="nav-link {{ $ticketsActive }}" href="{{ route('tickets.index') }}" data-tooltip="All Tickets">
-            <i class="ti ti-ticket"></i><span class="nav-text">All Tickets</span>
-        </a>
-    </li>
-    <li>
-        <a class="nav-link {{ $dailyTaskActive }}" href="{{ route('daily-task.index') }}" data-tooltip="Daily Task">
-            <i class="ti ti-calendar"></i><span class="nav-text">Daily Task</span>
-        </a>
-    </li>
+    @if(Auth::guard('web')->user()->role != 'Requester')
+        <li>
+            <a class="nav-link {{ $ticketsActive }}" href="{{ route('tickets.index') }}" data-tooltip="All Tickets">
+                <i class="ti ti-ticket"></i><span class="nav-text">All Tickets</span>
+            </a>
+        </li>
+        <li>
+            <a class="nav-link {{ $dailyTaskActive }}" href="{{ route('daily-task.index') }}" data-tooltip="Daily Task">
+                <i class="ti ti-calendar"></i><span class="nav-text">Daily Task</span>
+            </a>
+        </li>
+    @endif
 
-    <li class="px-4 py-2">
-        <small class="nav-text text-muted">Control Management</small>
-    </li>
-    <li>
-        <a class="nav-link {{ $officeActive }}" href="{{ route('office.index') }}" data-tooltip="Offices">
-            <i class="ti ti-building"></i><span class="nav-text">Offices</span>
-        </a>
-    </li>
-    <li>
-        <a class="nav-link {{ $categoryActive }}" href="{{ route('category.index') }}" data-tooltip="Categories">
-            <i class="ti ti-server"></i><span class="nav-text">Categories</span>
-        </a>
-    </li>
-
-    <li class="px-4 py-2">
-        <small class="nav-text text-muted">Reports Generation</small>
-    </li>
-    <li>
-        <a class="nav-link {{ $accomplishmentActive }}" href="{{ route('accomplishment-report.index') }}" data-tooltip="Accomplishment">
-            <i class="ti ti-file-type-pdf"></i><span class="nav-text">Accomplishment</span>
-        </a>
-    </li>
-    <li>
-        <a class="nav-link" href="#" data-tooltip="Client Satisfactory">
-            <i class="ti ti-forms"></i><span class="nav-text">Client Satisfactory</span>
-        </a>
-    </li>
-    <li>
-        <a class="nav-link" href="#" data-tooltip="Client Feedback">
-            <i class="ti ti-file-report"></i><span class="nav-text">Client Feedback</span>
-        </a>
-    </li>
+    @if(Auth::guard('web')->user()->role != 'Requester')
+        <li class="px-4 py-2">
+            <small class="nav-text text-muted">Control Management</small>
+        </li>
+        @if(Auth::guard('web')->user()->role == 'Administrator')
+            <li>
+                <a class="nav-link {{ $officeActive }}" href="{{ route('office.index') }}" data-tooltip="Offices">
+                    <i class="ti ti-building"></i><span class="nav-text">Offices</span>
+                </a>
+            </li>
+        @endif
+        <li>
+            <a class="nav-link {{ $categoryActive }}" href="{{ route('category.index') }}" data-tooltip="Categories">
+                <i class="ti ti-server"></i><span class="nav-text">Categories</span>
+            </a>
+        </li>
+    @endif
+    
+    @if(Auth::guard('web')->user()->role != 'Requester')
+        <li class="px-4 py-2">
+            <small class="nav-text text-muted">Reports Generation</small>
+        </li>
+        <li>
+            <a class="nav-link {{ $accomplishmentActive }}" href="{{ route('accomplishment-report.index') }}" data-tooltip="Accomplishment">
+                <i class="ti ti-file-type-pdf"></i><span class="nav-text">Accomplishment</span>
+            </a>
+        </li>
+        <li>
+            <a class="nav-link" href="#" data-tooltip="Client Satisfactory">
+                <i class="ti ti-forms"></i><span class="nav-text">Client Satisfactory</span>
+            </a>
+        </li>
+        <li>
+            <a class="nav-link" href="#" data-tooltip="Client Feedback">
+                <i class="ti ti-file-report"></i><span class="nav-text">Client Feedback</span>
+            </a>
+        </li>
+    @endif
 
     @if(Auth::guard('web')->user()->role == 'Administrator')
         <li class="px-4 py-2">
