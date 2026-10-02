@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('fname');
             $table->string('mname')->nullable();
             $table->string('lname');
+            $table->string('ext')->nullable();
             $table->string('email')->unique();
             $table->string('password');
             $table->string('role');

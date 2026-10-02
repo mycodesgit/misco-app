@@ -27,6 +27,7 @@ class User extends Authenticatable
         'lname',
         'fname',
         'mname',
+        'ext',
         'email',
         'password',
         'role',
@@ -56,18 +57,22 @@ class User extends Authenticatable
         'password' => 'hashed',
         'ustatus'  => 'integer',
     ];
+    
     public function hasRole($role)
     {
         return $this->role === $role;
     }
+
     public function isAdmin(): bool
     {
         return $this->role === 'Administrator'; 
     }
+
     public function office()
     {
         return $this->belongsTo(Office::class, 'office_id');
     }
+
     public function pageTitle(string $title): string
     {
         $prefix = ($this->role === 'Requester') 

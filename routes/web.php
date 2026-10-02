@@ -42,6 +42,10 @@ Route::group(['middleware'=>['login_auth']],function(){
 
     Route::prefix('/tickets')->group(function () {
         Route::get('/request/view/all',[TicketRequestController::class,'index'])->name('tickets.index');
+        Route::get('/request/view/all/fetch/pending',[TicketRequestController::class,'showpending'])->name('tickets.showpending');
+        Route::get('/request/view/all/fetch/progress',[TicketRequestController::class,'showprogress'])->name('tickets.showprogress');
+        Route::get('/request/view/all/fetch/resolved',[TicketRequestController::class,'showresolved'])->name('tickets.showresolved');
+        Route::get('/request/view/all/fetch/closed',[TicketRequestController::class,'showclosed'])->name('tickets.showclosed');
         Route::get('/request/view/details',[TicketRequestController::class,'store'])->name('tickets.store');
     });
 

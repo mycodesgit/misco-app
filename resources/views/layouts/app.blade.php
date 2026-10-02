@@ -243,6 +243,9 @@
         });
     </script>
 
+    @if (request()->routeIs('tickets.index'))
+        @include('script.ticket.requestjs')
+    @endif
     @if (request()->routeIs('daily-task.index'))
         @include('script.daily.taskjs')
     @endif

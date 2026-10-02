@@ -10,7 +10,7 @@ class DailyTicketRequest extends Model
     use HasFactory;
 
     protected $primaryKey = 'id';
-    protected $table = 'dailyticketrequests';
+    protected $table = 'dailyticketrequest';
 
     protected $fillable = [
         'user_id',

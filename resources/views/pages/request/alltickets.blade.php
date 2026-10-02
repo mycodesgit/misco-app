@@ -22,76 +22,149 @@
 
                 <div class="row g-3 mb-5">
                     <div class="col-md-12">
-                        <div class="card card-animate">
-                            <div class="card-header pt-3">
-                                <h6 class="card-title">
-                                    <i class="fas fa-server"></i> List of all Ticket Section
-                                </h6>
+                        <ul class="nav nav-pills bg-light p-2 card-animate rounded-2 d-inline-flex mb-2" id="pills-tab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="pills-one-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-one" type="button" role="tab"
+                                    aria-controls="pills-one" aria-selected="true">
+                                    Pending Tickets
+                                </button>
+                            </li>
+                            &nbsp;
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-two-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-two" type="button" role="tab"
+                                    aria-controls="pills-two" aria-selected="false" tabindex="-1">
+                                    In Progress Tickets
+                                </button>
+                            </li>
+                            &nbsp;
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-three-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-three" type="button" role="tab"
+                                    aria-controls="pills-three" aria-selected="false" tabindex="-1">
+                                    Resolved Tickets
+                                </button>
+                            </li>
+                            &nbsp;
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-four-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-four" type="button" role="tab"
+                                    aria-controls="pills-four" aria-selected="false" tabindex="-1">
+                                    Closed Tickets
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="pills-one" role="tabpanel" aria-labelledby="pills-one-tab" tabindex="0">
+                                <div class="card card-animate">
+                                    <div class="card-header pt-3">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-server"></i> List of all Pending Ticket Section
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <table id="ticketpendingTable" class="table table-hover" style="width: 100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ticket No.</th>
+                                                    <th>Requester</th>
+                                                    <th>Subject</th>
+                                                    <th>Category</th>
+                                                    <th>Sub-Category</th>
+                                                    <th>Status</th>
+                                                    <th width="10%">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <table id="categoryTable" class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Ticket No.</th>
-                                            <th>Requester</th>
-                                            <th>Subject</th>
-                                            <th>Category</th>
-                                            <th>Sub-Category</th>
-                                            <th>Status</th>
-                                            <th width="10%">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="fw-bold">#TK-8942</td>
-                                            <td>
-                                                <div class="fw-semibold">Database Connection Timeout</div>
-                                                <small class="text-muted"><i class="ti ti-server me-1"></i> Infrastructure</small>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="avatar-circle-sm bg-primary text-white fw-bold">MS</div>
-                                                    <div>
-                                                        <div class="fw-semibold small">Maria Santos</div>
-                                                        <small class="text-muted">Registrar Dept</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge bg-danger rounded-pill"><i class="ti ti-alert-triangle me-1"></i> High</span></td>
-                                            <td class="small text-muted">10 mins ago</td>
-                                            <td><span class="badge bg-primary"><i class="ti ti-alert-triangle me-1"></i> New Ticket</span></td>
-                                            <td>
-                                                <a href="{{ url('/tickets/8942') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
-                                                    <i class="ti ti-eye me-1"></i> View
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-bold">#TK-8941</td>
-                                            <td>
-                                                <div class="fw-semibold">Network Printer Offline</div>
-                                                <small class="text-muted"><i class="ti ti-printer me-1"></i> Hardware</small>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <div class="avatar-circle-sm bg-info text-white fw-bold">JD</div>
-                                                    <div>
-                                                        <div class="fw-semibold small">John Doe</div>
-                                                        <small class="text-muted">Finance Office</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge bg-warning text-dark rounded-pill">Medium</span></td>
-                                            <td class="small text-muted">1 hour ago</td>
-                                            <td><span class="badge bg-primary"><i class="ti ti-alert-triangle me-1"></i> New Ticket</span></td>
-                                            <td>
-                                                <a href="{{ url('/tickets/8941') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
-                                                    <i class="ti ti-eye me-1"></i> View
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="tab-pane fade" id="pills-two" role="tabpanel" aria-labelledby="pills-two-tab" tabindex="0">
+                                <div class="card card-animate">
+                                    <div class="card-header pt-3">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-server"></i> List of all In-progress Ticket Section
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <table id="ticketprogressTable" class="table table-hover" style="width: 100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ticket No.</th>
+                                                    <th>Requester</th>
+                                                    <th>Subject</th>
+                                                    <th>Category</th>
+                                                    <th>Sub-Category</th>
+                                                    <th>Status</th>
+                                                    <th width="10%">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-three" role="tabpanel" aria-labelledby="pills-three-tab" tabindex="0">
+                                <div class="card card-animate">
+                                    <div class="card-header pt-3">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-server"></i> List of all Resolved Ticket Section
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <table id="ticketresolvedTable" class="table table-hover" style="width: 100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ticket No.</th>
+                                                    <th>Requester</th>
+                                                    <th>Subject</th>
+                                                    <th>Category</th>
+                                                    <th>Sub-Category</th>
+                                                    <th>Status</th>
+                                                    <th width="10%">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-four" role="tabpanel" aria-labelledby="pills-four-tab" tabindex="0">
+                                <div class="card card-animate">
+                                    <div class="card-header pt-3">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-server"></i> List of all Closed Ticket Section
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <table id="ticketclosedTable" class="table table-hover" style="width: 100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ticket No.</th>
+                                                    <th>Requester</th>
+                                                    <th>Subject</th>
+                                                    <th>Category</th>
+                                                    <th>Sub-Category</th>
+                                                    <th>Status</th>
+                                                    <th width="10%">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -111,4 +184,12 @@
             font-size: 0.75rem;
         }
     </style>
+
+    <script>
+        var ticketPendingReadRoute = "{{ route('tickets.showpending') }}";
+        var ticketProgressRoute = "{{ route('tickets.showprogress') }}";
+        var ticketResolvedRoute = "{{ route('tickets.showresolved') }}";
+        var ticketClosedRoute = "{{ route('tickets.showclosed') }}";
+        var ticketCreateRoute = "";
+    </script>
 @endsection
