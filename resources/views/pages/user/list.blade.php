@@ -143,10 +143,20 @@
                         <!-- Section 3: Organizational Assignment -->
                         <h6 class="text-uppercase text-muted fw-bold mb-3 small">3. Organizational Role & Location</h6>
                         <div class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label fw-semibold">Campus <span class="text-danger">*</span></label>
                                 <select name="campus_id" class="form-control form-control-sm">
                                     <option value="" selected disabled>--- Select Campus ---</option>
+                                    <option value="MC">Main</option>
+                                    <option value="VC">Victorias</option>
+                                    <option value="SCC">San Carlos</option>
+                                    <option value="HC">Hinigaran</option>
+                                    <option value="MP">Moises Padilla</option>
+                                    <option value="IC">Ilog</option>
+                                    <option value="CA">Candoni</option>
+                                    <option value="CC">Cauayan</option>
+                                    <option value="SC">Sipalay</option>
+                                    <option value="HinC">Hinobaan</option>
                                     {{-- Loop through campuses --}}
                                     {{-- @foreach($campuses as $campus) --}}
                                     {{--    <option value="{{ $campus->id }}">{{ $campus->campus_name }}</option> --}}
@@ -154,30 +164,25 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Office <span class="text-danger">*</span></label>
-                                <select class="form-control form-control-sm" name="office_id">
-                                    <option value="" selected disabled>--- Select Office ---</option>
-                                    @foreach ($offices as $data)
-                                        <option value="{{ $data->id }}">{{ $data->office_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
                                 <select class="form-control form-control-sm" name="role" required>
                                     <option value="" selected disabled>--- Select Role ---</option>
                                     @if(Auth::check() && Auth::user()->role == 'Administrator')
                                         <option value="Administrator">Administrator</option>
                                     @endif
-                                    <option value="Budget Officer">Budget Officer</option>
-                                    <option value="Procurement Officer">Procurement Officer</option>
-                                    <option value="Campus Admin">Campus Admin</option>
-                                    <option value="Dean">Dean</option>
-                                    <option value="Office Head">Office Head</option>
-                                    <option value="Checker">Checker</option>
-                                    <option value="MIS Checker">MIS Checker</option>
+                                    <option value="IT Support">IT Support</option>
+                                    <option value="Requester">Requester</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Office <span class="text-danger">*</span></label>
+                                <select class="form-control form-control-sm select2" name="office_id">
+                                    <option value="" selected disabled>--- Select Office ---</option>
+                                    @foreach ($offices as $data)
+                                        <option value="{{ $data->id }}">{{ $data->office_name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -260,7 +265,7 @@
 
                             <div class="col-md-4">
                                 <label for="editoffice" class="form-label fw-semibold">Office <span class="text-danger">*</span></label>
-                                <select name="office_id" id="editoffice" class="form-control form-control-sm">
+                                <select name="office_id" id="editoffice" class="form-control form-control-sm select2" required>
                                     <option value="" disabled>--- Select Office ---</option>
                                     @foreach ($offices as $dataoff)
                                         <option value="{{ $dataoff->id }}">{{ $dataoff->office_abbr }}</option>
@@ -290,13 +295,8 @@
                                     @if(Auth::check() && Auth::user()->role == 'Administrator')
                                         <option value="Administrator">Administrator</option>
                                     @endif
-                                    <option value="Budget Officer">Budget Officer</option>
-                                    <option value="Procurement Officer">Procurement Officer</option>
-                                    <option value="Campus Admin">Campus Admin</option>
-                                    <option value="Dean">Dean</option>
-                                    <option value="Office Head">Office Head</option>
-                                    <option value="Checker">Checker</option>
-                                    <option value="MIS Checker">MIS Checker</option>
+                                    <option value="IT Support">IT Support</option>
+                                    <option value="Requester">Requester</option>
                                 </select>
                             </div>
 
@@ -304,9 +304,16 @@
                                 <label for="editcampus" class="form-label fw-semibold">Campus <span class="text-danger">*</span></label>
                                 <select name="campus_id" class="form-control form-control-sm" id="editcampus">
                                     <option value="" disabled>--- Select Campus ---</option>
-                                    {{-- @foreach ($camp as $datacamp)
-                                        <option value="{{ $datacamp->id }}">{{ $datacamp->campus_name }}</option>
-                                    @endforeach --}}
+                                    <option value="MC">Main</option>
+                                    <option value="VC">Victorias</option>
+                                    <option value="SCC">San Carlos</option>
+                                    <option value="HC">Hinigaran</option>
+                                    <option value="MP">Moises Padilla</option>
+                                    <option value="IC">Ilog</option>
+                                    <option value="CA">Candoni</option>
+                                    <option value="CC">Cauayan</option>
+                                    <option value="SC">Sipalay</option>
+                                    <option value="HinC">Hinobaan</option>
                                 </select>
                             </div>
 

@@ -46,7 +46,7 @@
             "columns": [
                 {data: 'lname'},
                 {data: 'fname'},
-                {data: 'mname'},
+                {data: 'mname', defaultContent: '<i>-</i>'},
                 // {data: 'campus_name'},
                 // {data: 'office_abbr'},
                 {data: 'email'},
@@ -115,7 +115,7 @@
         $('#editlastname').val(lName);
         $('#editextension').val(extension);
         $('#edituseremail').val(email);
-        $('#editoffice').val(office);
+        $('#editoffice').val(office).trigger('change');
         $('#editgender').val(gender);
         $('#editrole').val(role);
         $('#editcampus').val(campus);
