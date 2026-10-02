@@ -73,32 +73,41 @@
                     </div>
                     <div class="col-md-8">
                         <div class="card card-animate">
-                            <div class="card-header pt-3">
-                                <h6 class="card-title">
-                                    <i class="fas fa-server"></i> Daily Task List Section
+                            <div class="card-header pt-3 d-flex justify-content-between align-items-center">
+                                <h6 class="card-title mb-0">
+                                    <i class="ti ti-server"></i> Daily Task List Section
                                 </h6>
+
+                                <!-- Filter Container with inline label -->
+                                <div class="d-flex align-items-center gap-2">
+                                    <label for="filterMonth" class="form-label mb-0 text-nowrap">Filter by Month:</label>
+                                    <select id="filterMonth" class="form-select form-select-sm" style="width: 160px;">
+                                        <option value="">All Months</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                    <label for="filterYear" class="form-label mb-0 text-nowrap">Year:</label>
+                                    <select id="filterYear" class="form-select form-select-sm" style="width: 100px;">
+                                        @php
+                                            $currentYear = date('Y');
+                                        @endphp
+                                        @for ($y = $currentYear; $y >= $currentYear - 5; $y--)
+                                            <option value="{{ $y }}">{{ $y }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="row mb-3 align-items-center">
-                                    <div class="col-md-3">
-                                        <label for="filterMonth" class="form-label fw-semibold">Filter by Month:</label>
-                                        <select id="filterMonth" class="form-select form-select-sm">
-                                            <option value="">All Months</option>
-                                            <option value="01">January</option>
-                                            <option value="02">February</option>
-                                            <option value="03">March</option>
-                                            <option value="04">April</option>
-                                            <option value="05">May</option>
-                                            <option value="06">June</option>
-                                            <option value="07">July</option>
-                                            <option value="08">August</option>
-                                            <option value="09">September</option>
-                                            <option value="10">October</option>
-                                            <option value="11">November</option>
-                                            <option value="12">December</option>
-                                        </select>
-                                    </div>
-                                </div>
                                 <table id="dailyTaskTable" class="table table-hover" style="width: 100%">
                                     <thead>
                                         <tr>

@@ -36,14 +36,16 @@ class DailyTaskController extends Controller
         $query = DailyTask::with(['user', 'category', 'subcategory']);
 
         // Filter by month if selected
+        $year = $request->input('year', now()->year);
+
         if ($request->has('month') && !empty($request->month)) {
             $month = $request->month;
-            $year = now()->year;
 
-            $query->where(function($q) use ($month, $year) {
-                $q->whereMonth('created_at', $month)
+            $query->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year);
-            });
+        } else {
+            // If "All Months" is selected, filter by the chosen year
+            $query->whereYear('created_at', $year);
         }
 
         $data = $query->orderBy('id', 'DESC')->get();

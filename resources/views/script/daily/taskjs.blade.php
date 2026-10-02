@@ -102,8 +102,12 @@
             });
         });
 
-        var currentMonth = ("0" + (new Date().getMonth() + 1)).slice(-2);
+        var now = new Date();
+        var currentMonth = ("0" + (now.getMonth() + 1)).slice(-2);
+        var currentYear = now.getFullYear();
+
         $('#filterMonth').val(currentMonth);
+        $('#filterYear').val(currentYear);
 
         // --- DATATABLE INITIALIZATION ---
         var dataTable = $('#dailyTaskTable').DataTable({
@@ -113,6 +117,7 @@
                 "data": function (d) {
                     // Pass selected month to backend
                     d.month = $('#filterMonth').val();
+                    d.year = $('#filterYear').val();
                 }
             },
             destroy: true,
@@ -188,7 +193,7 @@
         });
 
         // Reload DataTables when month filter changes
-        $('#filterMonth').on('change', function() {
+        $('#filterMonth, #filterYear').on('change', function() {
             dataTable.ajax.reload();
         });
 
