@@ -199,6 +199,9 @@
         });
     </script>
 
+    @if (request()->routeIs('daily-task.index'))
+        @include('script.daily.taskjs')
+    @endif
     @if (request()->routeIs('category.index'))
         @include('script.mnge.categoryjs')
         @include('script.mnge.categorysubjs')

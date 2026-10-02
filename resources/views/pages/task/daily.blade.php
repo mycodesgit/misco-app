@@ -32,24 +32,38 @@
                                 </h6>
                             </div>
                             <div class="card-body">
-                                <form method="POST" id="addRole">
+                                <form method="POST" id="adDailyTask">
                                     @csrf
 
                                     <div class="form-group mb-3">
                                         <div class="row g-3">
                                             <div class="col-md-12">
-                                                <label class="form-label fw-semibold">Role Name: <span class="text-danger">*</span></label>
-                                                <input type="text" name="rolename" class="form-control form-control-sm" oninput="var words = this.value.split(' '); for(var i = 0; i < words.length; i++){ words[i] = words[i].substr(0,1).toUpperCase() + words[i].substr(1); } this.value = words.join(' ');" placeholder="Enter role name" required>
+                                                <label class="form-label fw-semibold">Category: <span class="text-danger">*</span></label>
+                                                <select name="cat_id" id="categorySelect" class="form-control" required>
+                                                    <option value="" disabled selected>Select Category</option>
+                                                    @foreach($cat as $category)
+                                                        <option value="{{ $category->id }}">{{ $category->ticketcatname }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label class="form-label fw-semibold">Sub Category: <span class="text-danger">*</span></label>
+                                                <select name="subcat_id" id="subcategorySelect" class="form-control" required disabled>
+                                                    <option value="" disabled selected>Select Sub Category</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label class="form-label fw-semibold">Task: <span class="text-danger">*</span></label>
+                                                <textarea name="dailytaskdesc" rows="4" class="form-control" placeholder="Enter task details" required></textarea>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <div class="form-row">
-                                            <div class="col-md-12">
-                                                <button type="submit" class="btn btn-outline-success">
-                                                    <i class="fas fa-save"></i> Save
-                                                </button>
+                                        <div class="row">
+                                            <div class="col-md-12 d-flex justify-content-between">
+                                                <button type="reset" class="btn btn-light"><i class="ti ti-restore"></i> Clear</button>
+                                                <button type="submit" class="btn btn-success"><i class="ti ti-device-floppy"></i>  Save</button>
                                             </div>
                                         </div>
                                     </div>
@@ -61,15 +75,18 @@
                         <div class="card card-animate">
                             <div class="card-header pt-3">
                                 <h6 class="card-title">
-                                    <i class="fas fa-list"></i> List
+                                    <i class="fas fa-server"></i> Daily Task List Section
                                 </h6>
                             </div>
                             <div class="card-body">
-                                <table id="rolesTable" class="table table-hover">
+                                <table id="dailyTaskTable" class="table table-hover" style="width: 100%">
                                     <thead>
                                         <tr>
-                                            <th>Role Name</th>
+                                            <th>Category</th>
+                                            <th>Sub Category</th>
+                                            <th>Task</th>
                                             <th>Status</th>
+                                            <th>Completed</th>
                                             <th width="10%">Actions</th>
                                         </tr>
                                     </thead>
@@ -84,4 +101,64 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="editDailyTaskModal" tabindex="-1" role="dialog" aria-labelledby="editDailyTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title" id="editDailyTaskModalLabel">
+                        <i class="ti ti-pencil"></i> Edit Daily Task
+                    </h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editDailyTaskForm">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="editDailyTaskId">
+                        <div class="col-md-12 mb-3">
+                            <label for="editDailyTaskDescription" class="form-label fw-semibold">Task Description: <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="editDailyTaskDescription" name="dailytaskdesc" required></textarea>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="editDailyTaskCategory" class="form-label fw-semibold">Category: <span class="text-danger">*</span></label>
+                            <select name="cat_id" id="editDailyTaskCategory" class="form-control" required>
+                                <option value="">Select Category</option>
+                                @foreach($cat as $category)
+                                    <option value="{{ $category->id }}">{{ $category->ticketcatname }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="editDailyTaskSubcategory" class="form-label fw-semibold">Sub Category: <span class="text-danger">*</span></label>
+                            <select name="subcat_id" id="editDailyTaskSubcategory" class="form-control" required>
+                                <option value="">Select Sub Category</option>
+                                @foreach($subcat as $subcategory)
+                                    <option value="{{ $subcategory->id }}">{{ $subcategory->ticketsubcatname }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="editDailyTaskStatus" class="form-label fw-semibold">Status: <span class="text-danger">*</span></label>
+                            <select name="status" id="editDailyTaskStatus" class="form-control" required>
+                                <option value="">Select Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var subcategorySelect = "{{ route('daily-task.getSubcategories', ['categoryId' => ':categoryId']) }}";
+        var dailyTaskCreateRoute = "{{ route('daily-task.create') }}";
+        var dailyTaskReadRoute = "{{ route('daily-task.show') }}";
+        var dailyTaskUpdateRoute = "{{ route('daily-task.update') }}";
+    </script>
 @endsection

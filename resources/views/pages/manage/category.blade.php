@@ -55,7 +55,7 @@
                                                     <div class="row g-3">
                                                         <div class="col-md-12">
                                                             <label class="form-label fw-semibold">Category Name: <span class="text-danger">*</span></label>
-                                                            <input type="text" name="ticketcatname" class="form-control form-control-sm" placeholder="Enter category name" required>
+                                                            <input type="text" name="ticketcatname" oninput="var words = this.value.split(' '); for(var i = 0; i < words.length; i++){ words[i] = words[i].substr(0,1).toUpperCase() + words[i].substr(1); } this.value = words.join(' ');" class="form-control form-control-sm" placeholder="Enter category name" required>
                                                         </div>
                                                         <div class="col-md-12">
                                                             <label class="form-label fw-semibold">Category Type: <span class="text-danger">*</span></label>
@@ -200,7 +200,7 @@
                         <input type="hidden" name="id" id="editCategoryId">
                         <div class="col-md-12 mb-3">
                             <label for="editCategoryName" class="form-label fw-semibold">Category Name: <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editCategoryName" name="ticketcatname" required>
+                            <input type="text" class="form-control" oninput="var words = this.value.split(' '); for(var i = 0; i < words.length; i++){ words[i] = words[i].substr(0,1).toUpperCase() + words[i].substr(1); } this.value = words.join(' ');" id="editCategoryName" name="ticketcatname" required>
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="editCategoryType" class="form-label fw-semibold">Category Type: <span class="text-danger">*</span></label>

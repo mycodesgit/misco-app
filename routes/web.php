@@ -45,6 +45,10 @@ Route::group(['middleware'=>['login_auth']],function(){
 
     Route::prefix('/daily-task')->group(function () {
         Route::get('/view', [DailyTaskController::class, 'index'])->name('daily-task.index');
+        Route::get('/get-subcategories/{categoryId}', [DailyTaskController::class, 'getSubcategories'])->name('daily-task.getSubcategories');
+        Route::post('/create', [DailyTaskController::class, 'create'])->name('daily-task.create');
+        Route::get('/show', [DailyTaskController::class, 'show'])->name('daily-task.show');
+        Route::post('/update', [DailyTaskController::class, 'update'])->name('daily-task.update');
     });
 
     Route::prefix('/manage')->group(function () {
