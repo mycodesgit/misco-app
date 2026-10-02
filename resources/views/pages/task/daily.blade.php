@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    MIS Ticketing | Daily Task
+    {{ auth()->user()->pageTitle('Ticketing Daily Task') }}
 @endsection
 
 @section('body')
@@ -12,7 +12,7 @@
                 <!-- Dashboard Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
-                        <h1 class="h4 fw-bold mb-1">IT Support Daily Task</h1>
+                        <h1 class="h4 fw-bold mb-1">{{ auth()->user()->pageTitle('Daily Tasks') }}</h1>
                         <p class="text-muted small mb-0">Manage your daily tasks and activities.</p>
                     </div>
                     <div class="d-flex gap-2">

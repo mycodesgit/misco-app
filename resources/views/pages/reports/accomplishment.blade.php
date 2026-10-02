@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    MIS Ticketing | Accomplishment Report
+    {{ auth()->user()->pageTitle('Ticketing Accomplishment Report') }}
 @endsection
 
 @section('body')

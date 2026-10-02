@@ -64,4 +64,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Office::class, 'office_id');
     }
+    public function pageTitle(string $title): string
+    {
+        $prefix = $this->office->office_abbr ?? 'N/A';
+
+        return trim("{$prefix} {$title}");   
+    }
 }

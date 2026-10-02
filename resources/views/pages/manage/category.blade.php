@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    MIS Ticketing | All Tickets
+    {{ auth()->user()->pageTitle('Ticketing Categories') }}
 @endsection
 
 @section('body')
@@ -12,8 +12,8 @@
                 <!-- Page Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
-                        <h1 class="h4 fw-bold mb-1">IT Support Categories</h1>
-                        <p class="text-muted small mb-0">Manage IT Support Categories.</p>
+                        <h1 class="h4 fw-bold mb-1">{{ auth()->user()->pageTitle('Categories') }}</h1>
+                        <p class="text-muted small mb-0">Manage {{ auth()->user()->pageTitle('Categories') }}</p>
                     </div>
                 </div>
 

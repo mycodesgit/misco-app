@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Ticket Details
+    {{ auth()->user()->pageTitle('Ticketing Request Details') }}
 @endsection
 
 @section('body')

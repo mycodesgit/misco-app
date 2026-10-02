@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    MIS Ticketing | Dashboard
+    {{ auth()->user()->pageTitle(' Ticketing Dashboard') }}
 @endsection
 
 @section('body')
@@ -12,7 +12,7 @@
                 <!-- Dashboard Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
-                        <h1 class="h4 fw-bold mb-1">Dashboard Overview</h1>
+                        <h1 class="h4 fw-bold mb-1">{{ auth()->user()->pageTitle('Dashboard Overview') }}</h1>
                         <p class="text-muted small mb-0">Track your daily task progress and activity metrics across the year.</p>
                     </div>
 

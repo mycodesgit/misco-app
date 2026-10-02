@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    All Tickets
+    {{ auth()->user()->pageTitle('Ticketing Requests') }}
 @endsection
 
 @section('body')
@@ -12,7 +12,7 @@
                 <!-- Page Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
-                        <h1 class="h4 fw-bold mb-1">IT Support Requests</h1>
+                        <h1 class="h4 fw-bold mb-1">{{ auth()->user()->pageTitle('Ticket Requests') }}</h1>
                         <p class="text-muted small mb-0">Manage incoming user issues, track ongoing fixes, and view closed tickets.</p>
                     </div>
                     <a href="{{ url('/tickets/create') }}" class="btn btn-primary btn-sm rounded-pill px-3">
