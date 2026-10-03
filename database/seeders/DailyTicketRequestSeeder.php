@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\TicketDB\DailyTicketRequest;
 use App\Models\TicketDB\User;
+use App\Models\TicketDB\Office;
 use App\Models\TicketDB\Category;
 use App\Models\TicketDB\Subcategory;
 use Carbon\Carbon;
@@ -27,6 +28,7 @@ class DailyTicketRequestSeeder extends Seeder
         $itStaff = User::whereIn('role', ['IT Support', 'Administrator'])->get();
         $categories = Category::all();
         $subcategories = Subcategory::all();
+        $office = Office::all();
 
         // Safety check to ensure required relations exist before seeding
         if ($requesters->isEmpty() || $categories->isEmpty() || $subcategories->isEmpty()) {
@@ -62,13 +64,14 @@ class DailyTicketRequestSeeder extends Seeder
 
             $randomRequester = $requesters->random();
             $randomCat = $categories->random();
-            
+
             // Pick a matching subcategory if available, otherwise any subcategory
             $matchingSubcats = $subcategories->where('cat_id', $randomCat->id);
             $randomSubcat = $matchingSubcats->isNotEmpty() ? $matchingSubcats->random() : $subcategories->random();
 
             DailyTicketRequest::create([
                 'user_id'           => $randomRequester->id,
+                'off_id'            => $randomRequester->office_id ?? $office->random()->id,
                 'cat_id'            => $randomCat->id,
                 'subcat_id'         => $randomSubcat->id,
                 'ticket_number'     => $ticketNumber,

@@ -35,7 +35,7 @@ return new class extends Migration
 
         DB::table('users')->insert([
             'office_id' => null,
-            'campus_id' => null,
+            'campus_id' => 'MC',
             'ustatus' => 1,
             'fname' => 'Super',
             'mname' => '',

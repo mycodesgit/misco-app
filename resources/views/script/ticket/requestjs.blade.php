@@ -48,7 +48,7 @@
                 {
                     data: 'ticket_number',
                     render: function(data) {
-                        return '<span class="fw-bold text-primary">#' + (data ?? 'N/A') + '</span>';
+                        return '<span class="fw-bold">#' + (data ?? 'N/A') + '</span>';
                     }
                 },
                 // 2. Requester Info (Name & Office)
@@ -77,13 +77,13 @@
                             initials = (firstInit + lastInit) || fullName.charAt(0).toUpperCase() || 'U';
                         }
 
-                        var officeAbbr = (user && user.office && user.office.office_abbr) 
-                            ? user.office.office_abbr 
+                        var officeAbbr = (user && user.office && user.office.office_abbr)
+                            ? user.office.office_abbr
                             : 'N/A';
 
                         return `
                             <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-circle-sm bg-primary text-white fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; font-size: 12px;">
+                                <div class="avatar-circle-sm bg-warning text-dark fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; font-size: 12px;">
                                     ${initials}
                                 </div>
                                 <div>
@@ -173,7 +173,7 @@
                 {
                     data: 'ticket_number',
                     render: function(data) {
-                        return '<span class="fw-bold text-primary">#' + (data ?? 'N/A') + '</span>';
+                        return '<span class="fw-bold">#' + (data ?? 'N/A') + '</span>';
                     }
                 },
                 // 2. Requester Info (Name & Office)
@@ -202,13 +202,13 @@
                             initials = (firstInit + lastInit) || fullName.charAt(0).toUpperCase() || 'U';
                         }
 
-                        var officeAbbr = (user && user.office && user.office.office_abbr) 
-                            ? user.office.office_abbr 
+                        var officeAbbr = (user && user.office && user.office.office_abbr)
+                            ? user.office.office_abbr
                             : 'N/A';
 
                         return `
                             <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-circle-sm bg-primary text-white fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; font-size: 12px;">
+                                <div class="avatar-circle-sm bg-warning text-dark fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; font-size: 12px;">
                                     ${initials}
                                 </div>
                                 <div>
@@ -295,7 +295,7 @@
                 {
                     data: 'ticket_number',
                     render: function(data) {
-                        return '<span class="fw-bold text-primary">#' + (data ?? 'N/A') + '</span>';
+                        return '<span class="fw-bold">#' + (data ?? 'N/A') + '</span>';
                     }
                 },
                 // 2. Requester Info (Name & Office)
@@ -324,13 +324,13 @@
                             initials = (firstInit + lastInit) || fullName.charAt(0).toUpperCase() || 'U';
                         }
 
-                        var officeAbbr = (user && user.office && user.office.office_abbr) 
-                            ? user.office.office_abbr 
+                        var officeAbbr = (user && user.office && user.office.office_abbr)
+                            ? user.office.office_abbr
                             : 'N/A';
 
                         return `
                             <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-circle-sm bg-primary text-white fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; font-size: 12px;">
+                                <div class="avatar-circle-sm bg-warning text-dark fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; font-size: 12px;">
                                     ${initials}
                                 </div>
                                 <div>
@@ -417,7 +417,7 @@
                 {
                     data: 'ticket_number',
                     render: function(data) {
-                        return '<span class="fw-bold text-primary">#' + (data ?? 'N/A') + '</span>';
+                        return '<span class="fw-bold">#' + (data ?? 'N/A') + '</span>';
                     }
                 },
                 // 2. Requester Info (Name & Office)
@@ -446,13 +446,13 @@
                             initials = (firstInit + lastInit) || fullName.charAt(0).toUpperCase() || 'U';
                         }
 
-                        var officeAbbr = (user && user.office && user.office.office_abbr) 
-                            ? user.office.office_abbr 
+                        var officeAbbr = (user && user.office && user.office.office_abbr)
+                            ? user.office.office_abbr
                             : 'N/A';
 
                         return `
                             <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-circle-sm bg-primary text-white fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; font-size: 12px;">
+                                <div class="avatar-circle-sm bg-warning text-dark fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; font-size: 12px;">
                                     ${initials}
                                 </div>
                                 <div>

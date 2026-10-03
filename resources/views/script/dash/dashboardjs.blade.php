@@ -28,7 +28,7 @@
                             <div class="avatar-podium bg-secondary bg-opacity-20 text-light rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto">
                                 ${second.initials}
                             </div>
-                            <span class="badge bg-secondary position-absolute start-50 translate-middle-x badge-rank rounded-circle">2</span>
+                            <span class="badge bg-info position-absolute start-50 translate-middle-x badge-rank rounded-circle">2</span>
                         </div>
                         <h6 class="fw-bold mb-0 text-truncate small">${second.short_name}</h6>
                         <span class="badge bg-light text-dark border small mt-1">${second.points} pts</span>
@@ -40,13 +40,13 @@
                     ${first ? `
                         <div class="position-relative d-inline-block mb-2">
                             <i class="ti ti-crown fs-4 text-warning crown-icon d-block"></i>
-                            <div class="avatar-podium-lg bg-warning bg-opacity-25 text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto border border-2 border-warning">
+                            <div class="avatar-podium-lg bg-secondary text-light rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto border border-2 border-secondary">
                                 ${first.initials}
                             </div>
                             <span class="badge bg-warning text-dark position-absolute start-50 translate-middle-x badge-rank rounded-circle fw-bold">1</span>
                         </div>
                         <h6 class="fw-bold mb-0 text-truncate">${first.short_name}</h6>
-                        <span class="badge bg-warning bg-opacity-20 border border-warning border-opacity-25 small mt-1">${first.points} pts</span>
+                        <span class="badge bg-light text-dark border small mt-1">${first.points} pts</span>
                     ` : '<div class="text-muted small py-4">-</div>'}
                 </div>
 
@@ -54,7 +54,7 @@
                 <div class="col-4 px-1">
                     ${third ? `
                         <div class="position-relative d-inline-block mb-2">
-                            <div class="avatar-podium bg-danger bg-opacity-20 text-light rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto">
+                            <div class="avatar-podium bg-secondary bg-opacity-20 text-light rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto">
                                 ${third.initials}
                             </div>
                             <span class="badge bg-danger position-absolute start-50 translate-middle-x badge-rank rounded-circle">3</span>
@@ -90,7 +90,7 @@
 
         function renderDailyTicketsChart(labels, createdData, resolvedData) {
             var ctx = document.getElementById('dailyTicketsBarChart').getContext('2d');
-            
+
             if (dailyTicketsChart) {
                 dailyTicketsChart.destroy();
             }
@@ -103,15 +103,15 @@
                         {
                             label: 'Created Tickets',
                             data: createdData,
-                            backgroundColor: '#ffb020',
-                            borderColor: '#e69d19',
+                            backgroundColor: '#e66239',
+                            borderColor: '#e66239',
                             borderWidth: 1
                         },
                         {
                             label: 'Resolved Tickets',
                             data: resolvedData,
-                            backgroundColor: '#1d1a27',
-                            borderColor: '#110f18',
+                            backgroundColor: '#65ab85',
+                            borderColor: '#65ab85',
                             borderWidth: 1
                         }
                     ]
@@ -163,7 +163,7 @@
                 predictions.forEach(p => {
                     html += `
                         <div class="col">
-                            <div class="p-2 border rounded bg-light dark-bg-dark">
+                            <div class="p-2 border rounded card-body-bg-color">
                                 <small class="text-muted d-block">${p.day}</small>
                                 <span class="fw-bold fs-5 text-primary">${p.predicted_count}</span>
                                 <small class="d-block text-muted" style="font-size: 0.7rem;">${p.date}</small>

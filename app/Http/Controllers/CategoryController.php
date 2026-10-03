@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Jenssegers\Agent\Agent;
 
 use App\Models\TicketDB\User;
+use App\Models\TicketDB\UserRole;
 use App\Models\TicketDB\Category;
 use App\Models\TicketDB\Subcategory;
 use App\Models\TicketDB\AuditTrailCategory;
@@ -22,14 +23,24 @@ class CategoryController extends Controller
 {
     public function index()
     {
+        $currentUserRole = Auth::user()->role;
+
         $cat = Category::with('user')->where('status', 1)->get();
 
-        return view('pages.manage.category', compact('cat'));
+        $urole = UserRole::where('status', 1)
+            ->where('rolename', '!=', 'Administrator')
+            ->where(function ($query) use ($currentUserRole) {
+                $query->where('rolename', '=', $currentUserRole)
+                    ->orWhere('rolename', 'Requester');
+            })
+            ->get();
+
+        return view('pages.manage.category', compact('cat', 'urole'));
     }
 
     public function show()
     {
-        $data = Category::with('user')->whereIn('status', [1, 2])->get();
+        $data = Category::with('user')->where('off_id', Auth::user()->office_id)->whereIn('status', [1, 2])->get();
 
         return response()->json(['data' => $data]);
     }
@@ -55,6 +66,7 @@ class CategoryController extends Controller
             try {
                 $cat = Category::create([
                     'user_id' => Auth::user()->id,
+                    'off_id' => Auth::user()->office_id,
                     'ticketcatname' => $request->input('ticketcatname'),
                     'cattype' => $request->input('cattype'),
                 ]);

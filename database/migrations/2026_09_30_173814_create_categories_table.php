@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->foreignId('off_id')->nullable()->constrained('offices')->onDelete('cascade');
             $table->string('ticketcatname');
-            $table->enum('cattype', ['IT Support', 'Requester'])->default('IT Support');
+            $table->string('cattype');
             $table->enum('status', ['1', '2', '3'])->default('1');
             $table->timestamps();
         });

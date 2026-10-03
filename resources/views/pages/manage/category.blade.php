@@ -60,9 +60,11 @@
                                                         <div class="col-md-12">
                                                             <label class="form-label fw-semibold">Category Type: <span class="text-danger">*</span></label>
                                                             <select name="cattype[]" class="form-control form-control-sm select2bs4" multiple="multiple" required>
-                                                                <option value="">Select Category Type</option>
-                                                                <option value="Requester">Requester</option>
-                                                                <option value="IT Support">IT Support</option>
+                                                                @foreach ($urole as $role)
+                                                                    <option value="{{ $role->rolename }}">
+                                                                        {{ $role->rolename }}
+                                                                    </option>
+                                                                @endforeach
                                                             </select>
                                                         </div>
                                                     </div>

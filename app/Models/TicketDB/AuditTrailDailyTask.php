@@ -13,6 +13,7 @@ class AuditTrailDailyTask extends Model
 
     protected $fillable = [
         'user_id',
+        'off_id',
         'email',
         'action',
         'actiondata',

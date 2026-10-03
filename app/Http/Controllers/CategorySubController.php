@@ -23,6 +23,9 @@ class CategorySubController extends Controller
     public function show()
     {
         $data = Subcategory::with(['user', 'category'])
+            ->whereHas('category', function ($query) {
+                $query->where('off_id', Auth::user()->office_id);
+            })
             ->whereIn('status', [1, 2])
             ->get();
 

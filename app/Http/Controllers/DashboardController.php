@@ -102,19 +102,17 @@ class DashboardController extends Controller
         $requesterHeatmapData = [];
 
         if ($user->role !== 'Requester') {
-            $resolvedTasks = DailyTask::whereYear('dailytask.completed_at', $year)
-                ->join('users', 'dailytask.user_id', '=', 'users.id')
-                ->join('offices', 'users.office_id', '=', 'offices.id')
-                ->where('dailytask.status', 'Completed')
-                ->selectRaw('DATE(dailytask.completed_at) as date, COUNT(*) as total')
+            $resolvedTasks = DailyTask::whereYear('completed_at', $year)
+                ->where('off_id', $user->office_id)
+                ->where('status', 'Completed')
+                ->selectRaw('DATE(completed_at) as date, COUNT(*) as total')
                 ->groupBy('date')
                 ->pluck('total', 'date');
 
-            $resolvedTicketsMap = DailyTicketRequest::whereYear('dailyticketrequest.resolved_at', $year)
-                ->join('users', 'dailyticketrequest.user_id', '=', 'users.id')
-                ->join('offices', 'users.office_id', '=', 'offices.id')
-                ->where('dailyticketrequest.status', 'Resolved')
-                ->selectRaw('DATE(dailyticketrequest.resolved_at) as date, COUNT(*) as total')
+            $resolvedTicketsMap = DailyTicketRequest::whereYear('resolved_at', $year)
+                ->where('off_id', $user->office_id)
+                ->where('status', 'Resolved')
+                ->selectRaw('DATE(resolved_at) as date, COUNT(*) as total')
                 ->groupBy('date')
                 ->pluck('total', 'date');
 

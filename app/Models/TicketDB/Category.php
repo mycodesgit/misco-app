@@ -14,7 +14,7 @@ class Category extends Model
 
     protected $fillable = [
         'user_id',
-        'offcat_id',
+        'off_id',
         'ticketcatname',
         'cattype',
         'status',

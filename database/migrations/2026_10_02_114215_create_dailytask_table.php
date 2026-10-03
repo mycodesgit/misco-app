@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('dailytask', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->foreignId('off_id')->constrained('offices')->onDelete('cascade');
             $table->foreignId('cat_id')->nullable()->constrained('categories')->onDelete('cascade');
             $table->foreignId('subcat_id')->nullable()->constrained('subcategories')->onDelete('cascade');
             $table->string('dailytaskdesc');

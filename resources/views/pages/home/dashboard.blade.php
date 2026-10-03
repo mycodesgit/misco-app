@@ -439,7 +439,7 @@
                                             </span>
                                         </div>
                                         <h3 class="fw-bold mb-2">
-                                            Welcome, {{ auth()->user()->fname }} {{ auth()->user()->lname }}! <br> How can we assist you today? 
+                                            Welcome, {{ auth()->user()->fname }} {{ auth()->user()->lname }}! <br> How can we assist you today?
                                         </h3>
                                         <p class="text-secondary mb-3 fs-6">
                                             Check your daily tasks, submit new tickets, and stay updated with the latest support activities.
