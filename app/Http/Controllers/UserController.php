@@ -17,6 +17,7 @@ use App\Models\TicketDB\User;
 use App\Models\TicketDB\UserRole;
 use App\Models\TicketDB\Office;
 use App\Models\TicketDB\AuditTrailUser;
+use App\Models\TicketDB\Category;
 
 class UserController extends Controller
 {
@@ -27,8 +28,9 @@ class UserController extends Controller
         $roles = UserRole::when(Auth::user()->role !== 'Administrator', function ($query) {
             $query->where('rolename', '!=', 'Administrator');
         })->get();
-
-        return view('pages.user.list', compact('users', 'offices', 'roles'));
+        $cat = Category::where('off_id', Auth::user()->office_id)->where('status', 1)->get();
+        
+        return view('pages.user.list', compact('users', 'offices', 'roles', 'cat'));
     }
 
     public function create(Request $request)

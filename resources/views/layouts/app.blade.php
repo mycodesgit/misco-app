@@ -181,11 +181,20 @@
             });
 
             $('.select2bs4').each(function () {
-                $(this).select2({
+                const $select = $(this);
+                const $modal = $select.closest('.modal');
+
+                const options = {
                     theme: 'bootstrap4',
-                    dropdownParent: $(this).closest('.modal'),
                     width: '100%'
-                });
+                };
+
+                // Only set dropdownParent when inside a modal
+                if ($modal.length) {
+                    options.dropdownParent = $modal;
+                }
+
+                $select.select2(options);
             });
         });
         document.addEventListener("DOMContentLoaded", function () {

@@ -208,7 +208,7 @@
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <h5 class="modal-title" id="editInfoModalLabel">
-                        <i class="fas fa-user-edit me-2"></i> Edit User Information
+                        <i class="ti ti-user-edit me-2"></i> Edit User Information
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -345,7 +345,7 @@
         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editPasswordModalLabel"><i class="fas fa-lock"></i> Edit Password</h5>
+                    <h5 class="modal-title" id="editPasswordModalLabel"><i class="ti ti-lock"></i> Edit Password</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="editPasswordForm">
@@ -365,11 +365,47 @@
         </div>
     </div>
 
+    <div class="modal fade" id="assignTaskCategoryModal" tabindex="-1" role="dialog" aria-labelledby="assignTaskCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignTaskCategoryModalLabel"><i class="ti ti-server"></i> Assign Task Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="assignTaskCategoryForm">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="assignTaskCategoryId">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="assignTaskCategoryName" class="form-label fw-semibold">Name: <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="{{ Auth::user()->fname }} {{ Auth::user()->mname ?? '' }} {{ Auth::user()->lname }}" name="user" readonly>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="assignTaskCategoryName" class="form-label fw-semibold">Select & asssign Task Category: <span class="text-danger">*</span></label>
+                                <select class="form-control select2bs4" id="assignTaskCategoryName" name="assigntaskcat[]" multiple="multiple">
+                                    @foreach ($cat as $category)
+                                        <option value="{{ $category->id }}">
+                                            {{ $category->ticketcatname }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success text-light">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="editUstatusModal" tabindex="-1" role="dialog" aria-labelledby="editUstatusModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editUstatusModalLabel">Edit User Status</h5>
+                    <h5 class="modal-title" id="editUstatusModalLabel"><i class="ti ti-toggle-left me-2"></i> Edit User Status</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="editUstatusForm">
