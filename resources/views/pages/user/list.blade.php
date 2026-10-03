@@ -378,11 +378,11 @@
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label for="assignTaskCategoryName" class="form-label fw-semibold">Name: <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="{{ Auth::user()->fname }} {{ Auth::user()->mname ?? '' }} {{ Auth::user()->lname }}" name="user" readonly>
+                                <input type="text" class="form-control fw-semibold" value="{{ Auth::user()->fname }} {{ Auth::user()->mname ?? '' }} {{ Auth::user()->lname }}" name="user" readonly>
                             </div>
                             <div class="col-md-12">
                                 <label for="assignTaskCategoryName" class="form-label fw-semibold">Select & asssign Task Category: <span class="text-danger">*</span></label>
-                                <select class="form-control select2bs4" id="assignTaskCategoryName" name="assigntaskcat[]" multiple="multiple">
+                                <select class="form-control select2bs4" id="assignTaskCategoryName" name="taskassigned[]" multiple="multiple">
                                     @foreach ($cat as $category)
                                         <option value="{{ $category->id }}">
                                             {{ $category->ticketcatname }}
