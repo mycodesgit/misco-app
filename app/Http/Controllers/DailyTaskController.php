@@ -77,7 +77,8 @@ class DailyTaskController extends Controller
                 $status = $request->input('status', 'Pending');
 
                 $task = DailyTask::create([
-                    'user_id'       => auth()->id(), // Use authenticated user ID
+                    'user_id'       => auth()->id(),
+                    'off_id'        => auth()->user()->office_id,
                     'cat_id'        => $request->input('cat_id'),
                     'subcat_id'     => $request->input('subcat_id'),
                     'dailytaskdesc' => $request->input('dailytaskdesc'),

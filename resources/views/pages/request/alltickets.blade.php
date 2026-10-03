@@ -54,6 +54,14 @@
                                     Closed Tickets
                                 </button>
                             </li>
+                            &nbsp;
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-five-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-five" type="button" role="tab"
+                                    aria-controls="pills-five" aria-selected="false" tabindex="-1">
+                                    My Tickets
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     <div class="col-md-12">
@@ -79,7 +87,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -106,7 +114,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -133,7 +141,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -160,7 +168,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                
+
                                             </tbody>
                                         </table>
                                     </div>

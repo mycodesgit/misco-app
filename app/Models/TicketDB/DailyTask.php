@@ -14,6 +14,7 @@ class DailyTask extends Model
 
     protected $fillable = [
         'user_id',
+        'off_id',
         'cat_id',
         'subcat_id',
         'dailytaskdesc',

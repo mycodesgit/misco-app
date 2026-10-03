@@ -102,28 +102,36 @@ class DashboardController extends Controller
         $requesterHeatmapData = [];
 
         if ($user->role !== 'Requester') {
+            // Fetch completed tasks grouped by date
             $resolvedTasks = DailyTask::whereYear('completed_at', $year)
-                ->where('off_id', $user->office_id)
                 ->where('status', 'Completed')
                 ->selectRaw('DATE(completed_at) as date, COUNT(*) as total')
                 ->groupBy('date')
-                ->pluck('total', 'date');
+                ->pluck('total', 'date')
+                ->toArray();
 
+            // Fetch resolved tickets grouped by date
             $resolvedTicketsMap = DailyTicketRequest::whereYear('resolved_at', $year)
-                ->where('off_id', $user->office_id)
                 ->where('status', 'Resolved')
                 ->selectRaw('DATE(resolved_at) as date, COUNT(*) as total')
                 ->groupBy('date')
-                ->pluck('total', 'date');
+                ->pluck('total', 'date')
+                ->toArray();
 
-            $allResolvedDates = $resolvedTasks->keys()->merge($resolvedTicketsMap->keys())->unique();
+            // Collect all unique string dates
+            $allResolvedDates = array_unique(array_merge(array_keys($resolvedTasks), array_keys($resolvedTicketsMap)));
 
+            // Combine task counts + ticket counts for each date
             foreach ($allResolvedDates as $date) {
-                $supportHeatmapData[$date] = ($resolvedTasks->get($date, 0)) + ($resolvedTicketsMap->get($date, 0));
+                $taskCount = $resolvedTasks[$date] ?? 0;
+                $ticketCount = $resolvedTicketsMap[$date] ?? 0;
+                $supportHeatmapData[(string)$date] = $taskCount + $ticketCount;
             }
         }
 
+        // Requester progress heatmap (filtered by current logged-in user)
         $requesterHeatmapData = DailyTicketRequest::whereYear('created_at', $year)
+            ->where('user_id', $user->id) // Filter by logged-in user (or use off_id depending on requirements)
             ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
             ->groupBy('date')
             ->pluck('total', 'date')

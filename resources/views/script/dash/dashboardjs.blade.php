@@ -15,13 +15,11 @@
                 return;
             }
 
-            // Top 3 Podium (1st, 2nd, 3rd)
             let first = leaderboardData[0] || null;
             let second = leaderboardData[1] || null;
             let third = leaderboardData[2] || null;
 
             let podiumHTML = `
-                <!-- Rank 2 -->
                 <div class="col-4 px-1">
                     ${second ? `
                         <div class="position-relative d-inline-block mb-2">
@@ -35,7 +33,6 @@
                     ` : '<div class="text-muted small py-4">-</div>'}
                 </div>
 
-                <!-- Rank 1 -->
                 <div class="col-4 px-1 podium-item-top">
                     ${first ? `
                         <div class="position-relative d-inline-block mb-2">
@@ -50,7 +47,6 @@
                     ` : '<div class="text-muted small py-4">-</div>'}
                 </div>
 
-                <!-- Rank 3 -->
                 <div class="col-4 px-1">
                     ${third ? `
                         <div class="position-relative d-inline-block mb-2">
@@ -67,7 +63,6 @@
 
             podiumContainer.html(podiumHTML);
 
-            // Remaining Ranks (4th onwards)
             let remaining = leaderboardData.slice(3);
             if (remaining.length > 0) {
                 remaining.forEach(item => {
@@ -120,19 +115,8 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: {
-                            ticks: {
-                                maxRotation: 45,
-                                minRotation: 45
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Ticket Count'
-                            }
-                        }
+                        x: { ticks: { maxRotation: 45, minRotation: 45 } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Ticket Count' } }
                     }
                 }
             });
@@ -223,6 +207,7 @@
                 data: { year: year, timeframe: timeframe },
                 dataType: "json",
                 success: function(data) {
+                    $('#displaySupportSelectedYear').text(year);
                     // Update Metric Cards
                     $('#card-new-tickets').text(data.metrics.newTickets);
                     $('#card-pending-tickets').text(data.metrics.pendingTickets);
@@ -235,7 +220,7 @@
                     renderDailyTicketsChart(data.chart.labels, data.chart.created, data.chart.resolved);
 
                     // Dynamic Heatmap Level Updates
-                    updateHeatmaps(data.supportHeatmapData, data.requesterHeatmapData);
+                    updateHeatmaps(data.supportHeatmapData, data.requesterHeatmapData, year);
 
                     // Render Cards
                     renderLeaderboard(data.leaderboard);
@@ -247,20 +232,117 @@
             });
         }
 
-        function updateHeatmaps(supportData, requesterData) {
-            $('#supportprogress .heatmap-cell[data-date]').each(function() {
-                let date = $(this).data('date');
-                let count = supportData[date] || 0;
-                let level = getHeatmapLevel(count);
-                $(this).attr('class', 'heatmap-cell level-' + level);
+        function formatHeatmapDate(dateObj) {
+            const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
+            return `${months[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`;
+        }
+
+        function renderHeatmapHTML(containerId, heatmapData, selectedYear) {
+            let year = parseInt(selectedYear, 10);
+            let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            let monthsHTML = '';
+
+            for (let m = 0; m < 12; m++) {
+                let firstDayOfMonth = new Date(year, m, 1);
+                let lastDayOfMonth = new Date(year, m + 1, 0);
+
+                // ISO Day of Week: Mon = 1, Tue = 2, ..., Sun = 7
+                let startIsoDay = firstDayOfMonth.getDay() === 0 ? 7 : firstDayOfMonth.getDay();
+
+                // Calculate Monday of the first week
+                let curr = new Date(year, m, 1 - (startIsoDay - 1));
+
+                let weeksHTML = '';
+
+                while (curr <= lastDayOfMonth) {
+                    let weekHTML = '<div class="heatmap-week">';
+                    for (let d = 0; d < 7; d++) {
+                        let cellYear = curr.getFullYear();
+                        let cellMonth = curr.getMonth();
+
+                        if (cellMonth === m && cellYear === year) {
+                            let yyyy = curr.getFullYear();
+                            let mm = String(curr.getMonth() + 1).padStart(2, '0');
+                            let dd = String(curr.getDate()).padStart(2, '0');
+                            let dbDate = `${yyyy}-${mm}-${dd}`;
+
+                            let formattedDate = formatHeatmapDate(curr);
+                            let count = heatmapData ? (heatmapData[dbDate] || 0) : 0;
+                            let level = getHeatmapLevel(count);
+                            let taskLabel = count === 1 ? 'task' : 'tasks';
+
+                            weekHTML += `
+                                <div class="heatmap-cell level-${level}"
+                                    data-date="${dbDate}"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="${count} ${taskLabel} resolved on ${formattedDate}">
+                                </div>`;
+                        } else {
+                            weekHTML += `<div class="heatmap-cell level-empty"></div>`;
+                        }
+
+                        curr.setDate(curr.getDate() + 1);
+                    }
+                    weekHTML += '</div>';
+                    weeksHTML += weekHTML;
+                }
+
+                monthsHTML += `
+                    <div class="heatmap-month-group">
+                        <div class="month-header text-muted small fw-semibold">${monthNames[m]}</div>
+                        <div class="heatmap-month-weeks">${weeksHTML}</div>
+                    </div>`;
+            }
+
+            let fullHeatmapHTML = `
+                <div class="table-responsive">
+                    <div class="activity-heatmap">
+                        <div class="heatmap-grid-wrapper">
+                            <div class="days-label text-muted">
+                                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                            </div>
+                            <div class="heatmap-months-container">
+                                ${monthsHTML}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end align-items-center gap-2 mt-3 text-muted small">
+                    <span>Less</span>
+                    <div class="heatmap-cell level-0"></div>
+                    <div class="heatmap-cell level-1"></div>
+                    <div class="heatmap-cell level-2"></div>
+                    <div class="heatmap-cell level-3"></div>
+                    <div class="heatmap-cell level-4"></div>
+                    <span>More</span>
+                </div>`;
+
+            // 1. Destroy existing Tooltips inside container to prevent leaks
+            $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                    let instance = bootstrap.Tooltip.getInstance(this);
+                    if (instance) instance.dispose();
+                }
             });
 
-            $('#requesterprogress .heatmap-cell[data-date]').each(function() {
-                let date = $(this).data('date');
-                let count = requesterData[date] || 0;
-                let level = getHeatmapLevel(count);
-                $(this).attr('class', 'heatmap-cell level-' + level);
-            });
+            // 2. Inject newly generated HTML layout
+            $(containerId).html(fullHeatmapHTML);
+
+            // 3. Re-initialize Bootstrap 5 tooltips
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
+                    new bootstrap.Tooltip(this);
+                });
+            }
+        }
+
+        function updateHeatmaps(supportData, requesterData, selectedYear) {
+            if (!selectedYear) {
+                selectedYear = $('#yearSelect').val() || new Date().getFullYear();
+            }
+            renderHeatmapHTML('#supportprogress', supportData, selectedYear);
+            renderHeatmapHTML('#requesterprogress', requesterData, selectedYear);
         }
 
         function getHeatmapLevel(count) {
@@ -272,41 +354,33 @@
         }
 
         $(document).ready(function() {
-            // 1. Render Chart Initial Data
             var initialLabels = @json($chart['labels'] ?? []);
             var initialCreated = @json($chart['created'] ?? []);
             var initialResolved = @json($chart['resolved'] ?? []);
             renderDailyTicketsChart(initialLabels, initialCreated, initialResolved);
 
-            // 2. Render Initial Leaderboard Data
             var initialLeaderboard = @json($leaderboard ?? []);
             renderLeaderboard(initialLeaderboard);
 
-            // 3. Render Other Initial Cards
             renderTopCategories(@json($topCategories ?? []));
             renderPredictedVolume(@json($predictedVolume ?? []));
             renderTopOffices(@json($topOffices ?? []));
             renderPersonnelPerformance(@json($personnelPerformance ?? []));
 
-            // 4. Timeframe Tab Click Handler (Daily / Monthly / All time)
             $(document).on('click', '.timeframe-btn', function(e) {
                 e.preventDefault();
+                $('.timeframe-btn').removeClass('active text-white').addClass('text-muted');$(this).addClass('active text-white').removeClass('text-muted');
 
-                // Update active styles on tabs
-                $('.timeframe-btn').removeClass('active text-white').addClass('text-muted');
-                $(this).addClass('active text-white').removeClass('text-muted');
-
-                // Fetch refreshed data for current year & selected timeframe
                 var timeframe = $(this).data('timeframe');
                 var selectedYear = $('#yearSelect').val() || new Date().getFullYear();
 
                 updateDashboard(selectedYear, timeframe);
             });
 
-            // 5. Year Select Change Handler
             $('#yearSelect').on('change', function() {
                 var selectedYear = $(this).val();
                 var activeTimeframe = $('#timeframeTabs .timeframe-btn.active').data('timeframe') || 'daily';
+                $('#displaySupportSelectedYear').text(selectedYear);
 
                 updateDashboard(selectedYear, activeTimeframe);
             });
@@ -326,27 +400,124 @@
                 data: { year: year, timeframe: timeframe },
                 dataType: "json",
                 success: function(data) {
-
-                    // Dynamic Heatmap Level Updates
-                    updateHeatmaps(data.supportHeatmapData, data.requesterHeatmapData);
+                    $('#displayRequesterSelectedYear').text(year);
+                    // Pass selected 'year' to updateHeatmaps
+                    updateHeatmaps(data.supportHeatmapData, data.requesterHeatmapData, year);
                 }
             });
         }
 
-        function updateHeatmaps(supportData, requesterData) {
-            $('#supportprogress .heatmap-cell[data-date]').each(function() {
-                let date = $(this).data('date');
-                let count = supportData[date] || 0;
-                let level = getHeatmapLevel(count);
-                $(this).attr('class', 'heatmap-cell level-' + level);
+        function formatHeatmapDate(dateObj) {
+            const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
+            return `${months[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`;
+        }
+
+        function renderHeatmapHTML(containerId, heatmapData, selectedYear) {
+            let year = parseInt(selectedYear, 10);
+            let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            let monthsHTML = '';
+
+            for (let m = 0; m < 12; m++) {
+                let firstDayOfMonth = new Date(year, m, 1);
+                let lastDayOfMonth = new Date(year, m + 1, 0);
+
+                // ISO Day of Week: Mon = 1, Tue = 2, ..., Sun = 7
+                let startIsoDay = firstDayOfMonth.getDay() === 0 ? 7 : firstDayOfMonth.getDay();
+
+                // Calculate Monday of the first week
+                let curr = new Date(year, m, 1 - (startIsoDay - 1));
+
+                let weeksHTML = '';
+
+                while (curr <= lastDayOfMonth) {
+                    let weekHTML = '<div class="heatmap-week">';
+                    for (let d = 0; d < 7; d++) {
+                        let cellYear = curr.getFullYear();
+                        let cellMonth = curr.getMonth();
+
+                        if (cellMonth === m && cellYear === year) {
+                            let yyyy = curr.getFullYear();
+                            let mm = String(curr.getMonth() + 1).padStart(2, '0');
+                            let dd = String(curr.getDate()).padStart(2, '0');
+                            let dbDate = `${yyyy}-${mm}-${dd}`;
+
+                            let formattedDate = formatHeatmapDate(curr);
+                            let count = heatmapData ? (heatmapData[dbDate] || 0) : 0;
+                            let level = getHeatmapLevel(count);
+                            let taskLabel = count === 1 ? 'task' : 'tasks';
+
+                            weekHTML += `
+                                <div class="heatmap-cell level-${level}"
+                                    data-date="${dbDate}"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="${count} ${taskLabel} resolved on ${formattedDate}">
+                                </div>`;
+                        } else {
+                            weekHTML += `<div class="heatmap-cell level-empty"></div>`;
+                        }
+
+                        curr.setDate(curr.getDate() + 1);
+                    }
+                    weekHTML += '</div>';
+                    weeksHTML += weekHTML;
+                }
+
+                monthsHTML += `
+                    <div class="heatmap-month-group">
+                        <div class="month-header text-muted small fw-semibold">${monthNames[m]}</div>
+                        <div class="heatmap-month-weeks">${weeksHTML}</div>
+                    </div>`;
+            }
+
+            let fullHeatmapHTML = `
+                <div class="table-responsive">
+                    <div class="activity-heatmap">
+                        <div class="heatmap-grid-wrapper">
+                            <div class="days-label text-muted">
+                                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                            </div>
+                            <div class="heatmap-months-container">
+                                ${monthsHTML}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end align-items-center gap-2 mt-3 text-muted small">
+                    <span>Less</span>
+                    <div class="heatmap-cell level-0"></div>
+                    <div class="heatmap-cell level-1"></div>
+                    <div class="heatmap-cell level-2"></div>
+                    <div class="heatmap-cell level-3"></div>
+                    <div class="heatmap-cell level-4"></div>
+                    <span>More</span>
+                </div>`;
+
+            // 1. Destroy existing Tooltips inside container to prevent leaks
+            $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                    let instance = bootstrap.Tooltip.getInstance(this);
+                    if (instance) instance.dispose();
+                }
             });
 
-            $('#requesterprogress .heatmap-cell[data-date]').each(function() {
-                let date = $(this).data('date');
-                let count = requesterData[date] || 0;
-                let level = getHeatmapLevel(count);
-                $(this).attr('class', 'heatmap-cell level-' + level);
-            });
+            // 2. Inject newly generated HTML layout
+            $(containerId).html(fullHeatmapHTML);
+
+            // 3. Re-initialize Bootstrap 5 tooltips
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
+                    new bootstrap.Tooltip(this);
+                });
+            }
+        }
+
+        function updateHeatmaps(supportData, requesterData, selectedYear) {
+            if (!selectedYear) {
+                selectedYear = $('#yearSelect').val() || new Date().getFullYear();
+            }
+            renderHeatmapHTML('#supportprogress', supportData, selectedYear);
+            renderHeatmapHTML('#requesterprogress', requesterData, selectedYear);
         }
 
         function getHeatmapLevel(count) {
@@ -357,26 +528,20 @@
             return 4;
         }
 
-        $(document).ready(function() {
-            // 4. Timeframe Tab Click Handler (Daily / Monthly / All time)
-            $(document).on('click', '.timeframe-btn', function(e) {
+        $(document).ready(function() {$(document).on('click', '.timeframe-btn', function(e) {
                 e.preventDefault();
+                $('.timeframe-btn').removeClass('active text-white').addClass('text-muted');$(this).addClass('active text-white').removeClass('text-muted');
 
-                // Update active styles on tabs
-                $('.timeframe-btn').removeClass('active text-white').addClass('text-muted');
-                $(this).addClass('active text-white').removeClass('text-muted');
-
-                // Fetch refreshed data for current year & selected timeframe
                 var timeframe = $(this).data('timeframe');
                 var selectedYear = $('#yearSelect').val() || new Date().getFullYear();
 
                 updateDashboard(selectedYear, timeframe);
             });
 
-            // 5. Year Select Change Handler
             $('#yearSelect').on('change', function() {
                 var selectedYear = $(this).val();
                 var activeTimeframe = $('#timeframeTabs .timeframe-btn.active').data('timeframe') || 'daily';
+                $('#displayRequesterSelectedYear').text(selectedYear);
 
                 updateDashboard(selectedYear, activeTimeframe);
             });
