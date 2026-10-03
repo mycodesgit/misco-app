@@ -243,6 +243,9 @@
         });
     </script>
 
+    @if (request()->routeIs('dashboard.index'))
+        @include('script.dash.dashboardjs')
+    @endif
     @if (request()->routeIs('tickets.index'))
         @include('script.ticket.requestjs')
     @endif
