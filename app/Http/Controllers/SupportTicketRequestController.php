@@ -20,11 +20,11 @@ use App\Models\TicketDB\AuditTrailCategory;
 use App\Models\TicketDB\AuditTrailCategorySub;
 use App\Models\TicketDB\AuditTrailDailyTicketRequest;
 
-class TicketRequestController extends Controller
+class SupportTicketRequestController extends Controller
 {
     public function index()
     {
-        return view('pages.request.alltickets');
+        return view('pages.request.supportalltickets');
     }
 
     public function showpending()
@@ -140,6 +140,6 @@ class TicketRequestController extends Controller
 
     public function store()
     {
-        return view('pages.request.showticket');
+        return view('pages.request.supportshowticket');
     }
 }

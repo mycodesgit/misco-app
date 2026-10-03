@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('users_role', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('off_id')->constrained('offices')->onDelete('cascade');
             $table->string('rolename');
             $table->enum('status', [1, 2, 3])->default(1);
             $table->timestamps();

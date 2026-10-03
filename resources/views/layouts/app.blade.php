@@ -180,10 +180,13 @@
                 });
             });
 
-            $('.select2bs4').select2({
-                theme: 'bootstrap4',
-                height: '100',
-            })
+            $('.select2bs4').each(function () {
+                $(this).select2({
+                    theme: 'bootstrap4',
+                    dropdownParent: $(this).closest('.modal'),
+                    width: '100%'
+                });
+            });
         });
         document.addEventListener("DOMContentLoaded", function () {
             const cards = document.querySelectorAll('.card-animate');
@@ -247,7 +250,10 @@
         @include('script.dash.dashboardjs')
     @endif
     @if (request()->routeIs('tickets.index'))
-        @include('script.ticket.requestjs')
+        @include('script.ticket.supportjs')
+    @endif
+    @if (request()->routeIs('ticketsrequester.index'))
+        @include('script.ticket.requesterjs')
     @endif
     @if (request()->routeIs('daily-task.index'))
         @include('script.daily.taskjs')

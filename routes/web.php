@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\TicketRequestController;
+use App\Http\Controllers\SupportTicketRequestController;
+use App\Http\Controllers\RequesterTicketRequestController;
 use App\Http\Controllers\DailyTaskController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategorySubController;
@@ -41,12 +42,16 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
     Route::prefix('/tickets')->group(function () {
-        Route::get('/request/view/all',[TicketRequestController::class,'index'])->name('tickets.index');
-        Route::get('/request/view/all/fetch/pending',[TicketRequestController::class,'showpending'])->name('tickets.showpending');
-        Route::get('/request/view/all/fetch/progress',[TicketRequestController::class,'showprogress'])->name('tickets.showprogress');
-        Route::get('/request/view/all/fetch/resolved',[TicketRequestController::class,'showresolved'])->name('tickets.showresolved');
-        Route::get('/request/view/all/fetch/closed',[TicketRequestController::class,'showclosed'])->name('tickets.showclosed');
-        Route::get('/request/view/details',[TicketRequestController::class,'store'])->name('tickets.store');
+        Route::get('/support/view/all',[SupportTicketRequestController::class,'index'])->name('tickets.index');
+        Route::get('/support/view/all/fetch/pending',[SupportTicketRequestController::class,'showpending'])->name('tickets.showpending');
+        Route::get('/support/view/all/fetch/progress',[SupportTicketRequestController::class,'showprogress'])->name('tickets.showprogress');
+        Route::get('/support/view/all/fetch/resolved',[SupportTicketRequestController::class,'showresolved'])->name('tickets.showresolved');
+        Route::get('/support/view/all/fetch/closed',[SupportTicketRequestController::class,'showclosed'])->name('tickets.showclosed');
+        Route::get('/support/view/details',[SupportTicketRequestController::class,'store'])->name('tickets.store');
+       
+        Route::get('/requester/view/all',[RequesterTicketRequestController::class,'index'])->name('ticketsrequester.index');
+        Route::get('/tickets/categories/{supportType}', [RequesterTicketRequestController::class, 'getCat'])->name('tickets.categories');
+        Route::get('/tickets/subcategories/{category}', [RequesterTicketRequestController::class, 'getSubcat'])->name('tickets.subcategories');
     });
 
     Route::prefix('/daily-task')->group(function () {

@@ -9,6 +9,8 @@
     $accomplishmentActive = in_array($current_route, ['accomplishment-report.index']) ? 'active' : '';
     $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
     $rolesAllActive = in_array($current_route, ['roles.index']) ? 'active' : '';
+
+    $ticketsrequesterActive = in_array($current_route, ['ticketsrequester.index']) ? 'active' : '';
 @endphp
 
 <ul class="nav flex-column">
@@ -29,6 +31,12 @@
         <li>
             <a class="nav-link {{ $dailyTaskActive }}" href="{{ route('daily-task.index') }}" data-tooltip="Daily Task">
                 <i class="ti ti-calendar"></i><span class="nav-text">Daily Task</span>
+            </a>
+        </li>
+    @else
+        <li>
+            <a class="nav-link {{ $ticketsrequesterActive }}" href="{{ route('ticketsrequester.index') }}" data-tooltip="My Tickets">
+                <i class="ti ti-ticket"></i><span class="nav-text">My Tickets</span>
             </a>
         </li>
     @endif
