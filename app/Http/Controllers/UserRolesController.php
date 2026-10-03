@@ -46,6 +46,7 @@ class UserRolesController extends Controller
 
             try {
                 $urole = UserRole::create([
+                    'off_id' => Auth::user()->office_id,
                     'rolename'  => $rolesName,
                 ]);
 

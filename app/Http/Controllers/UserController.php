@@ -15,8 +15,10 @@ use Jenssegers\Agent\Agent;
 
 use App\Models\TicketDB\User;
 use App\Models\TicketDB\UserRole;
+use App\Models\TicketDB\UserAssignedTask;
 use App\Models\TicketDB\Office;
 use App\Models\TicketDB\AuditTrailUser;
+use App\Models\TicketDB\AuditTrailUserAssignedTask;
 use App\Models\TicketDB\Category;
 
 class UserController extends Controller
@@ -55,7 +57,7 @@ class UserController extends Controller
                     'lname'          => $request->input('lname'),
                     'fname'          => $request->input('fname'),
                     'mname'          => $request->input('mname'),
-                    'email'       => $userEmail,
+                    'email'          => $userEmail,
                     'password'       => Hash::make($request->input('password')),
                     'campus_id'      => $request->input('campus_id'),
                     'office_id'      => $request->input('office_id'),
@@ -65,10 +67,17 @@ class UserController extends Controller
                     'remember_token' => Str::random(60),
                 ]);
 
-                $userPayload = $user->makeHidden(['password', 'remember_token'])->toArray();
+                $userAssignedTask = UserAssignedTask::create([
+                    'user_id'        => $user->id,
+                    'taskassigned'   => $request->input('taskassigned'),
+                    'aboutassigned'  => $request->input('aboutassigned'),
+                ]);
 
+                $userPayload = $user->makeHidden(['password', 'remember_token'])->toArray();
+                $userAssignedTaskPayload = $userAssignedTask->toArray();
                 // Abstracted Audit Trail
                 $this->logAudit($request, 'Add_User', $userPayload);
+                $this->logUserAssignedTaskAudit($request, 'Add_UserAssignedTask', $userAssignedTaskPayload);
 
                 return response()->json(['success' => true, 'message' => 'User stored successfully!']);
             } catch (\Exception $e) {
@@ -209,6 +218,25 @@ class UserController extends Controller
         $platform = $agent->platform();
 
         AuditTrailUser::create([
+            'user_id'    => auth()->id(),
+            'email'   => auth()->user()->email ?? 'System',
+            'action'     => $action,
+            'actiondata' => json_encode($payload),
+            'ip_address' => $request->ip(),
+            'user_agent' => $browser . ' on ' . $platform,
+            'login_at'   => now(),
+        ]);
+    }
+
+    private function logUserAssignedTaskAudit(Request $request, string $action, array $payload): void
+    {
+        $agent = new Agent();
+        $agent->setUserAgent($request->userAgent());
+
+        $browser  = $agent->browser();
+        $platform = $agent->platform();
+
+        AuditTrailUserAssignedTask::create([
             'user_id'    => auth()->id(),
             'email'   => auth()->user()->email ?? 'System',
             'action'     => $action,
