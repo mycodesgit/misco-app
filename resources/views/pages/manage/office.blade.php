@@ -44,11 +44,10 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <div class="form-row">
-                                            <div class="col-md-12">
-                                                <button type="submit" class="btn btn-outline-success">
-                                                    <i class="fas fa-save"></i> Save
-                                                </button>
+                                        <div class="row">
+                                            <div class="col-md-12 d-flex justify-content-between">
+                                                <button type="reset" class="btn btn-light"><i class="ti ti-restore"></i> Clear</button>
+                                                <button type="submit" class="btn btn-success"><i class="ti ti-device-floppy"></i>  Save</button>
                                             </div>
                                         </div>
                                     </div>
@@ -60,7 +59,7 @@
                         <div class="card card-animate">
                             <div class="card-header pt-3">
                                 <h6 class="card-title">
-                                    <i class="fas fa-list"></i> List
+                                    <i class="ti ti-server"></i> List of Offices Section
                                 </h6>
                             </div>
                             <div class="card-body">

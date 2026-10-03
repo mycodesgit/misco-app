@@ -28,10 +28,13 @@ class CategoryController extends Controller
         $cat = Category::with('user')->where('status', 1)->get();
 
         $urole = UserRole::where('status', 1)
-            ->where('rolename', '!=', 'Administrator')
-            ->where(function ($query) use ($currentUserRole) {
-                $query->where('rolename', '=', $currentUserRole)
-                    ->orWhere('rolename', 'Requester');
+            ->when($currentUserRole !== 'Administrator', function ($query) use ($currentUserRole) {
+                // These conditions run ONLY if the logged-in user is NOT an Administrator
+                $query->where('rolename', '!=', 'Administrator')
+                    ->where(function ($query) use ($currentUserRole) {
+                        $query->where('rolename', '=', $currentUserRole)
+                                ->orWhere('rolename', 'Requester');
+                    });
             })
             ->get();
 

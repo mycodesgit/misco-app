@@ -25,7 +25,7 @@ class DailyTaskController extends Controller
 {
     public function index()
     {
-        $cat = Category::where('status', 1)->orderBy('ticketcatname', 'ASC')->get();
+        $cat = Category::where('status', 1)->where('off_id', Auth::user()->office_id)->orderBy('ticketcatname', 'ASC')->get();
         $subcat = Subcategory::where('status', 1)->orderBy('ticketsubcatname', 'ASC')->get();
 
         return view('pages.task.daily', compact('cat', 'subcat'));

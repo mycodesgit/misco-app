@@ -86,7 +86,7 @@
                                     <div class="card card-animate">
                                         <div class="card-header pt-3">
                                             <h6 class="card-title">
-                                                <i class="fas fa-server"></i> List of all categories section
+                                                <i class="ti ti-server"></i> List of all categories section
                                             </h6>
                                         </div>
                                         <div class="card-body">
@@ -137,7 +137,7 @@
 
                                                         <div class="col-md-12">
                                                             <label class="form-label fw-semibold">Sub-category: <span class="text-danger">*</span></label>
-                                                            <input type="text" name="ticketsubcatname" class="form-control form-control-sm" placeholder="Enter sub-category name" required>
+                                                            <input type="text" name="ticketsubcatname" oninput="var words = this.value.split(' '); for(var i = 0; i < words.length; i++){ words[i] = words[i].substr(0,1).toUpperCase() + words[i].substr(1); } this.value = words.join(' ');" class="form-control form-control-sm" placeholder="Enter sub-category name" required>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -158,7 +158,7 @@
                                     <div class="card">
                                         <div class="card-header pt-3">
                                             <h6 class="card-title">
-                                                <i class="fas fa-server"></i> List of all sub-categories section
+                                                <i class="ti ti-server"></i> List of all sub-categories section
                                             </h6>
                                         </div>
                                         <div class="card-body">
