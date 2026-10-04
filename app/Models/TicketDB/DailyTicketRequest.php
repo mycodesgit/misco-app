@@ -14,6 +14,7 @@ class DailyTicketRequest extends Model
 
     protected $fillable = [
         'user_id',
+        'reqoff_id',
         'off_id',
         'cat_id',
         'subcat_id',
@@ -50,9 +51,9 @@ class DailyTicketRequest extends Model
     /**
      * The office/department where the request originated.
      */
-    public function office()
+    public function requesteroffice()
     {
-        return $this->belongsTo(Office::class, 'office_id');
+        return $this->belongsTo(Office::class, 'reqoff_id');
     }
 
     /**

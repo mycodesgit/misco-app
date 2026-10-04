@@ -147,6 +147,7 @@ class RequesterTicketRequestController extends Controller
             // 4. Create Ticket Record
             $ticket = DailyTicketRequest::create([
                 'user_id'           => Auth::id(),
+                'reqoff_id'         => Auth::user()->office_id,
                 'off_id'            => $request->off_id,
                 'cat_id'            => $request->cat_id,
                 'subcat_id'         => $request->subcat_id,

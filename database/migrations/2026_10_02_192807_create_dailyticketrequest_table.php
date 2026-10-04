@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             // Requester Details
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('reqoff_id')->constrained('offices')->onDelete('cascade');
             $table->foreignId('off_id')->constrained('offices')->onDelete('cascade');
 
             // Classification (Relates to same Category/Subcategory system)

@@ -32,7 +32,7 @@
             });
         });
 
-        var dataTable = $('#ticketpendingTable').DataTable({
+        var dataTablePending = $('#ticketpendingTable').DataTable({
             "ajax": {
                 "url": ticketPendingReadRoute,
                 "type": "GET",
@@ -136,12 +136,11 @@
                 {
                     data: 'id',
                     render: function(data, type, row) {
-                        var baseUrl = "{{ url('/tickets') }}";
-                        var viewBtn = `<a href="${baseUrl}/${data}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
-                        var editBtn = `<button type="button" class="btn btn-sm btn-success text-white btn-ticketedit me-1" data-id="${data}" data-bs-toggle="tooltip" title="Edit Ticket"><i class="ti ti-pencil"></i></button>`;
+                        var baseUrl = "{{ route('tickets.store') }}";
+                        var viewBtn = `<a href="${baseUrl}?view=${data}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
                         var deleteBtn = `<button type="button" value="${data}" class="btn btn-sm btn-danger ticket-delete" data-bs-toggle="tooltip" title="Delete Ticket"><i class="ti ti-trash"></i></button>`;
 
-                        return viewBtn + editBtn + deleteBtn;
+                        return viewBtn + (typeof editBtn !== 'undefined' ? editBtn : '') + deleteBtn;
                     }
                 }
             ],
@@ -150,9 +149,9 @@
             }
         });
         $(document).on('ticketAdded', function() {
-            dataTable.ajax.reload();
+            dataTablePending.ajax.reload();
         });
-        dataTable.on('draw', function () {
+        dataTablePending.on('draw', function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
 

@@ -141,8 +141,23 @@ class SupportTicketRequestController extends Controller
         }
     }
 
-    public function store()
-    {
-        return view('pages.request.supportshowticket');
-    }
+    public function store(Request $request)
+{
+    $ticketId = $request->query('view');
+
+    $ticket = DailyTicketRequest::select([
+            'id', 'ticket_number', 'user_id', 'reqoff_id', 'off_id', 'cat_id', 'subcat_id',
+            'assigned_to', 'priority', 'contactno', 'issue_description',
+            'remarks', 'attachment', 'status', 'created_at'
+        ])
+        ->with([
+            'category:id,ticketcatname', // replace 'ticketcatname' with your actual column name
+            'subcategory:id,ticketsubcatname', 
+            'requester:id,fname,lname,email', 
+            'requesteroffice:id,office_name,office_abbr'
+        ])
+        ->findOrFail($ticketId);
+
+    return view('pages.request.supportshowticket', compact('ticket'));
+}
 }

@@ -17,13 +17,41 @@
                         </a>
                         <div>
                             <h1 class="h4 fw-bold mb-1">
-                                #TK-8942: Database Connection Timeout
+                                <span class="text-primary">{{ $ticket->ticket_number }}</span> : &nbsp;
+                                <span>{{ $ticket->category->ticketcatname }}</span>
+                                <span>( {{ $ticket->subcategory->ticketsubcatname }} )</span>
                             </h1>
-                            <p class="text-muted small mb-0">Submitted by <strong>Maria Santos</strong> &bull; Registrar Department</p>
+                            <p class="text-muted small mb-0">Submitted by <strong>{{ $ticket->requester->fname }} {{ $ticket->requester->lname }}</strong> &bull; {{ $ticket->requesteroffice->office_abbr }}</p>
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-danger rounded-pill px-3 py-2"><i class="ti ti-alert-triangle me-1"></i> High Priority</span>
+                        @php
+                            $priorityConfig = match(strtolower($ticket->priority)) {
+                                'low' => [
+                                    'class' => 'bg-info text-dark',
+                                    'icon'  => 'ti-info-circle'
+                                ],
+                                'medium' => [
+                                    'class' => 'bg-primary',
+                                    'icon'  => 'ti-adjustments'
+                                ],
+                                'high' => [
+                                    'class' => 'bg-warning text-dark',
+                                    'icon'  => 'ti-alert-circle'
+                                ],
+                                'urgent' => [
+                                    'class' => 'bg-danger',
+                                    'icon'  => 'ti-alert-triangle'
+                                ],
+                                default => [
+                                    'class' => 'bg-secondary',
+                                    'icon'  => 'ti-help-circle'
+                                ]
+                            };
+                        @endphp
+                        <span class="badge {{ $priorityConfig['class'] }} rounded-pill px-3 py-2">
+                            <i class="ti {{ $priorityConfig['icon'] }} me-1"></i> {{ $ticket->priority }}
+                        </span>
                         <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="ti ti-clock me-1"></i> Pending</span>
                     </div>
                 </div>
@@ -46,21 +74,23 @@
                                     <div class="row text-center">
                                         <div class="col-6 border-end">
                                             <span class="text-muted small d-block">Category</span>
-                                            <span class="fw-semibold small"><i class="ti ti-server me-1"></i> Infrastructure</span>
+                                            <span class="fw-semibold small"><i class="ti ti-server me-1"></i> {{ $ticket->category->ticketcatname }}</span>
                                         </div>
                                         <div class="col-6">
                                             <span class="text-muted small d-block">Submitted Date</span>
-                                            <span class="fw-semibold small">Sep 29, 2026 10:15 AM</span>
+                                            <span class="fw-semibold small">
+                                                {{ $ticket->created_at?->format('M d, Y h:i A') }}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Detailed Complaint Description -->
                                 <div class="mb-4">
-                                    <label class="form-label text-muted small fw-bold">Issue Description:</label>
+                                    <label class="form-label fw-bold">Issue Description:</label>
                                     <div class="p-3 card-body-content-bg-color rounded border">
                                         <p class="mb-0">
-                                            "Whenever I attempt to click 'Generate PDF Report' inside the student grading module, the page loads for 30 seconds and throws a 500 MySQL connection timeout error. This is blocking our deadline processing."
+                                            " {{ $ticket->issue_description }} "
                                         </p>
                                     </div>
                                 </div>
@@ -83,18 +113,17 @@
                                             <!-- File Info -->
                                             <div class="flex-grow-1 min-w-0">
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" class="fw-semibold text-decoration-none d-block text-truncate small mb-1">
-                                                    error_screen_log.png
+                                                    {{ basename($ticket->attachment) }}
                                                 </a>
-                                                <span class="badge text-muted border fw-normal">PNG &bull; 340 KB</span>
+                                                <span class="badge text-muted border fw-normal">
+                                                    {{ strtoupper(pathinfo($ticket->attachment, PATHINFO_EXTENSION)) }} Attachment
+                                                </span>
                                             </div>
 
                                             <!-- Action Buttons -->
                                             <div class="d-flex align-items-center gap-1 pe-1">
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" class="btn btn-sm btn-icon btn-light border text-secondary" title="View Image">
-                                                    <i class="ti ti-eye"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-sm btn-icon btn-primary" title="Download File">
-                                                    <i class="ti ti-download"></i>
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" class="btn btn-sm btn-light border text-secondary" title="View Image">
+                                                    <i class="ti ti-eye"></i> View Attachment
                                                 </a>
                                             </div>
                                         </div>
@@ -199,12 +228,34 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h6 class="modal-title fw-bold"><i class="ti ti-photo me-1"></i> Attached Issue Screenshot</h6>
+                    <h6 class="modal-title fw-bold">
+                        <i class="ti ti-photo me-1"></i> Attached Issue Screenshot
+                    </h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-center p-2 bg-dark">
-                    <img src="https://via.placeholder.com/800x500/1a222c/ffffff?text=Database+Error+Screenshot+Proof" class="img-fluid rounded" alt="Full Preview">
+                <div class="modal-body text-center p-2">
+                    @if(!empty($ticket->attachment))
+                        <img src="{{ asset($ticket->attachment) }}" 
+                            class="img-fluid rounded" 
+                            alt="{{ basename($ticket->attachment) }}"
+                            style="max-height: 75vh; object-fit: contain;">
+                    @else
+                        <div class="text-white py-5">
+                            <i class="ti ti-photo-off fs-1 d-block mb-2 text-muted"></i>
+                            <p class="mb-0 text-muted">No attachment available for this ticket.</p>
+                        </div>
+                    @endif
                 </div>
+                {{-- @if(!empty($ticket->attachment))
+                    <div class="modal-footer py-2">
+                        <a href="{{ asset($ticket->attachment) }}" 
+                        target="_blank" 
+                        download="{{ basename($ticket->attachment) }}" 
+                        class="btn btn-sm btn-primary">
+                            <i class="ti ti-download me-1"></i> Download File
+                        </a>
+                    </div>
+                @endif --}}
             </div>
         </div>
     </div>
