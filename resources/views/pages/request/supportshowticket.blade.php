@@ -152,61 +152,47 @@
                             <!-- Chat Box Header -->
                             <div class="card-header p-3 border-bottom d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar-circle bg-warning text-white fw-bold me-2">MS</div>
+                                    <div class="avatar-circle bg-warning text-white fw-bold me-2">
+                                        {{ strtoupper(substr($ticket->requester?->fname ?? 'U', 0, 1) . substr($ticket->requester?->lname ?? 'N', 0, 1)) }}
+                                    </div>
                                     <div>
                                         <h6 class="mb-0 fw-bold">Live Ticket Chat</h6>
-                                        <small class="text-muted">Chatting with Requester: <strong>Maria Santos</strong></small>
+                                        <small class="text-muted">
+                                            Chatting with: 
+                                            <strong>
+                                                @if(auth()->id() === $ticket->user_id)
+                                                    {{-- Logged in user is the Requester -> Show Assigned Support or Default --}}
+                                                    {{ $ticket->supportoffice->office_abbr ?? 'Support Team' }} Support Personnel
+                                                @else
+                                                    {{-- Logged in user is IT Support -> Show Requester --}}
+                                                    {{ $ticket->requester?->fname ?? 'User' }} {{ $ticket->requester?->lname ?? '' }}
+                                                @endif
+                                            </strong>
+                                        </small>
                                     </div>
                                 </div>
                                 <span class="badge bg-light text-dark border"><i class="ti ti-circle-filled text-success me-1"></i> Chat Active</span>
                             </div>
 
                             <!-- Chat Messages Body -->
-                            <div class="card-body p-3 flex-grow-1 overflow-y-auto ticket-chat-body">
-
+                            <div class="card-body p-3 flex-grow-1 overflow-y-auto ticket-chat-body" id="chatBox">
                                 <div class="text-center my-2">
                                     <small class="text-muted border px-2 py-1 rounded">
-                                        Chat opened for Ticket #TK-8942
+                                        Chat opened for Ticket #{{ $ticket->ticket_number ?? $ticket->id }}
                                     </small>
                                 </div>
-
-                                <!-- Requester Message -->
-                                <div class="d-flex mb-3 align-items-start">
-                                    <div class="avatar-circle bg-warning text-white fw-bold me-2 flex-shrink-0">MS</div>
-                                    <div>
-                                        <div class="d-flex align-items-center gap-2 mb-1">
-                                            <span class="fw-semibold small">Maria Santos</span>
-                                            <small class="text-muted">10:15 AM</small>
-                                        </div>
-                                        <div class="chat-bubble incoming-bubble p-3 rounded-3">
-                                            <p class="mb-0">Hi IT Support! I attached the error screenshot on the left side of this page. Let me know if you need more details.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- IT Staff Message -->
-                                <div class="d-flex mb-3 align-items-start justify-content-end">
-                                    <div class="text-end">
-                                        <div class="d-flex align-items-center justify-content-end gap-2 mb-1">
-                                            <small class="text-muted">10:20 AM</small>
-                                            <span class="fw-semibold small">You (IT Support)</span>
-                                        </div>
-                                        <div class="chat-bubble outgoing-bubble p-3 rounded-3 ms-auto">
-                                            <p class="mb-0">Hello Maria! Received your request. We are inspecting the MariaDB query execution logs now.</p>
-                                        </div>
-                                    </div>
-                                    <div class="avatar-circle bg-secondary text-white fw-bold ms-2 flex-shrink-0">IT</div>
-                                </div>
-
+                                
+                                {{-- Messages will dynamically render here via JS --}}
                             </div>
 
-                            <!-- Chat Input Footer (PURE TEXT MESSAGES ONLY) -->
+                            <!-- Chat Input Footer -->
                             <div class="card-footer bg-transparent p-3 border-top">
-                                <form action="#" method="POST" id="chatOnlyForm">
+                                <form method="POST" id="chatOnlyForm">
                                     @csrf
+                                    <input type="hidden" id="ticket_id" value="{{ $ticket->id }}">
                                     <div class="position-relative d-flex align-items-center">
-                                        <input type="text" class="form-control custom-input-btn" placeholder="Type a text message to requester..." required>
-                                        <button class="btn btn-success btn-inside" type="submit">
+                                        <input type="text" id="chatMessageInput" class="form-control custom-input-btn" placeholder="Type a text message to requester..." required autocomplete="off">
+                                        <button class="btn btn-success btn-inside" type="submit" id="sendChatBtn">
                                             <i class="ti ti-send me-1"></i> Send
                                         </button>
                                     </div>

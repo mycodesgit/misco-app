@@ -10,7 +10,7 @@
     $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
     $rolesAllActive = in_array($current_route, ['roles.index']) ? 'active' : '';
 
-    $ticketsrequesterActive = in_array($current_route, ['ticketsrequester.index']) ? 'active' : '';
+    $ticketsrequesterActive = in_array($current_route, ['ticketsrequester.index', 'tickets.store']) ? 'active' : '';
 @endphp
 
 <ul class="nav flex-column">

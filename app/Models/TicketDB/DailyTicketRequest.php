@@ -56,6 +56,11 @@ class DailyTicketRequest extends Model
         return $this->belongsTo(Office::class, 'reqoff_id');
     }
 
+    public function supportoffice()
+    {
+        return $this->belongsTo(Office::class, 'off_id');
+    }
+
     /**
      * The IT staff member assigned to work on this ticket.
      */

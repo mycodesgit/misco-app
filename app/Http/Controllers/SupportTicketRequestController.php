@@ -16,6 +16,7 @@ use App\Models\TicketDB\User;
 use App\Models\TicketDB\Category;
 use App\Models\TicketDB\Subcategory;
 use App\Models\TicketDB\DailyTicketRequest;
+use App\Models\TicketDB\TicketChat;
 use App\Models\TicketDB\AuditTrailCategory;
 use App\Models\TicketDB\AuditTrailCategorySub;
 use App\Models\TicketDB\AuditTrailDailyTicketRequest;
@@ -142,22 +143,77 @@ class SupportTicketRequestController extends Controller
     }
 
     public function store(Request $request)
-{
-    $ticketId = $request->query('view');
+    {
+        $ticketId = $request->query('view');
 
-    $ticket = DailyTicketRequest::select([
-            'id', 'ticket_number', 'user_id', 'reqoff_id', 'off_id', 'cat_id', 'subcat_id',
-            'assigned_to', 'priority', 'contactno', 'issue_description',
-            'remarks', 'attachment', 'status', 'created_at'
-        ])
-        ->with([
-            'category:id,ticketcatname', // replace 'ticketcatname' with your actual column name
-            'subcategory:id,ticketsubcatname', 
-            'requester:id,fname,lname,email', 
-            'requesteroffice:id,office_name,office_abbr'
-        ])
-        ->findOrFail($ticketId);
+        $ticket = DailyTicketRequest::select([
+                'id', 'ticket_number', 'user_id', 'reqoff_id', 'off_id', 'cat_id', 'subcat_id',
+                'assigned_to', 'priority', 'contactno', 'issue_description',
+                'remarks', 'attachment', 'status', 'created_at'
+            ])
+            ->with([
+                'category:id,ticketcatname', // replace 'ticketcatname' with your actual column name
+                'subcategory:id,ticketsubcatname', 
+                'requester:id,fname,lname,email', 
+                'requesteroffice:id,office_name,office_abbr',
+                'supportoffice:id,office_abbr'
+            ])
+            ->findOrFail($ticketId);
 
-    return view('pages.request.supportshowticket', compact('ticket'));
-}
+        return view('pages.request.supportshowticket', compact('ticket'));
+    }
+
+    // Send Message
+    public function sendMessage(Request $request)
+    {
+        $request->validate([
+            'ticket_id' => 'required|exists:dailyticketrequest,id',
+            'message'   => 'required|string',
+        ]);
+
+        $chat = TicketChat::create([
+            'ticket_id' => $request->ticket_id,
+            'sender_id' => auth()->id(),
+            'message'   => $request->message,
+        ]);
+
+        // Load sender details for frontend rendering
+        $chat->load('sender');
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'id'         => $chat->id,
+                'message'    => $chat->message,
+                'sender_id'  => $chat->sender_id,
+                'sender_name'=> $chat->sender->fname . ' ' . $chat->sender->lname,
+                'time'       => $chat->created_at->format('h:i A'),
+                'is_me'      => $chat->sender_id === auth()->id()
+            ]
+        ]);
+    }
+
+    // Fetch Messages
+    public function fetchMessages($ticketId)
+    {
+        $messages = TicketChat::with('sender')
+            ->where('ticket_id', $ticketId)
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(function ($chat) {
+                return [
+                    'id'          => $chat->id,
+                    'message'     => $chat->message,
+                    'sender_id'   => $chat->sender_id,
+                    'sender_name' => $chat->sender->fname . ' ' . $chat->sender->lname,
+                    'time'        => $chat->created_at->format('h:i A'),
+                    'is_me'       => $chat->sender_id === auth()->id()
+                ];
+            });
+
+        return response()->json([
+            'success'  => true,
+            'messages' => $messages
+        ]);
+    }
 }

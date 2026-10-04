@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('ticketchats', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('ticket_id')->constrained('dailyticketrequest')->onDelete('cascade');
+            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
+            $table->text('message');
+            $table->boolean('is_read')->default(false);
             $table->timestamps();
+
+            // Indexing for rapid message retrieval per ticket
+            $table->index(['ticket_id', 'created_at']);
         });
     }
 

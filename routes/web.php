@@ -48,6 +48,9 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/support/view/all/fetch/resolved',[SupportTicketRequestController::class,'showresolved'])->name('tickets.showresolved');
         Route::get('/support/view/all/fetch/closed',[SupportTicketRequestController::class,'showclosed'])->name('tickets.showclosed');
         Route::get('/support/view/details',[SupportTicketRequestController::class,'store'])->name('tickets.store');
+
+        Route::post('/ticket/chat/send', [SupportTicketRequestController::class, 'sendMessage'])->name('ticket.chat.send');
+        Route::get('/ticket/chat/fetch/{ticketId}', [SupportTicketRequestController::class, 'fetchMessages'])->name('ticket.chat.fetch');
        
         Route::get('/requester/view/all',[RequesterTicketRequestController::class,'index'])->name('ticketsrequester.index');
         Route::get('/requester/tickets/categories/{supportType}', [RequesterTicketRequestController::class, 'getCat'])->name('tickets.categories');
