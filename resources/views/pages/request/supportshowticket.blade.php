@@ -12,9 +12,15 @@
                 <!-- Page Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div class="d-flex align-items-start gap-2">
-                        <a href="{{ route('tickets.index') }}" class="btn btn-light btn-sm" title="Back to Requests" aria-label="Back to Requests">
-                            <i class="ti ti-arrow-left"></i>
-                        </a>
+                        @if(Auth::guard('web')->user()->role != 'Requester')
+                            <a href="{{ route('tickets.index') }}" class="btn btn-light btn-sm" title="Back to Requests" aria-label="Back to Requests">
+                                <i class="ti ti-arrow-left"></i>
+                            </a>
+                        @else
+                            <a href="{{ route('ticketsrequester.index') }}" class="btn btn-light btn-sm" title="Back to Requests" aria-label="Back to Requests">
+                                <i class="ti ti-arrow-left"></i>
+                            </a>
+                        @endif
                         <div>
                             <h1 class="h4 fw-bold mb-1">
                                 <span class="text-primary">{{ $ticket->ticket_number }}</span> : &nbsp;
@@ -88,7 +94,7 @@
                                 <!-- Detailed Complaint Description -->
                                 <div class="mb-4">
                                     <label class="form-label fw-bold">Issue Description:</label>
-                                    <div class="p-3 card-body-content-bg-color rounded border">
+                                    <div class="p-3 card-body-content-bg-color shadow-sm rounded border">
                                         <p class="mb-0">
                                             " {{ $ticket->issue_description }} "
                                         </p>
@@ -132,6 +138,7 @@
 
                                 <!-- IT Management Action -->
                                 <hr>
+                                @if(Auth::guard('web')->user()->role != 'Requester')
                                 <div class="d-flex justify-content-between">
                                     <button class="btn btn-outline-success">
                                         <i class="ti ti-check me-1"></i> Mark as Resolved & Close
@@ -140,6 +147,7 @@
                                         <i class="ti ti-progress me-1"></i> Mark as 'In Progress / Working'
                                     </button>
                                 </div>
+                                @endif
 
                             </div>
                         </div>
@@ -295,8 +303,9 @@
         }
 
         .chat-bubble {
-            font-size: 0.9rem;
-            max-width: 85%;
+            max-width: 100%; /* Prevents bubbles from taking the entire screen width */
+            width: fit-content; /* Shrinks to text size when message is short */
+            word-wrap: break-word;
         }
 
         .incoming-bubble {
@@ -313,6 +322,7 @@
             background-color: #ebf4ff;
             border: 1px solid var(--bs-border-color, #dee2e6);
             color: #000;
+            
         }
 
         [data-bs-theme="dark"] .outgoing-bubble {

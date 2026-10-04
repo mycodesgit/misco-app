@@ -15,9 +15,6 @@
                         <h1 class="h4 fw-bold mb-1">{{ auth()->user()->pageTitle('Ticket Requests') }}</h1>
                         <p class="text-muted small mb-0">Manage incoming user issues, track ongoing fixes, and view closed tickets.</p>
                     </div>
-                    <a href="{{ url('/tickets/create') }}" class="btn btn-primary btn-sm rounded-pill px-3">
-                        <i class="ti ti-plus me-1"></i> Submit New Ticket
-                    </a>
                 </div>
 
                 <div class="row g-3 mb-5">

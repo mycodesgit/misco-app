@@ -260,7 +260,6 @@
     @endif
     @if (request()->routeIs('tickets.index'))
         @include('script.ticket.supportjs')
-        @include('script.ticket.ticketchatjs')
     @endif
     @if (request()->routeIs('tickets.store'))
         @include('script.ticket.ticketchatjs')

@@ -194,20 +194,61 @@ class SupportTicketRequestController extends Controller
     }
 
     // Fetch Messages
+    // public function fetchMessages($ticketId)
+    // {
+    //     $messages = TicketChat::with('sender')
+    //         ->where('ticket_id', $ticketId)
+    //         ->orderBy('created_at', 'asc')
+    //         ->get()
+    //         ->map(function ($chat) {
+    //             return [
+    //                 'id'          => $chat->id,
+    //                 'message'     => $chat->message,
+    //                 'sender_id'   => $chat->sender_id,
+    //                 'sender_name' => $chat->sender->fname . ' ' . $chat->sender->lname,
+    //                 'time'        => $chat->created_at->format('h:i A'),
+    //                 'is_me'       => $chat->sender_id === auth()->id()
+    //             ];
+    //         });
+
+    //     return response()->json([
+    //         'success'  => true,
+    //         'messages' => $messages
+    //     ]);
+    // }
+
     public function fetchMessages($ticketId)
     {
+        // Retrieve ticket details to check ownership and assignment
+        $ticket = DailyTicketRequest::select(['id', 'user_id', 'assigned_to'])->findOrFail($ticketId);
+
+        $currentUserId = auth()->id();
+
+        // Check if the current user is authorized (Requester OR Assigned Support)
+        $isRequester = $currentUserId === $ticket->user_id;
+        $isAssignedSupport = $currentUserId === $ticket->assigned_to;
+
+        if (!$isRequester && !$isAssignedSupport) {
+            return response()->json([
+                'success'  => false,
+                'message'  => 'Unauthorized to view this conversation.',
+                'messages' => []
+            ], 403);
+        }
+
+        // Fetch messages only if authorized
         $messages = TicketChat::with('sender')
             ->where('ticket_id', $ticketId)
             ->orderBy('created_at', 'asc')
             ->get()
-            ->map(function ($chat) {
+            ->map(function ($chat) use ($currentUserId) {
                 return [
                     'id'          => $chat->id,
                     'message'     => $chat->message,
                     'sender_id'   => $chat->sender_id,
-                    'sender_name' => $chat->sender->fname . ' ' . $chat->sender->lname,
+                    'sender_name' => $chat->sender?->fname . ' ' . $chat->sender?->lname,
                     'time'        => $chat->created_at->format('h:i A'),
-                    'is_me'       => $chat->sender_id === auth()->id()
+                    'is_me'       => $chat->sender_id === $currentUserId
                 ];
             });
 

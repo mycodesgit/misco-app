@@ -102,13 +102,13 @@
         if (msg.is_me) {
             html = `
                 <div class="d-flex mb-3 align-items-start justify-content-end">
-                    <div class="text-end">
-                        <div class="d-flex align-items-center justify-content-end gap-2 mb-1">
+                    <div class="d-flex flex-column align-items-end min-w-0">
+                        <div class="d-flex align-items-center gap-2 mb-1">
                             <small class="text-muted">${msg.time}</small>
                             <span class="fw-semibold small">You</span>
                         </div>
-                        <div class="chat-bubble outgoing-bubble p-3 rounded-3 ms-auto">
-                            <p class="mb-0">${escapeHtml(msg.message)}</p>
+                        <div class="chat-bubble outgoing-bubble p-3 rounded-3">
+                            <p class="mb-0 text-break">${escapeHtml(msg.message)}</p>
                         </div>
                     </div>
                     <div class="avatar-circle bg-secondary text-white fw-bold ms-2 flex-shrink-0">
@@ -121,13 +121,13 @@
                     <div class="avatar-circle bg-warning text-white fw-bold me-2 flex-shrink-0">
                         ${getInitials(msg.sender_name)}
                     </div>
-                    <div>
+                    <div class="d-flex flex-column align-items-start min-w-0">
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <span class="fw-semibold small">${escapeHtml(msg.sender_name)}</span>
                             <small class="text-muted">${msg.time}</small>
                         </div>
-                        <div class="chat-bubble incoming-bubble p-3 rounded-3">
-                            <p class="mb-0">${escapeHtml(msg.message)}</p>
+                        <div class="chat-bubble shadow-sm incoming-bubble p-3 rounded-3">
+                            <p class="mb-0 text-break">${escapeHtml(msg.message)}</p>
                         </div>
                     </div>
                 </div>`;
