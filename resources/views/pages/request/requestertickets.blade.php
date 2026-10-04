@@ -230,6 +230,12 @@
                                 </select>
                             </div>
 
+                            <div class="col-md-12">
+                                <label for="assigned_to_display" class="form-label fw-semibold">Assigned to personnel: <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="assigned_to_display" name="assigned_to[]" placeholder="Select a category first" readonly>
+                                <input type="hidden" name="assigned_to" id="assigned_to">
+                            </div>
+
                             <!-- Priority Level -->
                             <div class="col-md-6">
                                 <label for="priority" class="form-label fw-semibold">Priority Level: <span class="text-danger">*</span></label>

@@ -18,8 +18,12 @@ class UserAssignedTask extends Model
         'aboutassigned',
     ];
 
+    protected $casts = [
+        'taskassigned' => 'array',
+    ];
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

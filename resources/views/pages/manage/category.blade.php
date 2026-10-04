@@ -208,8 +208,11 @@
                             <label for="editCategoryType" class="form-label fw-semibold">Category Type: <span class="text-danger">*</span></label>
                             <select name="cattype[]" id="editCategoryType" class="form-control select2" multiple="multiple" required>
                                 <option disabled selected>Select Category Type</option>
-                                <option value="Requester">Requester</option>
-                                <option value="IT Support">IT Support</option>
+                                @foreach ($urole as $role)
+                                    <option value="{{ $role->rolename }}">
+                                        {{ $role->rolename }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-12 mb-3">

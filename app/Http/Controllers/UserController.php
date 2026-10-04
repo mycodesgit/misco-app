@@ -88,12 +88,32 @@ class UserController extends Controller
 
     public function show()
     {
-        $data = User::with('office')
-            ->where('users.ustatus', '!=', '3')
-            ->get();
+        $users = User::with([
+            'office',
+            'assignedTasks:id,user_id,taskassigned',
+        ])
+        ->where('users.ustatus', '!=', 3)
+        ->get();
 
-        return response()->json(['data' => $data]);
+        $data = $users->map(function ($user) {
+            $assignedIds = $user->assignedTasks?->taskassigned ?? [];
+
+            // Always return an array of strings
+            $assignedIds = collect($assignedIds)
+                ->map(fn ($id) => (string) $id)
+                ->values()
+                ->all();
+
+            $user->taskassigned = $assignedIds;
+
+            return $user;
+        });
+
+        return response()->json([
+            'data' => $data
+        ]);
     }
+
 
     public function update(Request $request)
     {
@@ -177,7 +197,8 @@ class UserController extends Controller
         }
     }
 
-    public function userUpdateStatus(Request $request) {
+    public function userUpdateStatus(Request $request) 
+    {
         $user = User::find($request->id);
 
         $request->validate([
@@ -203,6 +224,34 @@ class UserController extends Controller
             return response()->json(['success' => true, 'message' => 'User Status updated successfully!']);
         } catch (\Exception $e) {
             return response()->json(['error' => true, 'message' => 'Failed to update User Status!']);
+        }
+    }
+
+    public function userAssignTaskUpdate(Request $request) 
+    {
+        $request->validate([
+            'id' => 'required',
+            'usertask' => 'required',
+        ]);
+
+        try {
+            $taskuser = UserAssignedTask::updateOrCreate(
+                ['user_id' => $request->input('id')],
+                ['taskassigned' => $request->input('usertask')]
+            );
+
+            $newData = $taskuser->fresh()->toArray();
+
+            $auditPayload = [
+                'after' => $newData,
+            ];
+
+            // Abstracted Audit Trail
+            $this->logUserAssignedTaskAudit($request, 'Edit_Task_Assignment', $auditPayload);
+
+            return response()->json(['success' => true, 'message' => 'User Task Assignment updated successfully!']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => true, 'message' => 'Failed to update User Task Assignment!']);
         }
     }
 

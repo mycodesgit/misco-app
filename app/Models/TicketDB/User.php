@@ -73,6 +73,11 @@ class User extends Authenticatable
         return $this->belongsTo(Office::class, 'office_id');
     }
 
+    public function assignedTasks()
+    {
+        return $this->hasOne(UserAssignedTask::class, 'user_id');
+    }
+
     public function pageTitle(string $title): string
     {
         $prefix = ($this->role === 'Requester') 

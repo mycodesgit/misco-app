@@ -70,10 +70,14 @@
                     data: 'id',
                     render: function(data, type, row) {
                         if (type === 'display') {
-                            var buttons = '<button type="button" class="btn btn-sm btn-success btn-useredit text-light" data-id="' + row.id + '" data-fname="' + row.fname + '" data-mname="' + row.mname + '" data-lname="' + row.lname + '" data-ext="' + row.ext + '" data-email="' + row.email + '" data-office="' + row.office_id + '" data-gender="' + row.gender + '" data-role="' + row.role + '" data-campus="' + row.campus_id + '" data-permission="' + row.isAllowed + '" data-toggle="tooltip" data-placement="top" title="Edit User."><i class="ti ti-pencil"></i> </button>'+'&nbsp;';
-                                buttons += '<button type="button" class="btn btn-sm btn-secondary btn-assigncategory" data-id="' + row.id + '" data-toggle="tooltip" data-placement="top" title="Assign Task Category."><i class="ti ti-server"></i> </button>'+'&nbsp;';
-                                buttons += '<button type="button" class="btn btn-sm btn-light btn-passedit" data-id="' + row.id + '" data-password="' + row.password + '" data-toggle="tooltip" data-placement="top" title="Edit User Password."><i class="ti ti-lock"></i> </button>'+'&nbsp;';
-                                buttons += '<button type="button" class="btn btn-sm btn-warning btn-ustatusedit" data-id="' + row.id + '" data-ustatus="' + row.ustatus + '" data-toggle="tooltip" data-placement="top" title="Enabled/Disabled."><i class="ti ti-toggle-left"></i> </button>'+'&nbsp;';
+                            var taskAssigned = Array.isArray(row.taskassigned)
+                                ? row.taskassigned
+                                : [];
+
+                            var buttons = '<button type="button" class="btn btn-sm btn-success btn-useredit text-light" data-id="' + row.id + '" data-fname="' + row.fname + '" data-mname="' + row.mname + '" data-lname="' + row.lname + '" data-ext="' + row.ext + '" data-email="' + row.email + '" data-office="' + row.office_id + '" data-gender="' + row.gender + '" data-role="' + row.role + '" data-campus="' + row.campus_id + '" data-permission="' + row.isAllowed + '" data-toggle="tooltip" data-placement="top" title="Edit User."><i class="ti ti-pencil"></i></button>&nbsp;';
+                                buttons += '<button type="button" class="btn btn-sm btn-secondary btn-assigncategory" data-id="' + row.id + '" data-fullname="' + row.fname + ' ' + row.mname + ' ' + row.lname + (row.ext && row.ext !== 'null' ? ' ' + row.ext : '') + '" data-taskassigned=\'' + JSON.stringify(taskAssigned) + '\'  data-toggle="tooltip" data-placement="top" title="Assign Task Category."><i class="ti ti-server"></i></button>&nbsp;';
+                                buttons += '<button type="button" class="btn btn-sm btn-light btn-passedit" data-id="' + row.id + '" data-password="' + row.password + '" data-toggle="tooltip" data-placement="top" title="Edit User Password."><i class="ti ti-lock"></i></button>&nbsp;';
+                                buttons += '<button type="button" class="btn btn-sm btn-warning btn-ustatusedit" data-id="' + row.id + '" data-ustatus="' + row.ustatus + '" data-toggle="tooltip" data-placement="top" title="Enabled/Disabled."><i class="ti ti-toggle-left"></i></button>&nbsp;';
                             if (isAdmin || isChecker) {
                                 buttons += '<button type="button" value="' + data + '" class="btn btn-sm btn-danger userpr-delete" data-toggle="tooltip" data-placement="top" title="Delete Category."><i class="ti ti-trash"></i> </button>';
                             }
@@ -161,14 +165,6 @@
 
         $('#editPasswordModal').modal('show');
     });
-    
-    $(document).on('click', '.btn-assigncategory', function() {
-        var id = $(this).data('id');
-
-        $('#assignTaskCategoryId').val(id);
-
-        $('#assignTaskCategoryModal').modal('show');
-    });
 
     $('#editPasswordForm').submit(function(event) {
         event.preventDefault();
@@ -223,6 +219,65 @@
                     toastr.success(response.message);
                     $('#editUstatusModal').modal('hide');
                     $(document).trigger('userAdded');
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function(xhr, status, error, message) {
+                var errorMessage = xhr.responseText ? JSON.parse(xhr.responseText).message : 'An error occurred';
+                toastr.error(errorMessage);
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-assigncategory', function () {
+        var id = $(this).attr('data-id');
+        var taskfullname = $(this).attr('data-fullname');
+        var rawTaskData = $(this).attr('data-taskassigned') || '[]';
+
+        var taskAssignCat = [];
+        try {
+            taskAssignCat = JSON.parse(rawTaskData);
+        } catch (error) {
+            console.error('Invalid taskassigned JSON:', rawTaskData);
+            taskAssignCat = [];
+        }
+        // Make sure IDs are strings
+        taskAssignCat = Array.isArray(taskAssignCat)
+            ? taskAssignCat.map(String)
+            : [];
+
+        $('#assignTaskCategoryId').val(id);
+        $('#assignTaskFullname').val(taskfullname);
+
+        // Clear current selections
+        $('#assignTaskCategoryName').val(null).trigger('change');
+
+        // Select assigned categories
+        if (taskAssignCat.length > 0) {
+            $('#assignTaskCategoryName').val(taskAssignCat).trigger('change');
+        }
+
+        $('#assignTaskCategoryModal').modal('show');
+    });
+
+    $('#assignTaskCategoryForm').submit(function(event) {
+        event.preventDefault();
+        var formData = $(this).serialize();
+
+        $.ajax({
+            url: userTaskAssignmentUpdateRoute,
+            type: "POST",
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if(response.success) {
+                    toastr.success(response.message);
+                    $('#assignTaskCategoryModal').modal('hide');
+                    $(document).trigger('userAdded');
+                    $('#addUser')[0].reset();
                 } else {
                     toastr.error(response.message);
                 }

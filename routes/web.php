@@ -52,6 +52,8 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/requester/view/all',[RequesterTicketRequestController::class,'index'])->name('ticketsrequester.index');
         Route::get('/tickets/categories/{supportType}', [RequesterTicketRequestController::class, 'getCat'])->name('tickets.categories');
         Route::get('/tickets/subcategories/{category}', [RequesterTicketRequestController::class, 'getSubcat'])->name('tickets.subcategories');
+        Route::get('/tickets/assigned-personnel/{category}', [RequesterTicketRequestController::class, 'getassignedPersonnel'])->name('tickets.assignedPersonnel');
+
     });
 
     Route::prefix('/daily-task')->group(function () {
@@ -92,6 +94,7 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::post('/list/view/update', [UserController::class, 'update'])->name('user.update');
         Route::post('/list/updatePass', [UserController::class, 'userUpdatePassword'])->name('userUpdatePassword');
         Route::post('list/updateStatusnow', [UserController::class, 'userUpdateStatus'])->name('userUpdateStatus');
+        Route::post('list/updateTaskassignment', [UserController::class, 'userAssignTaskUpdate'])->name('userAssignTaskUpdate');
     });
 
     Route::prefix('/roles')->group(function () {

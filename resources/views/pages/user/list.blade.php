@@ -178,7 +178,7 @@
 
                             <div class="col-md-12">
                                 <label class="form-label fw-semibold">Office <span class="text-danger">*</span></label>
-                                <select class="form-control form-control-sm select2" name="office_id">
+                                <select class="form-control form-control-sm select2bs4" name="office_id">
                                     <option value="" selected disabled>--- Select Office ---</option>
                                     @foreach ($offices as $data)
                                         <option value="{{ $data->id }}">{{ $data->office_name }}</option>
@@ -377,12 +377,12 @@
                         <input type="hidden" name="id" id="assignTaskCategoryId">
                         <div class="row g-3">
                             <div class="col-md-12">
-                                <label for="assignTaskCategoryName" class="form-label fw-semibold">Name: <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control fw-semibold" value="{{ Auth::user()->fname }} {{ Auth::user()->mname ?? '' }} {{ Auth::user()->lname }}" name="user" readonly>
+                                <label for="assignTaskFullname" class="form-label fw-semibold">Name: <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control fw-semibold" id="assignTaskFullname" readonly>
                             </div>
                             <div class="col-md-12">
                                 <label for="assignTaskCategoryName" class="form-label fw-semibold">Select & asssign Task Category: <span class="text-danger">*</span></label>
-                                <select class="form-control select2bs4" id="assignTaskCategoryName" name="taskassigned[]" multiple="multiple">
+                                <select class="form-control select2bs4" id="assignTaskCategoryName" name="usertask[]" multiple="multiple">
                                     @foreach ($cat as $category)
                                         <option value="{{ $category->id }}">
                                             {{ $category->ticketcatname }}
@@ -435,6 +435,7 @@
         var userUpdateRoute = "{{ route('user.update', ['id' => ':id']) }}";
         var userPassUpdateRoute = "{{ route('userUpdatePassword', ['id' => ':id']) }}";
         var userStatusUpdateRoute = "{{ route('userUpdateStatus', ['id' => ':id']) }}";
+        var userTaskAssignmentUpdateRoute = "{{ route('userAssignTaskUpdate', ['id' => ':id']) }}";
 
         var isAdmin = '{{ Auth::guard("web")->user()->role == "Administrator" ? true : false }}';
         var isChecker = '{{ Auth::guard("web")->user()->role == "Checker" ? true : false }}';

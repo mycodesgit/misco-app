@@ -62,4 +62,21 @@ class RequesterTicketRequestController extends Controller
 
         return response()->json($subcategories);
     }
+
+    public function getassignedPersonnel($category)
+    {
+        $users = User::with('assignedTasks')
+            ->where('ustatus', '!=', 3)
+            ->whereHas('assignedTasks', function ($query) use ($category) {
+                $query->whereJsonContains('taskassigned', (string) $category);
+            })
+            ->get([
+                'id',
+                'fname',
+                'lname',
+            ]);
+
+        return response()->json($users);
+    }
+
 }
