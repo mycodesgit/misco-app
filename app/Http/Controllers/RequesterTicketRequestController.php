@@ -192,8 +192,11 @@ class RequesterTicketRequestController extends Controller
 
     public function showreqpending()
     {
+        $authuser = Auth::user()->id;
+
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
             ->where('status', 'Pending')
+            ->where('user_id', $authuser)
             ->orderBy('id', 'DESC')
             ->get();
 

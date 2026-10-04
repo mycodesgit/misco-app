@@ -27,10 +27,13 @@ class SupportTicketRequestController extends Controller
         return view('pages.request.supportalltickets');
     }
 
-    public function showpending()
+    public function showsupportpending()
     {
+        $authuseroffice = Auth::user()->office_id;
+
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
             ->where('status', 'Pending')
+            ->where('off_id', $authuseroffice)
             ->orderBy('id', 'DESC')
             ->get();
 

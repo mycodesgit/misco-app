@@ -113,6 +113,7 @@ class DashboardController extends Controller
             // Fetch resolved tickets grouped by date
             $resolvedTicketsMap = DailyTicketRequest::whereYear('resolved_at', $year)
                 ->where('status', 'Resolved')
+                ->where('off_id', $user->office_id)
                 ->selectRaw('DATE(resolved_at) as date, COUNT(*) as total')
                 ->groupBy('date')
                 ->pluck('total', 'date')

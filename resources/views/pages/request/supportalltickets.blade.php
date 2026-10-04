@@ -194,7 +194,7 @@
     </style>
 
     <script>
-        var ticketPendingReadRoute = "{{ route('tickets.showpending') }}";
+        var ticketPendingReadRoute = "{{ route('tickets.showsupportpending') }}";
         var ticketProgressRoute = "{{ route('tickets.showprogress') }}";
         var ticketResolvedRoute = "{{ route('tickets.showresolved') }}";
         var ticketClosedRoute = "{{ route('tickets.showclosed') }}";

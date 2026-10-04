@@ -43,7 +43,7 @@ Route::group(['middleware'=>['login_auth']],function(){
 
     Route::prefix('/tickets')->group(function () {
         Route::get('/support/view/all',[SupportTicketRequestController::class,'index'])->name('tickets.index');
-        Route::get('/support/view/all/fetch/pending',[SupportTicketRequestController::class,'showpending'])->name('tickets.showpending');
+        Route::get('/support/view/all/fetch/pending',[SupportTicketRequestController::class,'showsupportpending'])->name('tickets.showsupportpending');
         Route::get('/support/view/all/fetch/progress',[SupportTicketRequestController::class,'showprogress'])->name('tickets.showprogress');
         Route::get('/support/view/all/fetch/resolved',[SupportTicketRequestController::class,'showresolved'])->name('tickets.showresolved');
         Route::get('/support/view/all/fetch/closed',[SupportTicketRequestController::class,'showclosed'])->name('tickets.showclosed');
