@@ -311,11 +311,11 @@
     </style>
 
     <script>
-        var ticketPendingReadRoute = "{{ route('tickets.showpending') }}";
-        var ticketProgressRoute = "{{ route('tickets.showprogress') }}";
-        var ticketResolvedRoute = "{{ route('tickets.showresolved') }}";
-        var ticketClosedRoute = "{{ route('tickets.showclosed') }}";
-        var ticketCreateRoute = "";
+        var ticketPendingReadRoute = "{{ route('tickets.showreqpending') }}";
+        var ticketProgressRoute = "{{ route('tickets.showreqprogress') }}";
+        var ticketResolvedRoute = "{{ route('tickets.showreqresolved') }}";
+        var ticketClosedRoute = "{{ route('tickets.showreqclosed') }}";
+        var ticketCreateRoute = "{{ route('ticketsrequester.create') }}";
 
         function previewImage(event) {
             var reader = new FileReader();

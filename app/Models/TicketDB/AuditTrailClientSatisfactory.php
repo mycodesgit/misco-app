@@ -5,11 +5,11 @@ namespace App\Models\TicketDB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AuditTrailDailyTicketRequest extends Model
+class AuditTrailClientSatisfactory extends Model
 {
     use HasFactory;
-    
-    protected $table = 'audit_traildailyticketrequest';
+
+    protected $table = 'audit_trailclientsatisfactory';
 
     protected $fillable = [
         'user_id',

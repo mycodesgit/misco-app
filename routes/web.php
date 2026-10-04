@@ -50,9 +50,14 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/support/view/details',[SupportTicketRequestController::class,'store'])->name('tickets.store');
        
         Route::get('/requester/view/all',[RequesterTicketRequestController::class,'index'])->name('ticketsrequester.index');
-        Route::get('/tickets/categories/{supportType}', [RequesterTicketRequestController::class, 'getCat'])->name('tickets.categories');
-        Route::get('/tickets/subcategories/{category}', [RequesterTicketRequestController::class, 'getSubcat'])->name('tickets.subcategories');
-        Route::get('/tickets/assigned-personnel/{category}', [RequesterTicketRequestController::class, 'getassignedPersonnel'])->name('tickets.assignedPersonnel');
+        Route::get('/requester/tickets/categories/{supportType}', [RequesterTicketRequestController::class, 'getCat'])->name('tickets.categories');
+        Route::get('/requester/tickets/subcategories/{category}', [RequesterTicketRequestController::class, 'getSubcat'])->name('tickets.subcategories');
+        Route::get('/requester/tickets/assigned-personnel/{category}', [RequesterTicketRequestController::class, 'getassignedPersonnel'])->name('tickets.assignedPersonnel');
+        Route::post('/requester/tickets/submit/ticket', [RequesterTicketRequestController::class, 'create'])->name('ticketsrequester.create');
+        Route::get('/requester/view/all/fetch/pending',[RequesterTicketRequestController::class,'showreqpending'])->name('tickets.showreqpending');
+        Route::get('/requester/view/all/fetch/progress',[RequesterTicketRequestController::class,'showreqprogress'])->name('tickets.showreqprogress');
+        Route::get('/requester/view/all/fetch/resolved',[RequesterTicketRequestController::class,'showreqresolved'])->name('tickets.showreqresolved');
+        Route::get('/requester/view/all/fetch/closed',[RequesterTicketRequestController::class,'showreqclosed'])->name('tickets.showreqclosed');
 
     });
 
