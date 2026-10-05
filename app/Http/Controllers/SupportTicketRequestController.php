@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -153,8 +154,8 @@ class SupportTicketRequestController extends Controller
             ])
             ->with([
                 'category:id,ticketcatname', // replace 'ticketcatname' with your actual column name
-                'subcategory:id,ticketsubcatname', 
-                'requester:id,fname,lname,email', 
+                'subcategory:id,ticketsubcatname',
+                'requester:id,fname,lname,email',
                 'requesteroffice:id,office_name,office_abbr',
                 'supportoffice:id,office_abbr'
             ])
@@ -169,12 +170,36 @@ class SupportTicketRequestController extends Controller
         $request->validate([
             'ticket_id' => 'required|exists:dailyticketrequest,id',
             'message'   => 'required|string',
+            'attachment' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
+        // Ensure either message or attachment is provided
+        if (!$request->filled('message') && !$request->hasFile('attachment')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please enter a message or select an image.'
+            ], 422);
+        }
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $currentYear = date('Y');
+            $senderId = auth()->id();
+            $extension = $file->getClientOriginalExtension();
+
+            // Format: senderid_year_timestamp.extension (e.g., 12_2026_1710000000.png)
+            $fileName = $senderId . '_' . $currentYear . '_' . time() . '.' . $extension;
+
+            // Save to storage/app/public/chat_attachments/2026/
+            $attachmentPath = $file->storeAs("chat_attachments/{$currentYear}", $fileName, 'public');
+        }
+
         $chat = TicketChat::create([
-            'ticket_id' => $request->ticket_id,
-            'sender_id' => auth()->id(),
-            'message'   => $request->message,
+            'ticket_id'  => $request->ticket_id,
+            'sender_id'  => auth()->id(),
+            'message'    => $request->message ?? '',
+            'attachment' => $attachmentPath ? 'storage/' . $attachmentPath : null,
         ]);
 
         // Load sender details for frontend rendering
@@ -185,6 +210,7 @@ class SupportTicketRequestController extends Controller
             'data'    => [
                 'id'         => $chat->id,
                 'message'    => $chat->message,
+                'attachment'  => $chat->attachment ? asset($chat->attachment) : null,
                 'sender_id'  => $chat->sender_id,
                 'sender_name'=> $chat->sender->fname . ' ' . $chat->sender->lname,
                 'time'       => $chat->created_at->format('h:i A'),
@@ -193,62 +219,23 @@ class SupportTicketRequestController extends Controller
         ]);
     }
 
+
     // Fetch Messages
-    // public function fetchMessages($ticketId)
-    // {
-    //     $messages = TicketChat::with('sender')
-    //         ->where('ticket_id', $ticketId)
-    //         ->orderBy('created_at', 'asc')
-    //         ->get()
-    //         ->map(function ($chat) {
-    //             return [
-    //                 'id'          => $chat->id,
-    //                 'message'     => $chat->message,
-    //                 'sender_id'   => $chat->sender_id,
-    //                 'sender_name' => $chat->sender->fname . ' ' . $chat->sender->lname,
-    //                 'time'        => $chat->created_at->format('h:i A'),
-    //                 'is_me'       => $chat->sender_id === auth()->id()
-    //             ];
-    //         });
-
-    //     return response()->json([
-    //         'success'  => true,
-    //         'messages' => $messages
-    //     ]);
-    // }
-
     public function fetchMessages($ticketId)
     {
-        // Retrieve ticket details to check ownership and assignment
-        $ticket = DailyTicketRequest::select(['id', 'user_id', 'assigned_to'])->findOrFail($ticketId);
-
-        $currentUserId = auth()->id();
-
-        // Check if the current user is authorized (Requester OR Assigned Support)
-        $isRequester = $currentUserId === $ticket->user_id;
-        $isAssignedSupport = $currentUserId === $ticket->assigned_to;
-
-        if (!$isRequester && !$isAssignedSupport) {
-            return response()->json([
-                'success'  => false,
-                'message'  => 'Unauthorized to view this conversation.',
-                'messages' => []
-            ], 403);
-        }
-
-        // Fetch messages only if authorized
         $messages = TicketChat::with('sender')
             ->where('ticket_id', $ticketId)
             ->orderBy('created_at', 'asc')
             ->get()
-            ->map(function ($chat) use ($currentUserId) {
+            ->map(function ($chat) {
                 return [
                     'id'          => $chat->id,
                     'message'     => $chat->message,
                     'sender_id'   => $chat->sender_id,
-                    'sender_name' => $chat->sender?->fname . ' ' . $chat->sender?->lname,
+                    'attachment'  => $chat->attachment ? asset($chat->attachment) : null,
+                    'sender_name' => $chat->sender->fname . ' ' . $chat->sender->lname,
                     'time'        => $chat->created_at->format('h:i A'),
-                    'is_me'       => $chat->sender_id === $currentUserId
+                    'is_me'       => $chat->sender_id === auth()->id()
                 ];
             });
 

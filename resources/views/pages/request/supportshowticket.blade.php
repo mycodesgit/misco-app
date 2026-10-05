@@ -143,7 +143,7 @@
                                     <button class="btn btn-outline-success">
                                         <i class="ti ti-check me-1"></i> Mark as Resolved & Close
                                     </button>
-                                    <button class="btn btn-secondary">
+                                    <button class="btn btn-info">
                                         <i class="ti ti-progress me-1"></i> Mark as 'In Progress / Working'
                                     </button>
                                 </div>
@@ -155,6 +155,7 @@
 
                     <!-- RIGHT COLUMN: Pure Message Chat Area (col-md-7) -->
                     <div class="col-md-7">
+
                         <div class="card h-100 d-flex flex-column">
 
                             <!-- Chat Box Header -->
@@ -166,7 +167,7 @@
                                     <div>
                                         <h6 class="mb-0 fw-bold">Live Ticket Chat</h6>
                                         <small class="text-muted">
-                                            Chatting with: 
+                                            Chatting with:
                                             <strong>
                                                 @if(auth()->id() === $ticket->user_id)
                                                     {{-- Logged in user is the Requester -> Show Assigned Support or Default --}}
@@ -189,23 +190,43 @@
                                         Chat opened for Ticket #{{ $ticket->ticket_number ?? $ticket->id }}
                                     </small>
                                 </div>
-                                
+
                                 {{-- Messages will dynamically render here via JS --}}
                             </div>
 
                             <!-- Chat Input Footer -->
                             <div class="card-footer bg-transparent p-3 border-top">
-                                <form method="POST" id="chatOnlyForm">
+                                <!-- Selected File Preview Container -->
+                                <div id="attachmentPreview" class="d-none mb-2 p-2 bg-light rounded border align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center text-truncate me-2">
+                                        <i class="ti ti-photo me-2 text-primary fs-5"></i>
+                                        <span id="fileNameDisplay" class="small fw-semibold text-truncate"></span>
+                                    </div>
+                                    <button type="button" class="btn-close btn-sm ms-2" id="removeAttachmentBtn" aria-label="Remove attachment"></button>
+                                </div>
+                                <form method="POST" id="chatOnlyForm" enctype="multipart/form-data">
                                     @csrf
                                     <input type="hidden" id="ticket_id" value="{{ $ticket->id }}">
+                                    <input type="file" id="chatAttachment" name="attachment" accept="image/*" class="d-none">
+
                                     <div class="position-relative d-flex align-items-center">
-                                        <input type="text" id="chatMessageInput" class="form-control custom-input-btn" placeholder="Type a text message to requester..." required autocomplete="off">
-                                        <button class="btn btn-success btn-inside" type="submit" id="sendChatBtn">
-                                            <i class="ti ti-send me-1"></i> Send
-                                        </button>
+                                        <input type="text" id="chatMessageInput" class="form-control custom-input-btn" placeholder="Type a text message to requester..." autocomplete="off">
+
+                                        <!-- Action buttons container placed inside the input -->
+                                        <div class="chat-input-actions d-flex align-items-center gap-1">
+                                            <!-- Attach Icon -->
+                                            <label for="chatAttachment" class="btn btn-link text-secondary p-1 mb-0 border-0" title="Attach Image">
+                                                <i class="ti ti-paperclip fs-5"></i>
+                                            </label>
+
+                                            <!-- Send Button -->
+                                            <button class="btn btn-success btn-inside-send" type="submit" id="sendChatBtn">
+                                                <i class="ti ti-send me-1"></i> Send
+                                            </button>
+                                        </div>
                                     </div>
                                     <small class="text-muted mt-1 d-block" style="font-size: 0.72rem;">
-                                        <i class="ti ti-info-circle me-1"></i> Direct chat supports pure text messages only. Photo attachments are managed on creation.
+                                        <i class="ti ti-info-circle me-1"></i> Supports text & image attachments (PNG, JPG, JPEG up to 5MB).
                                     </small>
                                 </form>
                             </div>
@@ -229,8 +250,8 @@
                 </div>
                 <div class="modal-body text-center p-2">
                     @if(!empty($ticket->attachment))
-                        <img src="{{ asset($ticket->attachment) }}" 
-                            class="img-fluid rounded" 
+                        <img src="{{ asset($ticket->attachment) }}"
+                            class="img-fluid rounded"
                             alt="{{ basename($ticket->attachment) }}"
                             style="max-height: 75vh; object-fit: contain;">
                     @else
@@ -242,9 +263,9 @@
                 </div>
                 {{-- @if(!empty($ticket->attachment))
                     <div class="modal-footer py-2">
-                        <a href="{{ asset($ticket->attachment) }}" 
-                        target="_blank" 
-                        download="{{ basename($ticket->attachment) }}" 
+                        <a href="{{ asset($ticket->attachment) }}"
+                        target="_blank"
+                        download="{{ basename($ticket->attachment) }}"
                         class="btn btn-sm btn-primary">
                             <i class="ti ti-download me-1"></i> Download File
                         </a>
@@ -306,11 +327,38 @@
             max-width: 100%; /* Prevents bubbles from taking the entire screen width */
             width: fit-content; /* Shrinks to text size when message is short */
             word-wrap: break-word;
+            position: relative;
+        }
+
+        /* Base style for both tails */
+        .chat-bubble::before {
+            content: '';
+            position: absolute;
+            top: 12px; /* Adjust vertical placement of the tail */
+            width: 0;
+            height: 0;
+            border: 7px solid transparent;
         }
 
         .incoming-bubble {
             background-color: var(--bs-light, #f8f9fa);
             border: 1px solid var(--bs-border-color, #dee2e6);
+        }
+
+        .incoming-bubble::before {
+            left: -14px;
+            border-right-color: var(--bs-border-color, #dee2e6); /* Border color of tail */
+        }
+
+        .incoming-bubble::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: -12px;
+            width: 0;
+            height: 0;
+            border: 7px solid transparent;
+            border-right-color: var(--bs-light, #f8f9fa); /* Fill color inside tail */
         }
 
         [data-bs-theme="dark"] .incoming-bubble {
@@ -322,7 +370,23 @@
             background-color: #ebf4ff;
             border: 1px solid var(--bs-border-color, #dee2e6);
             color: #000;
-            
+
+        }
+
+        .outgoing-bubble::before {
+            right: -14px;
+            border-left-color: var(--bs-border-color, #dee2e6); /* Border color of tail */
+        }
+
+        .outgoing-bubble::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            right: -12px;
+            width: 0;
+            height: 0;
+            border: 7px solid transparent;
+            border-left-color: #ebf4ff; /* Fill color inside tail */
         }
 
         [data-bs-theme="dark"] .outgoing-bubble {
@@ -331,20 +395,29 @@
             color: #fff;
         }
         /* Add padding on the right so the typing text doesn't slide under the button */
+        /* Increased padding-right to accommodate both the clip icon and send button */
         .custom-input-btn {
-            padding-right: 95px;
-            border-radius: 8px; /* Optional: adjusts rounding for a modern feel */
+            padding-right: 130px;
+            border-radius: 8px;
         }
 
-        /* Absolute position for the button inside the input */
-        .btn-inside {
+        /* Absolute position for the actions container inside the input */
+        .chat-input-actions {
             position: absolute;
             right: 5px;
             top: 50%;
             transform: translateY(-50%);
+            z-index: 5;
+        }
+
+        .btn-inside-send {
             border-radius: 6px;
             padding: 6px 14px;
-            z-index: 5;
+        }
+
+        /* Optional hover state for the attach icon inside input */
+        .chat-input-actions label:hover {
+            color: #198754 !important;
         }
     </style>
 

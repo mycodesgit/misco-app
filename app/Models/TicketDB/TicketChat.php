@@ -16,6 +16,7 @@ class TicketChat extends Model
         'ticket_id',
         'sender_id',
         'message',
+        'attachment',
         'is_read',
     ];
 

@@ -51,12 +51,22 @@ class DashboardController extends Controller
     private function getDashboardData($year, $timeframe, $user)
     {
         // --- 1. Metric Cards ---
+        $totalRequests = DailyTicketRequest::where('off_id', $user->office_id)->whereYear('created_at', $year)->count();
+
         $newTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->whereDate('created_at', now()->today())
             ->count();
 
         $pendingTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->whereIn('status', ['Pending', 'Open'])
+            ->count();
+        $highPendingTickets = DailyTicketRequest::whereYear('created_at', $year)
+            ->whereIn('status', ['Pending', 'Open'])
+            ->where('priority', 'High')
+            ->count();
+        $urgentPendingTickets = DailyTicketRequest::whereYear('created_at', $year)
+            ->whereIn('status', ['Pending', 'Open'])
+            ->where('priority', 'Urgent')
             ->count();
 
         $inProgressTickets = DailyTicketRequest::whereYear('created_at', $year)
@@ -66,12 +76,16 @@ class DashboardController extends Controller
         $resolvedTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->where('status', 'Resolved')
             ->count();
+        $resolutionRate = $totalRequests > 0
+            ? round(($resolvedTickets / $totalRequests) * 100, 1)
+            : 0;
 
         $closedTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->where('status', 'Closed')
             ->count();
-
-        $totalRequests = DailyTicketRequest::whereYear('created_at', $year)->count();
+        $closedRate = $totalRequests > 0
+            ? round(($closedTickets / $totalRequests) * 100, 1)
+            : 0;
 
         // --- 2. Bar Chart Data ---
         $createdPerDay = DailyTicketRequest::whereYear('created_at', $year)
@@ -234,9 +248,13 @@ class DashboardController extends Controller
             'metrics' => [
                 'newTickets' => $newTickets,
                 'pendingTickets' => $pendingTickets,
+                'highPendingTickets' => $highPendingTickets,
+                'urgentPendingTickets' => $urgentPendingTickets,
                 'inProgressTickets' => $inProgressTickets,
                 'resolvedTickets' => $resolvedTickets,
+                'resolutionRate' => $resolutionRate,
                 'closedTickets' => $closedTickets,
+                'closedRate' => $closedRate,
                 'totalRequests' => $totalRequests,
             ],
             'chart' => [

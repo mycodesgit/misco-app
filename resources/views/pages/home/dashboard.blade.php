@@ -284,8 +284,28 @@
                                                     <i class="ti ti-clock fs-4"></i>
                                                 </div>
                                             </div>
-                                            <div class="mt-2 small text-muted">
-                                                <span class="text-danger fw-semibold"><i class="ti ti-alert-circle me-1"></i></span> 3 High Priority awaiting tech
+                                            <div class="mt-2 small">
+                                                @if (($metrics['urgentPendingTickets'] ?? 0) > 0)
+                                                    <span class="text-danger fw-semibold">
+                                                        <i class="ti ti-alert-circle me-1"></i>
+                                                        {{ $metrics['urgentPendingTickets'] }} Urgent
+                                                    </span>
+                                                @endif
+
+                                                @if (($metrics['highPendingTickets'] ?? 0) > 0)
+                                                    <span class="text-warning fw-semibold ms-2">
+                                                        <i class="ti ti-alert-triangle me-1"></i>
+                                                        {{ $metrics['highPendingTickets'] }} High
+                                                    </span>
+                                                @endif
+
+                                                @if (($metrics['urgentPendingTickets'] ?? 0) == 0 &&
+                                                    ($metrics['highPendingTickets'] ?? 0) == 0)
+                                                    <span class="text-success fw-semibold">
+                                                        <i class="ti ti-circle-check me-1"></i>
+                                                        No high-priority tickets
+                                                    </span>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -325,7 +345,7 @@
                                                 </div>
                                             </div>
                                             <div class="mt-2 small text-muted">
-                                                <span class="text-success fw-semibold"><i class="ti ti-check me-1"></i></span> 89.6% resolution rate
+                                                <span class="text-success fw-semibold"><i class="ti ti-check me-1"></i></span> {{ $metrics['resolutionRate'] ?? 0 }}% resolution rate
                                             </div>
                                         </div>
                                     </div>
@@ -345,7 +365,7 @@
                                                 </div>
                                             </div>
                                             <div class="mt-2 small text-muted">
-                                                <span class="text-danger fw-semibold"><i class="ti ti-check me-1"></i>89.6%</span> resolution rate
+                                                <span class="text-danger fw-semibold"><i class="ti ti-check me-1"></i>{{ $metrics['closedRate'] ?? 0 }}%</span>
                                             </div>
                                         </div>
                                     </div>
@@ -365,7 +385,7 @@
                                                 </div>
                                             </div>
                                             <div class="mt-2 small text-muted">
-                                                <span class="text-success fw-semibold"><i class="ti ti-trending-up me-1"></i>+12%</span> vs last month
+                                                <span class="text-success fw-semibold"><i class="ti ti-trending-up me-1"></i></span> {{ auth()->user()->pageTitle(' Ticketing') }}
                                             </div>
                                         </div>
                                     </div>

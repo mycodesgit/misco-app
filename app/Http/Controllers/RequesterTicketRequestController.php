@@ -35,7 +35,7 @@ class RequesterTicketRequestController extends Controller
                 $query->where('rolename', $currentUserRole);
             })
             ->get();
-        
+
         $cat = Category::with('user')->where('status', 1)->get();
 
         return view('pages.request.requestertickets', compact('urole', 'cat'));
@@ -120,26 +120,26 @@ class RequesterTicketRequestController extends Controller
             $attachmentPath = null;
             if ($request->hasFile('attachment')) {
                 $file = $request->file('attachment');
-                
+
                 // Get current user and office abbreviation
                 $userId = auth()->id();
                 $officeAbbr = auth()->user()->office->office_abbr ?? 'UNKNOWN';
-                
+
                 // Clean office abbreviation (remove spaces or special characters if any)
                 $cleanOfficeAbbr = preg_replace('/[^A-Za-z0-9\-]/', '', $officeAbbr);
-                
+
                 // Format: {userId}_{officeAbbr}_{yearTimestamp}.{extension}
                 // Example output: 12_IT_20261004184632.jpg
                 $extension = $file->getClientOriginalExtension();
                 $filename = $userId . '_' . $cleanOfficeAbbr . '_' . date('YmdHis') . '.' . $extension;
-                
+
                 // Define year folder path
                 $currentYear = date('Y');
                 $folderPath = 'ticket_attachments/' . $currentYear;
-                
+
                 // Store in storage/app/public/ticket_attachments/{YEAR}/
                 $file->storeAs($folderPath, $filename, 'public');
-                
+
                 // Relative path saved in DB
                 $attachmentPath = '/storage/' . $folderPath . '/' . $filename;
             }
@@ -242,7 +242,7 @@ class RequesterTicketRequestController extends Controller
         $agent = new Agent();
         $agent->setUserAgent($request->userAgent());
 
-        $browser  = $agent->browser();   
+        $browser  = $agent->browser();
         $platform = $agent->platform();
 
         AuditTrailDailyTicketRequest::create([
@@ -251,7 +251,7 @@ class RequesterTicketRequestController extends Controller
             'action'     => $action,
             'actiondata' => json_encode($payload),
             'ip_address' => $request->ip(),
-            'user_agent' => $browser . ' on ' . $platform, 
+            'user_agent' => $browser . ' on ' . $platform,
             'login_at'   => now(),
         ]);
     }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('ticket_id')->constrained('dailyticketrequest')->onDelete('cascade');
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
             $table->text('message');
-            $table->boolean('is_read')->default(false);
+            $table->string('attachment')->nullable();
             $table->timestamps();
 
             // Indexing for rapid message retrieval per ticket

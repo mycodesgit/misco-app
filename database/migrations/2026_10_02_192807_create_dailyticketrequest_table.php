@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('remarks')->nullable(); // Optional remarks or additional notes
 
             // IT Assignment & Tracking
-            $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null'); // IT staff assigned
+            $table->string('assigned_to')->nullable(); // IT staff assigned
             $table->enum('status', ['Pending', 'In Progress', 'Resolved', 'Cancelled'])->default('Pending');
 
             // Timestamps for SLA & Accomplishment Reporting

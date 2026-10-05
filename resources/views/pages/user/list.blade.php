@@ -64,7 +64,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <!-- Modal Header -->
@@ -143,6 +143,16 @@
                         <!-- Section 3: Organizational Assignment -->
                         <h6 class="text-uppercase text-muted fw-bold mb-3 small">3. Organizational Role & Location</h6>
                         <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Office <span class="text-danger">*</span></label>
+                                <select class="form-control form-control-sm select2bs4" name="office_id">
+                                    <option value="" selected disabled>--- Select Office ---</option>
+                                    @foreach ($offices as $data)
+                                        <option value="{{ $data->id }}">{{ $data->office_abbr }} - {{ $data->office_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Campus <span class="text-danger">*</span></label>
                                 <select name="campus_id" class="form-control form-control-sm">
@@ -175,26 +185,16 @@
                                     @endforeach
                                 </select>
                             </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold">Office <span class="text-danger">*</span></label>
-                                <select class="form-control form-control-sm select2bs4" name="office_id">
-                                    <option value="" selected disabled>--- Select Office ---</option>
-                                    @foreach ($offices as $data)
-                                        <option value="{{ $data->id }}">{{ $data->office_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
                         </div>
                     </div>
 
                     <!-- Modal Footer with Justified Action Buttons -->
                     <div class="modal-footer d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i> Close
+                            <i class="ti ti-cancel me-1"></i> Close
                         </button>
                         <button type="submit" class="btn btn-success text-white">
-                            <i class="fas fa-save me-1"></i> Save User
+                            <i class="ti ti-device-floppy me-1"></i> Save User
                         </button>
                     </div>
                 </form>
@@ -202,7 +202,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editInfoModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <!-- Modal Header -->
@@ -256,29 +256,29 @@
                         <hr class="my-3 text-muted opacity-25">
 
                         <!-- Section 2: Account Details -->
-                        <h6 class="text-uppercase text-muted fw-bold mb-3 small">2. Account Credentials & Demographics</h6>
+                        <h6 class="text-uppercase text-muted fw-bold mb-3 small">2. Account Credentials & Office</h6>
                         <div class="row g-3 mb-4">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="edituseremail" class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control form-control-sm" id="edituseremail" name="email" placeholder="Enter Email" required>
                             </div>
 
-                            <div class="col-md-4">
-                                <label for="editoffice" class="form-label fw-semibold">Office <span class="text-danger">*</span></label>
-                                <select name="office_id" id="editoffice" class="form-control form-control-sm select2" required>
-                                    <option value="" disabled>--- Select Office ---</option>
-                                    @foreach ($offices as $dataoff)
-                                        <option value="{{ $dataoff->id }}">{{ $dataoff->office_abbr }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="editgender" class="form-label fw-semibold">Gender <span class="text-danger">*</span></label>
                                 <select name="gender" class="form-control form-control-sm" id="editgender" required>
                                     <option value="" disabled>--- Select Gender ---</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="editoffice" class="form-label fw-semibold">Office <span class="text-danger">*</span></label>
+                                <select name="office_id" id="editoffice" class="form-control form-control-sm select2bs4" required>
+                                    <option value="" disabled>--- Select Office ---</option>
+                                    @foreach ($offices as $dataoff)
+                                        <option value="{{ $dataoff->id }}">{{ $dataoff->office_abbr }} - {{ $dataoff->office_name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -330,10 +330,10 @@
                     <!-- Modal Footer with Justified Action Buttons -->
                     <div class="modal-footer d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i> Close
+                            <i class="ti ti-cancel me-1"></i> Close
                         </button>
                         <button type="submit" class="btn btn-success text-white">
-                            <i class="fas fa-save me-1"></i> Save Changes
+                            <i class="ti ti-device-floppy me-1"></i> Save Changes
                         </button>
                     </div>
                 </form>
@@ -341,7 +341,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="editPasswordModal" tabindex="-1" role="dialog" aria-labelledby="editPasswordModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editPasswordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="editPasswordModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -357,15 +357,19 @@
                         </div>
                     </div>
                     <div class="modal-footer d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success text-light">Save changes</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="ti ti-cancel me-1"></i> Close
+                        </button>
+                        <button type="submit" class="btn btn-success text-white">
+                            <i class="ti ti-device-floppy me-1"></i> Save User
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="assignTaskCategoryModal" tabindex="-1" role="dialog" aria-labelledby="assignTaskCategoryModalLabel" aria-hidden="true">
+    <div class="modal fade" id="assignTaskCategoryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="assignTaskCategoryModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -393,15 +397,19 @@
                         </div>
                     </div>
                     <div class="modal-footer d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success text-light">Save changes</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="ti ti-cancel me-1"></i> Close
+                        </button>
+                        <button type="submit" class="btn btn-success text-white">
+                            <i class="ti ti-device-floppy me-1"></i> Save User
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="editUstatusModal" tabindex="-1" role="dialog" aria-labelledby="editUstatusModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editUstatusModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="editUstatusModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -420,9 +428,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success text-light">Save changes</button>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="ti ti-cancel me-1"></i> Close
+                        </button>
+                        <button type="submit" class="btn btn-success text-white">
+                            <i class="ti ti-device-floppy me-1"></i> Save User
+                        </button>
                     </div>
                 </form>
             </div>
