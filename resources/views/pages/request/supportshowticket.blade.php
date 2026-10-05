@@ -50,7 +50,7 @@
                                 'pending'     => ['class' => 'bg-warning text-dark', 'icon' => 'ti-clock'],
                                 'in progress' => ['class' => 'bg-info',             'icon' => 'ti-progress'],
                                 'resolved'    => ['class' => 'bg-success',          'icon' => 'ti-circle-check'],
-                                'canceled'    => ['class' => 'bg-danger',           'icon' => 'ti-circle-x'],
+                                'cancelled'    => ['class' => 'bg-danger',           'icon' => 'ti-circle-x'],
                                 default       => ['class' => 'bg-secondary',        'icon' => 'ti-help-circle']
                             };
                         @endphp
@@ -135,56 +135,81 @@
                                 <!-- IT Management Action -->
                                 <hr>
                                 @if(Auth::guard('web')->user()->role != 'Requester')
-                                @php
-                                    $currentStatus = strtolower($ticket->status);
-                                @endphp
+                                    @php
+                                        $currentStatus = strtolower($ticket->status);
+                                    @endphp
 
-                                <div class="d-flex align-items-center gap-2" id="ticket-action-container">
-                                    @if($currentStatus === 'cancelled')
-                                        {{-- Information alert when ticket is cancelled/closed --}}
-                                        <div class="alert alert-danger w-100 mb-0 d-flex align-items-center py-2 px-3">
-                                            <i class="ti ti-lock me-2 fs-5"></i>
-                                            <span>This ticket has been <strong>Closed / Cancelled</strong>.</span>
-                                        </div>
+                                    <div class="d-flex align-items-center gap-2" id="ticket-action-container">
+                                        @if($currentStatus === 'cancelled')
+                                            {{-- Information alert when ticket is cancelled/closed --}}
+                                            <div class="alert alert-danger w-100 mb-0 d-flex align-items-center py-2 px-3">
+                                                <i class="ti ti-lock me-2 fs-5"></i>
+                                                <span>This ticket has been <strong>Closed / Cancelled</strong>.</span>
+                                            </div>
 
-                                    @elseif($currentStatus === 'resolved')
-                                        {{-- Resolved state: Option to close or show resolution info --}}
-                                        <div class="alert alert-success w-100 mb-0 d-flex align-items-center" role="alert">
-                                            <i class="ti ti-circle-check fs-4 me-2"></i>
-                                            <div>This ticket has been marked as <strong>Resolved</strong>.</div>
-                                        </div>
+                                        @elseif($currentStatus === 'resolved')
+                                            {{-- Resolved state: Option to close or show resolution info --}}
+                                            <div class="alert alert-success w-100 mb-0 d-flex align-items-center" role="alert">
+                                                <i class="ti ti-circle-check fs-4 me-2"></i>
+                                                <div>This ticket has been marked as <strong>Resolved</strong>.</div>
+                                            </div>
 
-                                    @elseif($currentStatus === 'in progress')
-                                        {{-- In Progress state: Can mark resolved or close --}}
-                                        <button class="btn btn-outline-success ticket-status-btn" data-id="{{ $ticket->id }}" data-action="resolved">
-                                            <i class="ti ti-check me-1"></i> Mark as Resolved
-                                        </button>
-                                        <button class="btn btn-outline-danger ticket-status-btn" data-id="{{ $ticket->id }}" data-action="cancelled">
-                                            <i class="ti ti-lock me-1"></i> Close Ticket
-                                        </button>
-
-                                    @else
-                                        {{-- Default / Pending state --}}
-                                        <div class="d-flex justify-content-between align-items-center w-100">
-                                            <!-- Close Ticket on the Far Left -->
+                                        @elseif($currentStatus === 'in progress')
+                                            {{-- In Progress state: Can mark resolved or close --}}
+                                            <button class="btn btn-outline-success ticket-status-btn" data-id="{{ $ticket->id }}" data-action="resolved">
+                                                <i class="ti ti-check me-1"></i> Mark as Resolved
+                                            </button>
                                             <button class="btn btn-outline-danger ticket-status-btn" data-id="{{ $ticket->id }}" data-action="cancelled">
                                                 <i class="ti ti-lock me-1"></i> Close Ticket
                                             </button>
 
-                                            <!-- Group on the Far Right -->
-                                            <div class="d-flex gap-2">
-                                                <button class="btn btn-success ticket-status-btn" data-id="{{ $ticket->id }}" data-action="resolved">
-                                                    <i class="ti ti-check me-1"></i> Mark as Resolved
+                                        @else
+                                            {{-- Default / Pending state --}}
+                                            <div class="d-flex justify-content-between align-items-center w-100">
+                                                <!-- Close Ticket on the Far Left -->
+                                                <button class="btn btn-outline-danger ticket-status-btn" data-id="{{ $ticket->id }}" data-action="cancelled">
+                                                    <i class="ti ti-lock me-1"></i> Close Ticket
                                                 </button>
-                                                <button class="btn btn-info ticket-status-btn" data-id="{{ $ticket->id }}" data-action="in_progress">
-                                                    <i class="ti ti-progress me-1"></i> Mark as In Progress
-                                                </button>
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
-                                @endif
 
+                                                <!-- Group on the Far Right -->
+                                                <div class="d-flex gap-2">
+                                                    <button class="btn btn-success ticket-status-btn" data-id="{{ $ticket->id }}" data-action="resolved">
+                                                        <i class="ti ti-check me-1"></i> Mark as Resolved
+                                                    </button>
+                                                    <button class="btn btn-info ticket-status-btn" data-id="{{ $ticket->id }}" data-action="in_progress">
+                                                        <i class="ti ti-progress me-1"></i> Mark as In Progress
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    @php
+                                        $currentReqStatus = strtolower($ticket->status);
+                                    @endphp
+                                    <div class="d-flex align-items-center gap-2" id="ticket-action-container">
+                                        @if($currentReqStatus === 'cancelled')
+                                            {{-- Information alert when ticket is cancelled/closed --}}
+                                            <div class="alert alert-danger w-100 mb-0 d-flex align-items-center py-2 px-3">
+                                                <i class="ti ti-lock me-2 fs-5"></i>
+                                                <span>This ticket has been <strong>Closed / Cancelled</strong>.</span>
+                                            </div>
+
+                                        @elseif($currentReqStatus === 'resolved')
+                                            {{-- Resolved state: Option to close or show resolution info --}}
+                                            <div class="alert alert-success w-100 mb-0 d-flex align-items-center" role="alert">
+                                                <i class="ti ti-circle-check fs-4 me-2"></i>
+                                                <div>This ticket has been marked as <strong>Resolved</strong>.</div>
+                                            </div>
+                                        @elseif($currentReqStatus === 'in progress')
+                                            {{-- In Progress state: Can mark resolved or close --}}
+                                            <div class="alert alert-info w-100 mb-0 d-flex align-items-center" role="alert">
+                                                <i class="ti ti-circle-check fs-4 me-2"></i>
+                                                <div>This ticket has been marked as <strong>In Progress/Working on it</strong>.</div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

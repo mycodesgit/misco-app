@@ -193,11 +193,11 @@ class RequesterTicketRequestController extends Controller
 
     public function showreqpending()
     {
-        $authuser = Auth::user()->id;
+        $authuserID = Auth::user()->id;
 
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
             ->where('status', 'Pending')
-            ->where('user_id', $authuser)
+            ->where('user_id', $authuserID)
             ->orderBy('id', 'DESC')
             ->get();
 
@@ -206,8 +206,11 @@ class RequesterTicketRequestController extends Controller
 
     public function showreqprogress()
     {
+        $authuserID = Auth::user()->id;
+
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
             ->where('status', 'In Progress')
+            ->where('user_id', $authuserID)
             ->orderBy('id', 'DESC')
             ->get();
 
@@ -216,8 +219,11 @@ class RequesterTicketRequestController extends Controller
 
     public function showreqresolved()
     {
+        $authuserID = Auth::user()->id;
+
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
             ->where('status', 'Resolved')
+            ->where('user_id', $authuserID)
             ->orderBy('id', 'DESC')
             ->get();
 
@@ -226,8 +232,11 @@ class RequesterTicketRequestController extends Controller
 
     public function showreqclosed()
     {
+        $authuserID = Auth::user()->id;
+
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
-            ->where('status', 'Closed')
+            ->where('status', 'Cancelled')
+            ->where('user_id', $authuserID)
             ->orderBy('id', 'DESC')
             ->get();
 
