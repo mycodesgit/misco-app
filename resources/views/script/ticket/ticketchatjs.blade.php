@@ -191,4 +191,86 @@
                 .replace(/'/g, "&#039;");
         }
     });
+
+    $(document).on('click', '.ticket-status-btn', function(e) {
+        e.preventDefault();
+
+        var ticketId = $(this).data('id');
+        var action = $(this).data('action'); // 'resolved', 'in_progress', or 'cancelled'
+
+        // Configure confirmation dialog options per action
+        var confirmConfig = {
+            'resolved': {
+                title: 'Mark as Resolved?',
+                text: 'This will set the status to Resolved and log the completion timestamp.',
+                confirmText: 'Yes, resolve it!',
+                confirmColor: '#28a745'
+            },
+            'in_progress': {
+                title: 'Mark as In Progress?',
+                text: 'This will set the status to In Progress and log the start time.',
+                confirmText: 'Yes, start working!',
+                confirmColor: '#17a2b8'
+            },
+            'cancelled': {
+                title: 'Close / Cancel Ticket?',
+                text: 'Are you sure you want to close this ticket?',
+                confirmText: 'Yes, close ticket!',
+                confirmColor: '#dc3545'
+            }
+        };
+
+        var config = confirmConfig[action] || {
+            title: 'Update Status?',
+            text: 'Are you sure you want to update this ticket?',
+            confirmText: 'Yes, update!',
+            confirmColor: '#3085d6'
+        };
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        Swal.fire({
+            title: config.title,
+            text: config.text,
+            icon: action === 'cancelled' ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonColor: config.confirmColor,
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: config.confirmText
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var url = ticketStatusUpdateRoute.replace(':id', ticketId);
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: {
+                        status: action
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Updated!',
+                                text: response.message || 'Ticket status updated successfully.',
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload(); // Reloads to render updated Blade state
+                            });
+                        } else {
+                            Swal.fire('Error!', response.message || 'Something went wrong.', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error!', 'An error occurred while updating the ticket.', 'error');
+                    }
+                });
+            }
+        });
+    });
 </script>

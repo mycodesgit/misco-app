@@ -31,6 +31,12 @@ class DashboardController extends Controller
         $timeframe = $request->get('timeframe', 'daily'); // Default timeframe
         $user = auth()->user();
 
+        $baseQuery = DailyTicketRequest::whereRaw('FIND_IN_SET(?, REPLACE(assigned_to, " ", ""))', [$user->id]);
+
+        $pendingCount       = (clone $baseQuery)->where('status', 'Pending')->count();
+        $inProgressCount    = (clone $baseQuery)->where('status', 'In Progress')->count();
+        $resolvedTodayCount = (clone $baseQuery)->where('status', 'Resolved')->whereDate('resolved_at', now()->today())->count();
+
         // Unique cache key including timeframe
         $cacheKey = "dashboard_data_{$selectedYear}_{$timeframe}_role_{$user->role}_user_{$user->id}";
 
@@ -45,6 +51,9 @@ class DashboardController extends Controller
         return view('pages.home.dashboard', array_merge([
             'selectedYear' => $selectedYear,
             'selectedTimeframe' => $timeframe,
+            'pendingCount'       => $pendingCount,
+            'inProgressCount'    => $inProgressCount,
+            'resolvedTodayCount' => $resolvedTodayCount,
         ], $dashboardData));
     }
 
@@ -54,6 +63,7 @@ class DashboardController extends Controller
         $totalRequests = DailyTicketRequest::where('off_id', $user->office_id)->whereYear('created_at', $year)->count();
 
         $newTickets = DailyTicketRequest::whereYear('created_at', $year)
+            ->whereIn('status', ['Pending', 'Open'])
             ->whereDate('created_at', now()->today())
             ->count();
 
@@ -81,7 +91,7 @@ class DashboardController extends Controller
             : 0;
 
         $closedTickets = DailyTicketRequest::whereYear('created_at', $year)
-            ->where('status', 'Closed')
+            ->where('status', 'Cancelled')
             ->count();
         $closedRate = $totalRequests > 0
             ? round(($closedTickets / $totalRequests) * 100, 1)
@@ -128,6 +138,7 @@ class DashboardController extends Controller
             $resolvedTicketsMap = DailyTicketRequest::whereYear('resolved_at', $year)
                 ->where('status', 'Resolved')
                 ->where('off_id', $user->office_id)
+                ->whereRaw('FIND_IN_SET(?, REPLACE(assigned_to, " ", ""))', [$user->id])
                 ->selectRaw('DATE(resolved_at) as date, COUNT(*) as total')
                 ->groupBy('date')
                 ->pluck('total', 'date')

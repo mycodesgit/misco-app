@@ -35,28 +35,61 @@
                     @if(Auth::guard('web')->user()->role != 'Requester')
                         <!-- Welcome Hero Card (col-md-6) -->
                         <div class="col-md-4">
-                            <div class="card overflow-hidden h-100 position-relative welcome-hero-card">
+                            <div class="card overflow-hidden position-relative welcome-hero-card">
                                 <div class="card-body p-4 d-flex flex-column justify-content-between position-relative z-1">
                                     <div>
+                                        <!-- Badge & Role Header -->
                                         <div class="d-flex align-items-center gap-2 mb-2">
                                             <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 small">
-                                                <i class="bi bi-circle-fill me-1 small"></i> Active Session
+                                                <i class="ti ti-circle-filled me-1 small"></i> Active
                                             </span>
                                         </div>
+
+                                        <!-- Welcome Greeting -->
                                         <h3 class="fw-bold mb-2">
-                                            Welcome, {{ auth()->user()->fname }} {{ auth()->user()->lname }}!
+                                            Welcome {{ auth()->user()->fname }} {{ auth()->user()->lname }}!
                                         </h3>
+
+                                        <!-- Team Performance Summary -->
                                         <p class="text-secondary mb-3 fs-6">
-                                            You've completed <strong class="text-dark dark-text-light">94.2%</strong> of your assigned tasks this month. Keep up the consistent pace!
+                                            You have resolved <strong class="text-success">{{ $resolvedTodayCount }} ticket{{ $resolvedTodayCount === 1 ? '' : 's' }}</strong> today. Keep up the great work!
                                         </p>
+
+                                        <!-- Dynamic Ticket Status Summary Bar -->
+                                        <div class="d-flex align-items-center gap-3 p-2 rounded-3 mb-3 border">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-warning p-2 rounded-circle"><i class="ti ti-clock-hour-4"></i></span>
+                                                <div>
+                                                    <div class="text-muted extra-small lh-1">Pending</div>
+                                                    <strong class="fs-6">{{ $pendingCount }}</strong>
+                                                </div>
+                                            </div>
+                                            <div class="vr my-1"></div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-info p-2 rounded-circle"><i class="ti ti-progress"></i></span>
+                                                <div>
+                                                    <div class="text-muted extra-small lh-1">In Progress</div>
+                                                    <strong class="fs-6">{{ $inProgressCount }}</strong>
+                                                </div>
+                                            </div>
+                                            <div class="vr my-1"></div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-success p-2 rounded-circle"><i class="ti ti-circle-check"></i></span>
+                                                <div>
+                                                    <div class="text-muted extra-small lh-1">Resolved Today</div>
+                                                    <strong class="fs-6">{{ $resolvedTodayCount }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div class="pt-2">
-                                        <a href="#" class="btn btn-success btn-sm rounded-pill px-3 me-2">
-                                            <i class="bi bi-plus-lg me-1"></i> New Activity
+                                    <!-- Action Buttons -->
+                                    <div class="pt-1 d-flex align-items-center gap-2">
+                                        <a href="#" class="btn btn-primary btn-sm rounded-pill px-3">
+                                            <i class="ti ti-ticket me-1"></i> View My Tickets
                                         </a>
-                                        <a href="#" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                                            View Schedule
+                                        <a href="#" class="btn btn-secondary btn-sm rounded-pill px-3">
+                                            <i class="ti ti-plus me-1"></i> Create Ticket
                                         </a>
                                     </div>
                                 </div>
@@ -655,7 +688,8 @@
         }
 
         .activity-heatmap {
-            min-width: 720px;
+            min-width: 100%;
+            height: 100%;
         }
 
         .heatmap-grid-wrapper {

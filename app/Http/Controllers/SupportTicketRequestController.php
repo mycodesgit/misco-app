@@ -44,8 +44,11 @@ class SupportTicketRequestController extends Controller
 
     public function showprogress()
     {
+        $authuseroffice = Auth::user()->office_id;
+
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
             ->where('status', 'In Progress')
+            ->where('off_id', $authuseroffice)
             ->orderBy('id', 'DESC')
             ->get();
 
@@ -54,8 +57,11 @@ class SupportTicketRequestController extends Controller
 
     public function showresolved()
     {
+        $authuseroffice = Auth::user()->office_id;
+
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
             ->where('status', 'Resolved')
+            ->where('off_id', $authuseroffice)
             ->orderBy('id', 'DESC')
             ->get();
 
@@ -64,8 +70,11 @@ class SupportTicketRequestController extends Controller
 
     public function showclosed()
     {
+        $authuseroffice = Auth::user()->office_id;
+
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
-            ->where('status', 'Closed')
+            ->where('status', 'Cancelled')
+            ->where('off_id', $authuseroffice)
             ->orderBy('id', 'DESC')
             ->get();
 
@@ -242,6 +251,42 @@ class SupportTicketRequestController extends Controller
         return response()->json([
             'success'  => true,
             'messages' => $messages
+        ]);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $ticket = DailyTicketRequest::findOrFail($id);
+        $status = $request->input('status');
+
+        if ($status === 'in_progress') {
+            $ticket->update([
+                'status'     => 'In Progress',
+                'started_at' => Carbon::now(), // Sets started_at timestamp
+            ]);
+            $message = 'Ticket marked as In Progress.';
+        } elseif ($status === 'resolved') {
+            $ticket->update([
+                'status'      => 'Resolved',
+                'resolved_at' => Carbon::now(), // Sets resolved_at timestamp
+            ]);
+            $message = 'Ticket marked as Resolved.';
+        } elseif ($status === 'cancelled') {
+            $ticket->update([
+                'status'      => 'Cancelled',
+            ]);
+            $message = 'Ticket marked as Cancelled.';
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid status provided.'
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'ticket'  => $ticket
         ]);
     }
 }
