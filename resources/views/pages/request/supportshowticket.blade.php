@@ -324,75 +324,82 @@
         }
 
         .chat-bubble {
-            max-width: 100%; /* Prevents bubbles from taking the entire screen width */
-            width: fit-content; /* Shrinks to text size when message is short */
+            max-width: 100%; /* Set to 75% so messages have space before wrapping */
+            width: fit-content;
             word-wrap: break-word;
-            position: relative;
+            position: relative; /* Required for positioning the tail */
         }
 
         /* Base style for both tails */
-        .chat-bubble::before {
-            content: '';
-            position: absolute;
-            top: 12px; /* Adjust vertical placement of the tail */
-            width: 0;
-            height: 0;
-            border: 7px solid transparent;
-        }
-
-        .incoming-bubble {
-            background-color: var(--bs-light, #f8f9fa);
-            border: 1px solid var(--bs-border-color, #dee2e6);
-        }
-
-        .incoming-bubble::before {
-            left: -14px;
-            border-right-color: var(--bs-border-color, #dee2e6); /* Border color of tail */
-        }
-
-        .incoming-bubble::after {
+        .chat-bubble::before,
+        .chat-bubble::after {
             content: '';
             position: absolute;
             top: 12px;
-            left: -12px;
             width: 0;
             height: 0;
             border: 7px solid transparent;
-            border-right-color: var(--bs-light, #f8f9fa); /* Fill color inside tail */
         }
 
+        /* -------------------------------------------------------------
+        INCOMING BUBBLE (Left Tail)
+        ------------------------------------------------------------- */
+        /* Light Mode */
+        .incoming-bubble {
+            background-color: var(--bs-light, #f8f9fa);
+            border: 1px solid var(--bs-border-color, #dee2e6);
+            color: #000;
+        }
+        .incoming-bubble::before {
+            left: -14px;
+            border-right-color: var(--bs-border-color, #fff); /* Outer border */
+        }
+        .incoming-bubble::after {
+            left: -12px;
+        }
+
+        /* Dark Mode */
         [data-bs-theme="dark"] .incoming-bubble {
             background-color: #818a94;
             border: 1px solid var(--bs-border-color, #dee2e6);
+            color: #fff;
+        }
+        [data-bs-theme="dark"] .incoming-bubble::before {
+            border-right-color: var(--bs-border-color, #dee2e6);
+        }
+        [data-bs-theme="dark"] .incoming-bubble::after {
+            border-right-color: #818a94;
         }
 
+        /* -------------------------------------------------------------
+        OUTGOING BUBBLE (Right Tail)
+        ------------------------------------------------------------- */
+        /* Light Mode */
         .outgoing-bubble {
             background-color: #ebf4ff;
             border: 1px solid var(--bs-border-color, #dee2e6);
             color: #000;
-
         }
-
         .outgoing-bubble::before {
             right: -14px;
-            border-left-color: var(--bs-border-color, #dee2e6); /* Border color of tail */
+            border-left-color: var(--bs-border-color, #dee2e6); /* Outer border */
         }
-
         .outgoing-bubble::after {
-            content: '';
-            position: absolute;
-            top: 12px;
             right: -12px;
-            width: 0;
-            height: 0;
-            border: 7px solid transparent;
-            border-left-color: #ebf4ff; /* Fill color inside tail */
+            border-left-color: #ebf4ff; /* Inner fill */
         }
 
+        /* Dark Mode */
         [data-bs-theme="dark"] .outgoing-bubble {
             background-color: #4a4d50;
             border: 1px solid #6f757b;
             color: #fff;
+        }
+        [data-bs-theme="dark"] .outgoing-bubble::before {
+            border-left-color: #6f757b;
+        }
+        [data-bs-theme="dark"] .outgoing-bubble::after {
+            border-left-color: #4a4d50;
         }
         /* Add padding on the right so the typing text doesn't slide under the button */
         /* Increased padding-right to accommodate both the clip icon and send button */
