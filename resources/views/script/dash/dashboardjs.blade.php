@@ -1,6 +1,7 @@
 @if(Auth::guard('web')->user()->role != 'Requester')
     <script>
         let dailyTicketsChart = null;
+        let topOfficesChart = null;
 
         // --- LEADERBOARD RENDER FUNCTION ---
         function renderLeaderboard(leaderboardData) {
@@ -161,21 +162,52 @@
         }
 
         function renderTopOffices(offices) {
-            let html = '<div class="list-group list-group-flush">';
-            if (!offices || offices.length === 0) {
-                html += '<div class="text-center text-muted py-2">No office records available</div>';
-            } else {
-                offices.forEach((o, idx) => {
-                    html += `
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-1">
-                            <span class="small">${idx + 1}. ${o.name}</span>
-                            <span class="badge bg-secondary">${o.total} tickets</span>
-                        </div>
-                    `;
-                });
+            var canvas = document.getElementById('topOfficesBarChart');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+
+            var sorted = (offices || []).slice().sort(function (a, b) {
+                return (b.total || 0) - (a.total || 0);
+            }).slice(0, 10);
+
+            var labels = sorted.map(function (o) {
+                return o.name || 'Unknown';
+            });
+            var values = sorted.map(function (o) { return o.total || 0; });
+
+            if (topOfficesChart) {
+                topOfficesChart.destroy();
             }
-            html += '</div>';
-            $('#top-offices-container').html(html);
+
+            topOfficesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Office/College',
+                            data: values,
+                            backgroundColor: '#4a5e5e',
+                            borderColor: '#4a5e5e',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            ticks: { maxRotation: 45, minRotation: 45, autoSkip: false },
+                            gridLines: { display: false }
+                        }],
+                        yAxes: [{
+                            ticks: { beginAtZero: true, precision: 0 },
+                            scaleLabel: { display: true, labelString: 'Ticket Count' }
+                        }]
+                    }
+                }
+            });
         }
 
         function renderPersonnelPerformance(personnel) {

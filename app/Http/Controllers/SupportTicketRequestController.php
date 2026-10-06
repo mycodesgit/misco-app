@@ -138,7 +138,7 @@ class SupportTicketRequestController extends Controller
 
             DB::commit();
 
-            Cache::flush(); // dashboard cache is the only Cache user — force fresh rebuild on next fetch
+            Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
             broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'));
 
             return response()->json([
@@ -291,7 +291,7 @@ class SupportTicketRequestController extends Controller
 
         $ticket->refresh();
 
-        Cache::flush(); // dashboard cache is the only Cache user — force fresh rebuild on next fetch
+        Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
         broadcast(new \App\Events\TicketStatusUpdated($ticket))->toOthers();
         broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'status_changed'));
 

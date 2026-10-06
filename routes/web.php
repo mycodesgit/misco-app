@@ -40,6 +40,7 @@ Route::group(['middleware'=>['guest']],function(){
 Route::group(['middleware'=>['login_auth']],function(){
     Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard.index');
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+    Route::get('/monitor',[MonitoringDashboardController::class,'index'])->name('monitoring.index');
 
     Route::prefix('/tickets')->group(function () {
         Route::get('/support/view/all',[SupportTicketRequestController::class,'index'])->name('tickets.index');
@@ -116,4 +117,5 @@ Route::group(['middleware'=>['login_auth']],function(){
     });
 
     Route::get('/dashboard/monitoring',[MonitoringDashboardController::class,'index'])->name('monitoring-dashboard.index');
+    Route::get('/dashboard/monitoring/helpdesk',[MonitoringDashboardController::class,'helpdesk'])->name('monitoring.helpdesk');
 });

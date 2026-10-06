@@ -29,14 +29,14 @@
     <div class="row">
         <div class="col-12">
             <div class="mb-4">
-                
+
                 <!-- Dashboard Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
                         <h1 class="h4 fw-bold mb-1">System Monitoring</h1>
                         <p class="text-muted small mb-0">Live status and real-time monitoring across all active campus modules</p>
                     </div>
-                    
+
                     <!-- Controls & Status Bar -->
                     <div class="d-flex align-items-center gap-2">
                         <!-- Live Clock & Date Badge (Single Line Style) -->
@@ -51,11 +51,11 @@
                     </div>
                 </div>
 
-            
+
 
                 <!-- Middle Row: System Monitoring Cards -->
                 <div class="row g-3">
-                    
+
                     <!-- 1. ENROLLMENT QUEUEING -->
                     <div class="col-md-6 col-xl-4">
                         <div class="card card-animate h-100" id="card-enrollment">
@@ -87,55 +87,55 @@
                                         <div class="marquee-wrapper">
                                             <div class="marquee-content">
                                                 <!-- ORIGINAL SET (1 to 6) -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 1</small>
-                                                    <span class="fw-bold text-dark small">A-083</span>
+                                                    <span class="fw-bold small">A-083</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 2</small>
-                                                    <span class="fw-bold text-dark small">B-012</span>
+                                                    <span class="fw-bold small">B-012</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 3</small>
-                                                    <span class="fw-bold text-dark small">A-085</span>
+                                                    <span class="fw-bold small">A-085</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 4</small>
-                                                    <span class="fw-bold text-dark small">A-086</span>
+                                                    <span class="fw-bold small">A-086</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 5</small>
-                                                    <span class="fw-bold text-dark small">A-087</span>
+                                                    <span class="fw-bold small">A-087</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 6</small>
-                                                    <span class="fw-bold text-dark small">B-014</span>
+                                                    <span class="fw-bold small">B-014</span>
                                                 </div>
 
                                                 <!-- DUPLICATE SET (Required for seamless infinite loop) -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 1</small>
-                                                    <span class="fw-bold text-dark small">A-083</span>
+                                                    <span class="fw-bold small">A-083</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 2</small>
-                                                    <span class="fw-bold text-dark small">B-012</span>
+                                                    <span class="fw-bold small">B-012</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 3</small>
-                                                    <span class="fw-bold text-dark small">A-085</span>
+                                                    <span class="fw-bold small">A-085</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 4</small>
-                                                    <span class="fw-bold text-dark small">A-086</span>
+                                                    <span class="fw-bold small">A-086</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 5</small>
-                                                    <span class="fw-bold text-dark small">A-087</span>
+                                                    <span class="fw-bold small">A-087</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <small class="fw-medium text-muted">Win 6</small>
-                                                    <span class="fw-bold text-dark small">B-014</span>
+                                                    <span class="fw-bold small">B-014</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -169,7 +169,7 @@
                             <div class="card-body d-flex flex-column">
                                 <!-- Split Content Row -->
                                 <div class="row g-2 align-items-center">
-                                    
+
                                     <!-- Left Column: Primary Metrics & Progress Bar -->
                                     <div class="col-5 border-end pe-2 text-center py-1">
                                         <h2 class="fw-bold mb-0 text-warning display-6">78%</h2>
@@ -183,9 +183,9 @@
                                     <div class="col-7 ps-2">
                                         <div class="marquee-wrapper" style="max-height: 160px; overflow: hidden; position: relative;">
                                             <div class="marquee-content d-flex flex-column gap-1">
-                                                
+
                                                 <!-- SUBMISSION ITEM 1 -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSIT-3A • ITE 301</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Prof. R. Santos</span>
@@ -194,7 +194,7 @@
                                                 </div>
 
                                                 <!-- SUBMISSION ITEM 2 -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSCS-2B • CS 204</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Dr. M. Cruz</span>
@@ -203,7 +203,7 @@
                                                 </div>
 
                                                 <!-- SUBMISSION ITEM 3 -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSEMC-1A • EMC 101</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Engr. A. Reyes</span>
@@ -212,7 +212,7 @@
                                                 </div>
 
                                                 <!-- SUBMISSION ITEM 4 -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSIS-4A • IS 402</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Prof. J. Garcia</span>
@@ -221,28 +221,28 @@
                                                 </div>
 
                                                 <!-- DUPLICATE SET FOR SMOOTH INFINITE MARQUEE LOOP -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSIT-3A • ITE 301</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Prof. R. Santos</span>
                                                     </div>
                                                     <span class="badge bg-success-subtle text-success extra-small">Just now</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSCS-2B • CS 204</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Dr. M. Cruz</span>
                                                     </div>
                                                     <span class="badge bg-success-subtle text-success extra-small">1m ago</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSEMC-1A • EMC 101</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Engr. A. Reyes</span>
                                                     </div>
                                                     <span class="badge bg-success-subtle text-success extra-small">3m ago</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSIS-4A • IS 402</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Prof. J. Garcia</span>
@@ -298,7 +298,7 @@
                                         <div class="marquee-wrapper" style="max-height: 160px; overflow: hidden; position: relative;">
                                             <div class="marquee-content d-flex flex-column gap-1">
                                                 <!-- STAFF ITEM 1 -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 90px;">J. Dela Cruz</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Lab 1 • PC Repair</span>
@@ -307,7 +307,7 @@
                                                 </div>
 
                                                 <!-- STAFF ITEM 2 -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 90px;">M. Santos</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Server Room • Backup</span>
@@ -316,7 +316,7 @@
                                                 </div>
 
                                                 <!-- STAFF ITEM 3 -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 90px;">R. Reyes</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Admin Office • Cable</span>
@@ -325,7 +325,7 @@
                                                 </div>
 
                                                 <!-- STAFF ITEM 4 -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 90px;">A. Garcia</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">MIS Office • HelpDesk</span>
@@ -334,28 +334,28 @@
                                                 </div>
 
                                                 <!-- DUPLICATE SET FOR SMOOTH INFINITE MARQUEE LOOP -->
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 90px;">J. Dela Cruz</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Lab 1 • PC Repair</span>
                                                     </div>
                                                     <span class="badge bg-warning-subtle text-warning extra-small">Busy</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 90px;">M. Santos</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Server Room • Backup</span>
                                                     </div>
                                                     <span class="badge bg-info-subtle text-info extra-small">In Progress</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 90px;">R. Reyes</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Admin Office • Cable</span>
                                                     </div>
                                                     <span class="badge bg-warning-subtle text-warning extra-small">Busy</span>
                                                 </div>
-                                                <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                     <div class="text-truncate me-1">
                                                         <small class="fw-bold d-block text-truncate" style="max-width: 90px;">A. Garcia</small>
                                                         <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">MIS Office • HelpDesk</span>
@@ -387,9 +387,14 @@
                                     <h6 class="fw-semibold">
                                         <i class="ti ti-headset me-1 text-primary"></i> IT HelpDesk Ticketing
                                     </h6>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small">
-                                        <i class="fas fa-circle me-1 style-dot blink-dot"></i>Live
-                                    </span>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <button type="button" id="helpdesk-sound-toggle" class="btn btn-sm btn-light border" title="Toggle sound alerts">
+                                            <i class="ti ti-volume" id="helpdesk-sound-icon"></i>
+                                        </button>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small">
+                                            <i class="fas fa-circle me-1 style-dot blink-dot"></i>Live
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-body d-flex flex-column">
@@ -398,43 +403,40 @@
                                     <div class="col-5 border-end pe-2">
                                         <div class="d-flex flex-column gap-1">
                                             <div class="p-1 px-2 border rounded text-center">
-                                                <h6 class="fw-bold text-warning mb-0">6</h6>
+                                                <h6 class="fw-bold text-warning mb-0" id="helpdesk-pending-count">{{ $counts['pending'] ?? 0 }}</h6>
                                                 <small class="text-muted extra-small">Pending</small>
                                             </div>
                                             <div class="p-1 px-2 border rounded text-center">
-                                                <h6 class="fw-bold text-info mb-0">3</h6>
+                                                <h6 class="fw-bold text-info mb-0" id="helpdesk-progress-count">{{ $counts['in_progress'] ?? 0 }}</h6>
                                                 <small class="text-muted extra-small">In Progress</small>
                                             </div>
                                             <div class="p-1 px-2 border rounded text-center">
-                                                <h6 class="fw-bold text-success mb-0">24</h6>
+                                                <h6 class="fw-bold text-success mb-0" id="helpdesk-resolved-count">{{ $counts['resolved'] ?? 0 }}</h6>
                                                 <small class="text-muted extra-small">Resolved</small>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Right Column: Vertical Mini Cards for Active/Pending Tickets -->
+                                    <!-- Right Column: Live Active Tickets (looping marquee, fixed height) -->
                                     <div class="col-7 ps-2">
-                                        <div class="d-flex flex-column gap-1">
-                                            <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
-                                                <div class="text-truncate me-1">
-                                                    <small class="fw-medium d-block text-truncate" style="max-width: 90px;">Network Down</small>
-                                                    <span class="text-muted extra-small">#TK-104</span>
-                                                </div>
-                                                <span class="badge bg-danger-subtle text-danger extra-small">High</span>
-                                            </div>
-                                            <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
-                                                <div class="text-truncate me-1">
-                                                    <small class="fw-medium d-block text-truncate" style="max-width: 90px;">Portal Reset</small>
-                                                    <span class="text-muted extra-small">#TK-105</span>
-                                                </div>
-                                                <span class="badge bg-warning-subtle text-warning extra-small">Medium</span>
-                                            </div>
-                                            <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
-                                                <div class="text-truncate me-1">
-                                                    <small class="fw-medium d-block text-truncate" style="max-width: 90px;">Printer Driver</small>
-                                                    <span class="text-muted extra-small">#TK-106</span>
-                                                </div>
-                                                <span class="badge bg-secondary-subtle text-secondary extra-small">Low</span>
+                                        <div class="marquee-wrapper">
+                                            <div class="marquee-content" id="helpdesk-latest-list">
+                                                @if (!empty($latest) && count($latest))
+                                                    {{-- Rendered twice for the seamless infinite marquee loop --}}
+                                                    @for ($r = 0; $r < 2; $r++)
+                                                        @foreach ($latest as $t)
+                                                            <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
+                                                                <div class="text-truncate me-1">
+                                                                    <small class="fw-medium d-block text-truncate" style="max-width: 90px;">{{ \Illuminate\Support\Str::limit($t['issue_description'] ?? 'Ticket', 18) }}</small>
+                                                                    <span class="text-muted extra-small">#{{ $t['ticket_number'] ?? $t['id'] }}</span>
+                                                                </div>
+                                                                <span class="badge extra-small {{ ($t['priority'] ?? '') === 'High' ? 'bg-danger-subtle text-danger' : ((($t['priority'] ?? '') === 'Medium') ? 'bg-warning-subtle text-warning' : 'bg-secondary-subtle text-secondary') }}">{{ $t['priority'] ?? '-' }}</span>
+                                                            </div>
+                                                        @endforeach
+                                                    @endfor
+                                                @else
+                                                    <div class="text-muted extra-small text-center py-2">No active tickets</div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -444,9 +446,10 @@
                                 <div class="mt-auto">
                                     <hr class="my-3">
                                     <div class="d-flex justify-content-between text-muted extra-small">
-                                        <span>High: <strong class="text-danger">1</strong></span>
-                                        <span>Medium: <strong class="text-warning">3</strong></span>
-                                        <span>Low: <strong class="text-secondary">2</strong></span>
+                                        <span>High: <strong class="text-danger" id="helpdesk-prio-high">{{ $priority['High'] ?? 0 }}</strong></span>
+                                        <span>Medium: <strong class="text-warning" id="helpdesk-prio-medium">{{ $priority['Medium'] ?? 0 }}</strong></span>
+                                        <span>Low: <strong class="text-secondary" id="helpdesk-prio-low">{{ $priority['Low'] ?? 0 }}</strong></span>
+                                        <span>Urgent: <strong class="text-danger" id="helpdesk-prio-urgent">{{ $priority['Urgent'] ?? 0 }}</strong></span>
                                     </div>
                                 </div>
                             </div>
@@ -516,14 +519,14 @@
                                     <!-- Right Column: Voucher Code Mini Cards -->
                                     <div class="col-6 ps-2">
                                         <div class="d-flex flex-column gap-1">
-                                            <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                            <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                 <div class="text-truncate">
                                                     <small class="fw-medium text-muted d-block extra-small">Availed</small>
                                                     <span class="fw-bold text-success small">1,250</span>
                                                 </div>
                                                 <i class="ti ti-ticket text-success fs-5"></i>
                                             </div>
-                                            <div class="p-1 px-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                            <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
                                                 <div class="text-truncate">
                                                     <small class="fw-medium text-muted d-block extra-small">Remaining</small>
                                                     <span class="fw-bold text-warning small">750</span>
@@ -593,7 +596,7 @@
         // Live Digital Clock Function with Combined Date/Time
         function updateTVClock() {
             const now = new Date();
-            
+
             // Format Time (10:30:01 PM)
             const timeStr = now.toLocaleTimeString('en-US', {
                 hour: '2-digit',
@@ -603,11 +606,11 @@
             });
 
             // Format Date (Sat, Sep 26, 2026)
-            const dateStr = now.toLocaleDateString('en-US', { 
-                weekday: 'short', 
-                month: 'short', 
-                day: '2-digit', 
-                year: 'numeric' 
+            const dateStr = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric'
             });
 
             const clockEl = document.getElementById('tv-clock-date');
@@ -615,8 +618,8 @@
                 clockEl.innerText = `${timeStr} | ${dateStr}`;
             }
         }
-        
+
         setInterval(updateTVClock, 1000);
         updateTVClock();
-    </script> 
+    </script>
 @endsection

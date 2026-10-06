@@ -37,8 +37,10 @@ class DashboardController extends Controller
         $inProgressCount    = (clone $baseQuery)->where('status', 'In Progress')->count();
         $resolvedTodayCount = (clone $baseQuery)->where('status', 'Resolved')->whereDate('resolved_at', now()->today())->count();
 
-        // Unique cache key including timeframe
-        $cacheKey = "dashboard_data_{$selectedYear}_{$timeframe}_role_{$user->role}_user_{$user->id}";
+        // Versioned key: bumped on every ticket write, so cache stays fast
+        // yet realtime updates are never stale (no flush = no file race)
+        $version = Cache::rememberForever('dashboard_version', fn() => 1);
+        $cacheKey = "dashboard_data_v{$version}_{$selectedYear}_{$timeframe}_role_{$user->role}_user_{$user->id}";
 
         $dashboardData = Cache::remember($cacheKey, 300, function () use ($selectedYear, $timeframe, $user) {
             return $this->getDashboardData($selectedYear, $timeframe, $user);
@@ -236,8 +238,8 @@ class DashboardController extends Controller
         $topOffices = DailyTicketRequest::whereYear('dailyticketrequest.created_at', $year)
             ->join('users', 'dailyticketrequest.user_id', '=', 'users.id')
             ->join('offices', 'users.office_id', '=', 'offices.id')
-            ->selectRaw('offices.office_name as name, COUNT(dailyticketrequest.id) as total')
-            ->groupBy('offices.id', 'offices.office_name')
+            ->selectRaw('offices.office_abbr as name, COUNT(dailyticketrequest.id) as total')
+            ->groupBy('offices.id', 'offices.office_abbr')
             ->orderByDesc('total')
             ->limit(10)
             ->get();

@@ -284,6 +284,9 @@
     @if (request()->routeIs('requester.index'))
         @include('script.usr.userjs')
     @endif
+    @if (request()->routeIs('monitoring-dashboard.index', 'monitoring.index'))
+        @include('script.tvmonitoring.helpdeskjs')
+    @endif
     @if (request()->routeIs('roles.index'))
         @include('script.usr.rolejs')
     @endif

@@ -459,8 +459,8 @@
                                                 <i class="ti ti-building"></i> Top 10 Offices/Colleges
                                             </h6>
                                         </div>
-                                        <div class="card-body" id="top-offices-container">
-                                            <!-- Dynamically populated -->
+                                        <div class="card-body" id="top-offices-container" style="height: 340px; position: relative;">
+                                            <canvas id="topOfficesBarChart"></canvas>
                                         </div>
                                     </div>
                                 </div>

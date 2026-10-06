@@ -172,7 +172,7 @@ class RequesterTicketRequestController extends Controller
 
             DB::commit();
 
-            Cache::flush(); // dashboard cache is the only Cache user — force fresh rebuild on next fetch
+            Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
             broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'));
 
             // 5. Log Audit
