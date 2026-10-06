@@ -52,7 +52,7 @@
 
                                         <!-- Team Performance Summary -->
                                         <p class="text-secondary mb-3 fs-6">
-                                            You have resolved <strong class="text-success">{{ $resolvedTodayCount }} ticket{{ $resolvedTodayCount === 1 ? '' : 's' }}</strong> today. Keep up the great work!
+                                            You have resolved <strong class="text-success" id="summary-resolved-today-text">{{ $resolvedTodayCount }} ticket{{ $resolvedTodayCount === 1 ? '' : 's' }}</strong> today. Keep up the great work!
                                         </p>
 
                                         <!-- Dynamic Ticket Status Summary Bar -->
@@ -61,7 +61,7 @@
                                                 <span class="badge bg-warning p-2 rounded-circle"><i class="ti ti-clock-hour-4"></i></span>
                                                 <div>
                                                     <div class="text-muted extra-small lh-1">Pending</div>
-                                                    <strong class="fs-6">{{ $pendingCount }}</strong>
+                                                    <strong class="fs-6" id="summary-pending-count">{{ $pendingCount }}</strong>
                                                 </div>
                                             </div>
                                             <div class="vr my-1"></div>
@@ -69,7 +69,7 @@
                                                 <span class="badge bg-info p-2 rounded-circle"><i class="ti ti-progress"></i></span>
                                                 <div>
                                                     <div class="text-muted extra-small lh-1">In Progress</div>
-                                                    <strong class="fs-6">{{ $inProgressCount }}</strong>
+                                                    <strong class="fs-6" id="summary-inprogress-count">{{ $inProgressCount }}</strong>
                                                 </div>
                                             </div>
                                             <div class="vr my-1"></div>
@@ -77,7 +77,7 @@
                                                 <span class="badge bg-success p-2 rounded-circle"><i class="ti ti-circle-check"></i></span>
                                                 <div>
                                                     <div class="text-muted extra-small lh-1">Resolved Today</div>
-                                                    <strong class="fs-6">{{ $resolvedTodayCount }}</strong>
+                                                    <strong class="fs-6" id="summary-resolved-today">{{ $resolvedTodayCount }}</strong>
                                                 </div>
                                             </div>
                                         </div>

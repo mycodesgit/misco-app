@@ -216,6 +216,16 @@
                     $('#card-closed-tickets').text(data.metrics.closedTickets);
                     $('#card-total-requests').text(data.metrics.totalRequests);
 
+                    // Dynamic Ticket Status Summary Bar (welcome hero)
+                    if (data.summary) {
+                        $('#summary-pending-count').text(data.summary.pendingCount);
+                        $('#summary-inprogress-count').text(data.summary.inProgressCount);
+                        $('#summary-resolved-today').text(data.summary.resolvedTodayCount);
+                        $('#summary-resolved-today-text').text(
+                            data.summary.resolvedTodayCount + ' ticket' + (data.summary.resolvedTodayCount === 1 ? '' : 's')
+                        );
+                    }
+
                     // Update Bar Chart
                     renderDailyTicketsChart(data.chart.labels, data.chart.created, data.chart.resolved);
 
@@ -384,6 +394,15 @@
 
                 updateDashboard(selectedYear, activeTimeframe);
             });
+
+            // Realtime: any ticket DB change busts cache server-side, then refetch here
+            if (typeof Echo !== 'undefined') {
+                Echo.channel('tickets')
+                    .listen('TicketListUpdated', function() {
+                        var y = $('#yearSelect').val() || new Date().getFullYear();
+                        updateDashboard(y);
+                    });
+            }
         });
     </script>
 @else
@@ -545,6 +564,15 @@
 
                 updateDashboard(selectedYear, activeTimeframe);
             });
+
+            // Realtime: any ticket DB change busts cache server-side, then refetch heatmap here
+            if (typeof Echo !== 'undefined') {
+                Echo.channel('tickets')
+                    .listen('TicketListUpdated', function() {
+                        var y = $('#yearSelect').val() || new Date().getFullYear();
+                        updateDashboard(y);
+                    });
+            }
         });
     </script>
 @endif

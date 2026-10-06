@@ -45,7 +45,13 @@ class DashboardController extends Controller
         });
 
         if ($request->ajax()) {
-            return response()->json($dashboardData);
+            return response()->json(array_merge($dashboardData, [
+                'summary' => [
+                    'pendingCount'       => $pendingCount,
+                    'inProgressCount'    => $inProgressCount,
+                    'resolvedTodayCount' => $resolvedTodayCount,
+                ],
+            ]));
         }
 
         return view('pages.home.dashboard', array_merge([

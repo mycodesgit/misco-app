@@ -514,5 +514,20 @@
         $(document).on('ticketClosedAdded', function() {
             dataTableClosed.ajax.reload();
         });
+
+        $(document).on('ticketListChanged', function() {
+            dataTablePending.ajax.reload(null, false);
+            dataTableProgress.ajax.reload(null, false);
+            dataTableResolved.ajax.reload(null, false);
+            dataTableClosed.ajax.reload(null, false);
+        });
+
+        // Realtime: any ticket DB change (created / status) refreshes all tables
+        if (typeof Echo !== 'undefined') {
+            Echo.channel('tickets')
+                .listen('TicketListUpdated', function() {
+                    $(document).trigger('ticketListChanged');
+                });
+        }
     });
 </script>

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -170,6 +171,9 @@ class RequesterTicketRequestController extends Controller
             ]);
 
             DB::commit();
+
+            Cache::flush(); // dashboard cache is the only Cache user — force fresh rebuild on next fetch
+            broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'));
 
             // 5. Log Audit
             $userPayload = $ticket->toArray();

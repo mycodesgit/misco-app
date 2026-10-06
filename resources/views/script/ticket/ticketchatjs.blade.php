@@ -1,6 +1,7 @@
 <script>
     $(document).ready(function () {
         const ticketId = $('#ticket_id').val();
+        const currentUserId = {{ auth()->id() }};
         const fetchUrl = "{{ route('ticket.chat.fetch', ['ticketId' => ':ticketId']) }}".replace(':ticketId', ticketId);
         const sendUrl = "{{ route('ticket.chat.send') }}";
 
@@ -18,9 +19,38 @@
         loadMessages(true);
 
         // Auto-poll for new messages every 3 seconds
-        setInterval(function() {
-            loadMessages(false);
-        }, 3000);
+        // setInterval(function() {
+        //     loadMessages(false);
+        // }, 3000);
+
+        if (typeof Echo !== 'undefined') {
+            Echo.private(`ticket.${ticketId}`)
+                .listen('MessageSent', (e) => {
+                    // Skip if sent by the logged-in user (already handled by AJAX submit response)
+                    if (e.sender_id == currentUserId) return;
+
+                    const incomingMessage = {
+                        id: e.id,
+                        message: e.message,
+                        attachment: e.attachment,
+                        sender_name: e.sender_name,
+                        time: e.time,
+                        is_me: false
+                    };
+
+                    appendMessage(incomingMessage);
+
+                    if (!userHasScrolledUp) {
+                        scrollToBottom();
+                    }
+                })
+                .listen('TicketStatusUpdated', (e) => {
+                    // Other browser changed status — update left card + badge live
+                    if (e.status) {
+                        updateTicketUI(e.status, e.ticket_id || ticketId);
+                    }
+                });
+        }
 
         // Load messages from controller
         function loadMessages(isInitialLoad = false) {
@@ -259,9 +289,11 @@
                                 icon: 'success',
                                 showConfirmButton: false,
                                 timer: 1500
-                            }).then(() => {
-                                location.reload(); // Reloads to render updated Blade state
                             });
+                            // Update left card + badge in place (no reload)
+                            if (response.ticket && response.ticket.status) {
+                                updateTicketUI(response.ticket.status, ticketId);
+                            }
                         } else {
                             Swal.fire('Error!', response.message || 'Something went wrong.', 'error');
                         }
@@ -273,4 +305,90 @@
             }
         });
     });
+
+    // Mirror of supportshowticket.blade.php left-card if/else — updates in place, no reload
+    var isSupportUser = {{ Auth::guard('web')->user()->role != 'Requester' ? 'true' : 'false' }};
+
+    function updateTicketUI(status, ticketId) {
+        var lower = (status || '').toLowerCase();
+
+        // 1. Update top status badge (#ticket-status-badge)
+        var badgeConfig = {
+            'pending':     { cls: 'bg-warning text-dark', icon: 'ti-clock' },
+            'in progress': { cls: 'bg-info',              icon: 'ti-progress' },
+            'resolved':    { cls: 'bg-success',            icon: 'ti-circle-check' },
+            'cancelled':   { cls: 'bg-danger',             icon: 'ti-circle-x' }
+        };
+        var badge = badgeConfig[lower] || { cls: 'bg-secondary', icon: 'ti-help-circle' };
+        var $badge = $('#ticket-status-badge');
+        if ($badge.length) {
+            $badge.removeClass('bg-warning text-dark bg-info bg-success bg-danger bg-secondary')
+                .addClass(badge.cls)
+                .html('<i class="ti ' + badge.icon + ' me-1"></i> ' + escapeHtmlTicketStatus(status));
+        }
+
+        // 2. Re-render left-card action container (#ticket-action-container)
+        var $container = $('#ticket-action-container');
+        if ($container.length) {
+            $container.html(renderActionButtons(lower, ticketId));
+        }
+    }
+
+    function escapeHtmlTicketStatus(text) {
+        return String(text == null ? '' : text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function renderActionButtons(lower, ticketId) {
+        if (isSupportUser) {
+            if (lower === 'cancelled') {
+                return '<div class="alert alert-danger w-100 mb-0 d-flex align-items-center py-2 px-3">' +
+                    '<i class="ti ti-lock me-2 fs-5"></i>' +
+                    '<span>This ticket has been <strong>Closed / Cancelled</strong>.</span></div>';
+            }
+            if (lower === 'resolved') {
+                return '<div class="alert alert-success w-100 mb-0 d-flex align-items-center" role="alert">' +
+                    '<i class="ti ti-circle-check fs-4 me-2"></i>' +
+                    '<div>This ticket has been marked as <strong>Resolved</strong>.</div></div>';
+            }
+            if (lower === 'in progress') {
+                return '<button class="btn btn-outline-success ticket-status-btn" data-id="' + ticketId + '" data-action="resolved">' +
+                        '<i class="ti ti-check me-1"></i> Mark as Resolved</button>' +
+                    '<button class="btn btn-outline-danger ticket-status-btn" data-id="' + ticketId + '" data-action="cancelled">' +
+                        '<i class="ti ti-lock me-1"></i> Close Ticket</button>';
+            }
+            // Default / Pending
+            return '<div class="d-flex justify-content-between align-items-center w-100">' +
+                    '<button class="btn btn-outline-danger ticket-status-btn" data-id="' + ticketId + '" data-action="cancelled">' +
+                        '<i class="ti ti-lock me-1"></i> Close Ticket</button>' +
+                    '<div class="d-flex gap-2">' +
+                        '<button class="btn btn-success ticket-status-btn" data-id="' + ticketId + '" data-action="resolved">' +
+                            '<i class="ti ti-check me-1"></i> Mark as Resolved</button>' +
+                        '<button class="btn btn-info ticket-status-btn" data-id="' + ticketId + '" data-action="in_progress">' +
+                            '<i class="ti ti-progress me-1"></i> Mark as In Progress</button>' +
+                    '</div></div>';
+        }
+
+        // Requester view (alerts only, mirrors Blade)
+        if (lower === 'cancelled') {
+            return '<div class="alert alert-danger w-100 mb-0 d-flex align-items-center py-2 px-3">' +
+                '<i class="ti ti-lock me-2 fs-5"></i>' +
+                '<span>This ticket has been <strong>Closed / Cancelled</strong>.</span></div>';
+        }
+        if (lower === 'resolved') {
+            return '<div class="alert alert-success w-100 mb-0 d-flex align-items-center" role="alert">' +
+                '<i class="ti ti-circle-check fs-4 me-2"></i>' +
+                '<div>This ticket has been marked as <strong>Resolved</strong>.</div></div>';
+        }
+        if (lower === 'in progress') {
+            return '<div class="alert alert-info w-100 mb-0 d-flex align-items-center" role="alert">' +
+                '<i class="ti ti-circle-check fs-4 me-2"></i>' +
+                '<div>This ticket has been marked as <strong>In Progress/Working on it</strong>.</div></div>';
+        }
+        return '';
+    }
 </script>

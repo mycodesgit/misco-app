@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="{{ asset('uilibs/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
     <!-- fullCalendar -->
     <link rel="stylesheet" href="{{ asset('uilibs/plugins/fullcalendar/fullcalendar.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         (function() {
             const savedTheme = localStorage.getItem('theme');

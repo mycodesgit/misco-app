@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -136,6 +138,9 @@ class SupportTicketRequestController extends Controller
 
             DB::commit();
 
+            Cache::flush(); // dashboard cache is the only Cache user — force fresh rebuild on next fetch
+            broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'));
+
             return response()->json([
                 'success' => true,
                 'message' => 'Ticket #' . $ticketNumber . ' created successfully!',
@@ -178,7 +183,7 @@ class SupportTicketRequestController extends Controller
     {
         $request->validate([
             'ticket_id' => 'required|exists:dailyticketrequest,id',
-            'message'   => 'required|string',
+            'message'   => 'nullable|string|max:2000',
             'attachment' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
@@ -213,6 +218,7 @@ class SupportTicketRequestController extends Controller
 
         // Load sender details for frontend rendering
         $chat->load('sender');
+        broadcast(new \App\Events\MessageSent($chat))->toOthers();
 
         return response()->json([
             'success' => true,
@@ -221,8 +227,8 @@ class SupportTicketRequestController extends Controller
                 'message'    => $chat->message,
                 'attachment'  => $chat->attachment ? asset($chat->attachment) : null,
                 'sender_id'  => $chat->sender_id,
-                'sender_name'=> $chat->sender->fname . ' ' . $chat->sender->lname,
-                'time'       => $chat->created_at->format('h:i A'),
+                'sender_name'=> trim(($chat->sender->fname ?? '') . ' ' . ($chat->sender->lname ?? '')) ?: 'User',
+                'time'       => $chat->created_at?->format('h:i A') ?? now()->format('h:i A'),
                 'is_me'      => $chat->sender_id === auth()->id()
             ]
         ]);
@@ -242,8 +248,8 @@ class SupportTicketRequestController extends Controller
                     'message'     => $chat->message,
                     'sender_id'   => $chat->sender_id,
                     'attachment'  => $chat->attachment ? asset($chat->attachment) : null,
-                    'sender_name' => $chat->sender->fname . ' ' . $chat->sender->lname,
-                    'time'        => $chat->created_at->format('h:i A'),
+                    'sender_name' => trim(($chat->sender->fname ?? '') . ' ' . ($chat->sender->lname ?? '')) ?: 'User',
+                    'time'        => $chat->created_at?->format('h:i A') ?? now()->format('h:i A'),
                     'is_me'       => $chat->sender_id === auth()->id()
                 ];
             });
@@ -282,6 +288,12 @@ class SupportTicketRequestController extends Controller
                 'message' => 'Invalid status provided.'
             ], 400);
         }
+
+        $ticket->refresh();
+
+        Cache::flush(); // dashboard cache is the only Cache user — force fresh rebuild on next fetch
+        broadcast(new \App\Events\TicketStatusUpdated($ticket))->toOthers();
+        broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'status_changed'));
 
         return response()->json([
             'success' => true,
