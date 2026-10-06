@@ -97,9 +97,11 @@ Route::group(['middleware'=>['login_auth']],function(){
     });
 
     Route::prefix('/users')->group(function () {
-        Route::get('/list/view/all',[UserController::class,'index'])->name('user.index');
+        Route::get('/list/view/all/supports',[UserController::class,'index'])->name('user.index');
+        Route::get('/list/view/all/requester',[UserController::class,'requesterindex'])->name('requester.index');
         Route::post('/list/view/add',[UserController::class,'create'])->name('user.create');
-        Route::get('/list/view/fetch',[UserController::class,'show'])->name('user.show');
+        Route::get('/list/view/fetch/support',[UserController::class,'show'])->name('user.show');
+        Route::get('/list/view/fetch/requester',[UserController::class,'requestershow'])->name('requester.show');
         Route::post('/list/view/update', [UserController::class, 'update'])->name('user.update');
         Route::post('/list/updatePass', [UserController::class, 'userUpdatePassword'])->name('userUpdatePassword');
         Route::post('list/updateStatusnow', [UserController::class, 'userUpdateStatus'])->name('userUpdateStatus');

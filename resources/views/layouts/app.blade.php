@@ -280,6 +280,9 @@
     @if (request()->routeIs('user.index'))
         @include('script.usr.userjs')
     @endif
+    @if (request()->routeIs('requester.index'))
+        @include('script.usr.userjs')
+    @endif
     @if (request()->routeIs('roles.index'))
         @include('script.usr.rolejs')
     @endif

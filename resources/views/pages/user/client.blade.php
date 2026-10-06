@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Ticketing | Users
+    Ticketing | Requester
 @endsection
 
 @section('body')
@@ -12,15 +12,12 @@
                 <!-- Dashboard Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
-                        <h1 class="h4 fw-bold mb-1">User's Management</h1>
-                        <p class="text-muted small mb-0">Manage user accounts, assign role permissions, and configure office access levels across the system.</p>
+                        <h1 class="h4 fw-bold mb-1">Requester Management</h1>
+                        <p class="text-muted small mb-0">Manage requester accounts in the system.</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-secondary">
-                            Export Report
-                        </button>
                         <button class="btn btn-sm btn-success text-white" data-bs-toggle="modal" data-bs-target="#createUserModal">
-                            <i class="ti ti-plus"></i> Create New User
+                            <i class="ti ti-plus"></i> Create New Requester
                         </button>
                     </div>
                 </div>
@@ -31,12 +28,12 @@
                         <div class="card card-animate">
                             <div class="card-header pt-3">
                                 <h6 class="card-title">
-                                    <i class="ti ti-users"></i> List of Users
+                                    <i class="ti ti-users"></i> List of Requester
                                 </h6>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-2 p-2">
-                                    <table id="userviewTable" class="table table-hover styled-table" style="width: 100%">
+                                    <table id="requesterviewTable" class="table table-hover styled-table" style="width: 100%">
                                         <thead>
                                             <tr>
                                                 <th>Last Name</th>
@@ -179,7 +176,7 @@
                                 <select class="form-control form-control-sm" name="role" required>
                                     <option value="" selected disabled>--- Select Role ---</option>
                                     @foreach ($roles as $role)
-                                        <option value="{{ $role->rolename }}">
+                                        <option value="{{ $role->rolename }}" selected>
                                             {{ $role->rolename }}
                                         </option>
                                     @endforeach
@@ -442,7 +439,7 @@
     </div>
 
     <script>
-        var userReadRoute = "{{ route('user.show') }}";
+        var userReadRoute = "{{ route('requester.show') }}";
         var userCreateRoute = "{{ route('user.create') }}";
         var userUpdateRoute = "{{ route('user.update', ['id' => ':id']) }}";
         var userPassUpdateRoute = "{{ route('userUpdatePassword', ['id' => ':id']) }}";

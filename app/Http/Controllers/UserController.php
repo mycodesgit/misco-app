@@ -31,8 +31,19 @@ class UserController extends Controller
             $query->where('rolename', '!=', 'Administrator');
         })->get();
         $cat = Category::where('off_id', Auth::user()->office_id)->where('status', 1)->get();
-        
+
         return view('pages.user.list', compact('users', 'offices', 'roles', 'cat'));
+    }
+
+    public function requesterindex()
+    {
+        $users = User::with('office')->get();
+        $offices = Office::all();
+        $roles = UserRole::where('rolename', '=', 'Requester')->get();
+
+        $cat = Category::where('off_id', Auth::user()->office_id)->where('status', 1)->get();
+
+        return view('pages.user.client', compact('users', 'offices', 'roles', 'cat'));
     }
 
     public function create(Request $request)
@@ -93,6 +104,35 @@ class UserController extends Controller
             'assignedTasks:id,user_id,taskassigned',
         ])
         ->where('users.ustatus', '!=', 3)
+        ->get();
+
+        $data = $users->map(function ($user) {
+            $assignedIds = $user->assignedTasks?->taskassigned ?? [];
+
+            // Always return an array of strings
+            $assignedIds = collect($assignedIds)
+                ->map(fn ($id) => (string) $id)
+                ->values()
+                ->all();
+
+            $user->taskassigned = $assignedIds;
+
+            return $user;
+        });
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    public function requestershow()
+    {
+        $users = User::with([
+            'office',
+            'assignedTasks:id,user_id,taskassigned',
+        ])
+        ->where('users.ustatus', '!=', 3)
+        ->where('users.role', '=', 'Requester')
         ->get();
 
         $data = $users->map(function ($user) {
@@ -197,7 +237,7 @@ class UserController extends Controller
         }
     }
 
-    public function userUpdateStatus(Request $request) 
+    public function userUpdateStatus(Request $request)
     {
         $user = User::find($request->id);
 
@@ -227,7 +267,7 @@ class UserController extends Controller
         }
     }
 
-    public function userAssignTaskUpdate(Request $request) 
+    public function userAssignTaskUpdate(Request $request)
     {
         $request->validate([
             'id' => 'required',

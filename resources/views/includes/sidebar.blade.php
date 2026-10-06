@@ -8,6 +8,7 @@
     $officeActive = in_array($current_route, ['office.index']) ? 'active' : '';
     $accomplishmentActive = in_array($current_route, ['accomplishment-report.index']) ? 'active' : '';
     $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
+    $requesterAllActive = in_array($current_route, ['requester.index']) ? 'active' : '';
     $rolesAllActive = in_array($current_route, ['roles.index']) ? 'active' : '';
 
     $ticketsrequesterActive = in_array($current_route, ['ticketsrequester.index', 'tickets.store']) ? 'active' : '';
@@ -58,7 +59,7 @@
             </a>
         </li>
     @endif
-    
+
     @if(Auth::guard('web')->user()->role != 'Requester')
         <li class="px-4 py-2">
             <small class="nav-text text-muted">Reports Generation</small>
@@ -85,14 +86,19 @@
             <small class="nav-text text-muted">User Management</small>
         </li>
         <li>
-            <a class="nav-link {{$usersAllActive}}" href="{{ route('user.index') }}" data-tooltip="Users">
-                <i class="ti ti-users"></i><span class="nav-text">Users</span>
+            <a class="nav-link {{$usersAllActive}}" href="{{ route('user.index') }}" data-tooltip="{{ auth()->user()->pageTitle(' Support Team') }}">
+                <i class="ti ti-user-cog"></i><span class="nav-text">{{ auth()->user()->pageTitle(' Support Team') }}</span>
+            </a>
+        </li>
+        <li>
+            <a class="nav-link {{ $requesterAllActive }}" href="{{ route('requester.index') }}" data-tooltip="Requester">
+                <i class="ti ti-users"></i><span class="nav-text">Requester</span>
             </a>
         </li>
         <li>
             <a class="nav-link {{ $rolesAllActive }}" href="{{ route('roles.index') }}">
                 <i class="ti ti-id-badge"></i><span class="nav-text">User Roles</span>
             </a>
-        </li> 
+        </li>
     @endif
 </ul>

@@ -99,6 +99,74 @@
         dataTable.on('draw', function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
+
+        var dataTableRequester = $('#requesterviewTable').DataTable({
+            "ajax": {
+                "url": userReadRoute,
+                "type": "GET",
+            },
+            destroy: true,
+            info: true,
+            responsive: true,
+            lengthChange: true,
+            searching: true,
+            paging: true,
+            "columns": [
+                {data: 'lname'},
+                {data: 'fname'},
+                {data: 'mname', defaultContent: '<i>-</i>'},
+                // {data: 'campus_name'},
+                // {data: 'office_abbr'},
+                {data: 'email'},
+                {data: 'role'},
+                {data: 'ustatus',
+                        render: function(data, type, row) {
+                        switch(parseInt(data)) {
+                            case 1:
+                                return '<span class="badge bg-info">Enabled</span>';
+                            case 2:
+                                return '<span class="badge bg-danger">Disabled</span>';
+                            case 3:
+                                return '<span class="badge bg-warning">Deleted</span>';
+                            default:
+                                return '<span class="badge bg-secondary">Unknown Status</span>';
+                        }
+                    },
+                },
+                {data: 'isAllowed'},
+                {
+                    data: 'id',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            var taskAssigned = Array.isArray(row.taskassigned)
+                                ? row.taskassigned
+                                : [];
+
+                            var buttons = '<button type="button" class="btn btn-sm btn-success btn-useredit text-light" data-id="' + row.id + '" data-fname="' + row.fname + '" data-mname="' + row.mname + '" data-lname="' + row.lname + '" data-ext="' + row.ext + '" data-email="' + row.email + '" data-office="' + row.office_id + '" data-gender="' + row.gender + '" data-role="' + row.role + '" data-campus="' + row.campus_id + '" data-permission="' + row.isAllowed + '" data-toggle="tooltip" data-placement="top" title="Edit User."><i class="ti ti-pencil"></i></button>&nbsp;';
+                                buttons += '<button type="button" class="btn btn-sm btn-secondary btn-assigncategory" data-id="' + row.id + '" data-fullname="' + row.fname + ' ' + row.mname + ' ' + row.lname + (row.ext && row.ext !== 'null' ? ' ' + row.ext : '') + '" data-taskassigned=\'' + JSON.stringify(taskAssigned) + '\'  data-toggle="tooltip" data-placement="top" title="Assign Task Category."><i class="ti ti-server"></i></button>&nbsp;';
+                                buttons += '<button type="button" class="btn btn-sm btn-light btn-passedit" data-id="' + row.id + '" data-password="' + row.password + '" data-toggle="tooltip" data-placement="top" title="Edit User Password."><i class="ti ti-lock"></i></button>&nbsp;';
+                                buttons += '<button type="button" class="btn btn-sm btn-warning btn-ustatusedit" data-id="' + row.id + '" data-ustatus="' + row.ustatus + '" data-toggle="tooltip" data-placement="top" title="Enabled/Disabled."><i class="ti ti-toggle-left"></i></button>&nbsp;';
+                            if (isAdmin || isChecker) {
+                                buttons += '<button type="button" value="' + data + '" class="btn btn-sm btn-danger userpr-delete" data-toggle="tooltip" data-placement="top" title="Delete Category."><i class="ti ti-trash"></i> </button>';
+                            }
+                            return buttons;
+                        } else {
+                            return data;
+                        }
+                    },
+                },
+            ],
+            "createdRow": function (row, data, index) {
+                $(row).attr('id', 'tr-' + data.uid);
+            }
+        });
+        $(document).on('userAdded', function() {
+            dataTableRequester.ajax.reload();
+        });
+
+        dataTableRequester.on('draw', function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
     });
 
     $(document).on('click', '.btn-useredit', function() {

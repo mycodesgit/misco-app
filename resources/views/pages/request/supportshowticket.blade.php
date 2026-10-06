@@ -112,22 +112,31 @@
                                                 </div>
                                             </a>
 
-                                            <!-- File Info -->
-                                            <div class="flex-grow-1 min-w-0">
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" class="fw-semibold text-decoration-none d-block text-truncate small mb-1">
-                                                    {{ basename($ticket->attachment) }}
-                                                </a>
-                                                <span class="badge text-muted border fw-normal">
-                                                    {{ strtoupper(pathinfo($ticket->attachment, PATHINFO_EXTENSION)) }} Attachment
-                                                </span>
-                                            </div>
+                                            @if (!empty($ticket->attachment))
+                                                <!-- File Info -->
+                                                <div class="flex-grow-1 min-w-0">
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" class="fw-semibold text-decoration-none d-block text-truncate small mb-1">
+                                                        {{ basename($ticket->attachment) }}
+                                                    </a>
+                                                    <span class="badge text-muted border fw-normal">
+                                                        {{ strtoupper(pathinfo($ticket->attachment, PATHINFO_EXTENSION)) }} Attachment
+                                                    </span>
+                                                </div>
 
-                                            <!-- Action Buttons -->
-                                            <div class="d-flex align-items-center gap-1 pe-1">
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" class="btn btn-sm btn-light border text-secondary" title="View Image">
-                                                    <i class="ti ti-eye"></i> View Attachment
-                                                </a>
-                                            </div>
+                                                <!-- Action Buttons -->
+                                                <div class="d-flex align-items-center gap-1 pe-1">
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" class="btn btn-sm btn-light border text-secondary" title="View Image">
+                                                        <i class="ti ti-eye"></i> View Attachment
+                                                    </a>
+                                                </div>
+                                            @else
+                                                <!-- No Attachment State -->
+                                                <div class="flex-grow-1 min-w-0">
+                                                    <span class="text-muted small italic">
+                                                        <i class="ti ti-paperclip me-1 text-secondary"></i> No attachment
+                                                    </span>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
