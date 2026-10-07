@@ -320,6 +320,9 @@
     @if (request()->routeIs('roles.index'))
         @include('script.usr.rolejs')
     @endif
+    @if (request()->routeIs('clientfeedback.index'))
+        @include('script.report.clientfeedbackjs')
+    @endif
 
 </body>
 </html>

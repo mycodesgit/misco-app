@@ -7,6 +7,7 @@
     $categoryActive = in_array($current_route, ['category.index']) ? 'active' : '';
     $officeActive = in_array($current_route, ['office.index']) ? 'active' : '';
     $accomplishmentActive = in_array($current_route, ['accomplishment-report.index']) ? 'active' : '';
+    $clientfeedbackActive = in_array($current_route, ['clientfeedback.index']) ? 'active' : '';
     $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
     $requesterAllActive = in_array($current_route, ['requester.index']) ? 'active' : '';
     $rolesAllActive = in_array($current_route, ['roles.index']) ? 'active' : '';
@@ -75,7 +76,7 @@
             </a>
         </li>
         <li>
-            <a class="nav-link" href="#" data-tooltip="Client Feedback">
+            <a class="nav-link {{ $clientfeedbackActive }}" href="{{ route('clientfeedback.index') }}" data-tooltip="Client Feedback">
                 <i class="ti ti-file-report"></i><span class="nav-text">Client Feedback</span>
             </a>
         </li>

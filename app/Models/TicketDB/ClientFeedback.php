@@ -16,6 +16,7 @@ class ClientFeedback extends Model
         'user_id',
         'cat_id',
         'subcat_id',
+        'off_id',
         'ticket_id',
         'rating',
         'feedback',
@@ -24,5 +25,10 @@ class ClientFeedback extends Model
     public function ticket()
     {
         return $this->belongsTo(DailyTicketRequest::class, 'ticket_id');
+    }
+
+    public function supportOffice()
+    {
+        return $this->belongsTo(Office::class, 'off_id');
     }
 }

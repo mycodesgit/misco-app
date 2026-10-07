@@ -17,6 +17,7 @@ use App\Http\Controllers\LogoutController;
 
 use App\Http\Controllers\MonitoringDashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ClientFeedbackController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -97,6 +98,8 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::prefix('/reports')->group(function () {
         Route::get('/accomplishment/generate', [AccomplishmentReportController::class, 'index'])->name('accomplishment-report.index');
         Route::get('/accomplishment/preview', [AccomplishmentReportController::class, 'previewPdf'])->name('accomplishment.preview');
+        Route::get('/clientfeedback/view', [ClientFeedbackController::class, 'index'])->name('clientfeedback.index');
+        Route::get('/clientfeedback/fetch', [ClientFeedbackController::class, 'show'])->name('clientfeedback.show');
     });
 
     Route::prefix('/users')->group(function () {

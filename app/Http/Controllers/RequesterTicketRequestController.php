@@ -167,6 +167,7 @@ class RequesterTicketRequestController extends Controller
                 'user_id'   => Auth::id(),
                 'cat_id'    => $request->input('cat_id'),
                 'subcat_id' => $request->input('subcat_id'),
+                'off_id'    => $request->input('off_id'),
                 'ticket_id' => $ticket->id,
             ]);
 
@@ -175,9 +176,10 @@ class RequesterTicketRequestController extends Controller
             Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
             broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'));
 
-            // Notify all support users (everyone except Requester role) of the new pending ticket
+            // Notify support users of the ticket's handling office only (office_id = ticket off_id)
             $supportUsers = User::where('role', '!=', 'Requester')
                 ->where('ustatus', '!=', 3)
+                ->where('office_id', $request->input('off_id'))
                 ->where('id', '!=', Auth::id())
                 ->get();
             if ($supportUsers->isNotEmpty()) {
@@ -332,6 +334,7 @@ class RequesterTicketRequestController extends Controller
 
         $satisfaction->cat_id    = $ticket->cat_id;
         $satisfaction->subcat_id = $ticket->subcat_id;
+        $satisfaction->off_id    = $ticket->off_id;
         $satisfaction->rating     = $request->rating;
         $satisfaction->feedback   = $request->feedback;
         $satisfaction->save();
