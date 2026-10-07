@@ -63,6 +63,8 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/requester/view/all/fetch/progress',[RequesterTicketRequestController::class,'showreqprogress'])->name('tickets.showreqprogress');
         Route::get('/requester/view/all/fetch/resolved',[RequesterTicketRequestController::class,'showreqresolved'])->name('tickets.showreqresolved');
         Route::get('/requester/view/all/fetch/closed',[RequesterTicketRequestController::class,'showreqclosed'])->name('tickets.showreqclosed');
+        Route::get('/requester/tickets/feedback/{ticketId}', [RequesterTicketRequestController::class, 'getFeedback'])->name('ticketsrequester.feedback.show');
+        Route::post('/requester/tickets/submit/feedback', [RequesterTicketRequestController::class, 'submitFeedback'])->name('ticketsrequester.feedback.submit');
 
     });
 

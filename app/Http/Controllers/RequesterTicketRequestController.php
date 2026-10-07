@@ -164,7 +164,6 @@ class RequesterTicketRequestController extends Controller
 
             $clientsat = ClientSatisfactory::create([
                 'user_id'   => Auth::id(),
-                'off_id'    => $request->input('off_id'),
                 'cat_id'    => $request->input('cat_id'),
                 'subcat_id' => $request->input('subcat_id'),
                 'ticket_id' => $ticket->id,
@@ -231,6 +230,16 @@ class RequesterTicketRequestController extends Controller
             ->orderBy('id', 'DESC')
             ->get();
 
+        // Detect from DB which tickets already have feedback submitted
+        $submittedTicketIds = ClientSatisfactory::whereIn('ticket_id', $data->pluck('id'))
+            ->whereNotNull('rating')
+            ->pluck('ticket_id')
+            ->toArray();
+
+        $data->each(function ($ticket) use ($submittedTicketIds) {
+            $ticket->has_feedback = in_array($ticket->id, $submittedTicketIds);
+        });
+
         return response()->json(['data' => $data]);
     }
 
@@ -245,6 +254,76 @@ class RequesterTicketRequestController extends Controller
             ->get();
 
         return response()->json(['data' => $data]);
+    }
+
+    /**
+     * Get existing feedback for a ticket (to pre-fill the modal).
+     */
+    public function getFeedback($ticketId)
+    {
+        $ticket = DailyTicketRequest::where('id', $ticketId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $satisfaction = ClientSatisfactory::where('ticket_id', $ticket->id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        return response()->json([
+            'ticket_number' => $ticket->ticket_number,
+            'rating'        => $satisfaction->rating ?? null,
+            'feedback'      => $satisfaction->feedback ?? null,
+        ]);
+    }
+
+    /**
+     * Store / update requester feedback using ClientSatisfactory model.
+     */
+    public function submitFeedback(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ticket_id' => 'required|exists:dailyticketrequest,id',
+            'rating'    => 'required|integer|min:1|max:5',
+            'feedback'  => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        $ticket = DailyTicketRequest::where('id', $request->ticket_id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$ticket) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ticket not found.'
+            ], 404);
+        }
+
+        $satisfaction = ClientSatisfactory::firstOrNew([
+            'ticket_id' => $ticket->id,
+            'user_id'   => Auth::id(),
+        ]);
+
+        $satisfaction->cat_id    = $ticket->cat_id;
+        $satisfaction->subcat_id = $ticket->subcat_id;
+        $satisfaction->rating     = $request->rating;
+        $satisfaction->feedback   = $request->feedback;
+        $satisfaction->save();
+
+        $this->logAuditSatisfactory($request, 'Submit_ClientSatisfactory', $satisfaction->toArray());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thank you for your feedback!',
+            'data'    => $satisfaction
+        ]);
     }
 
     /**
@@ -266,6 +345,24 @@ class RequesterTicketRequestController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' => $browser . ' on ' . $platform,
             'login_at'   => now(),
+        ]);
+    }
+
+    private function logAuditSatisfactory(Request $request, string $action, array $payload): void
+    {
+        $agent = new Agent();
+        $agent->setUserAgent($request->userAgent());
+
+        $browser  = $agent->browser();
+        $platform = $agent->platform();
+
+        AuditTrailClientSatisfactory::create([
+            'user_id'    => auth()->id(),
+            'email'      => auth()->user()->email ?? 'System',
+            'action'     => $action,
+            'actiondata' => json_encode($payload),
+            'ip_address' => $request->ip(),
+            'user_agent' => $browser . ' on ' . $platform,
         ]);
     }
 }

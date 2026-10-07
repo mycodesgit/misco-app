@@ -17,6 +17,12 @@ class ClientSatisfactory extends Model
         'cat_id',
         'subcat_id',
         'ticket_id',
+        'rating',
         'feedback',
     ];
+
+    public function ticket()
+    {
+        return $this->belongsTo(DailyTicketRequest::class, 'ticket_id');
+    }
 }

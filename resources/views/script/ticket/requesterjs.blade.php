@@ -159,7 +159,7 @@
             dataTablePending.ajax.reload();
         });
         dataTablePending.on('draw', function () {
-            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-bs-toggle="tooltip"]').tooltip();
         });
 
 
@@ -281,6 +281,9 @@
         $(document).on('ticketProgressAdded', function() {
             dataTableProgress.ajax.reload();
         });
+        dataTableProgress.on('draw', function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
 
 
         var dataTableResolved = $('#ticketresolvedTable').DataTable({
@@ -383,14 +386,20 @@
                         return `<span class="badge ${statusClass}">${data ?? 'Pending'}</span>`;
                     }
                 },
-                // 7. Actions (View / Edit / Delete)
+                // 7. Actions (View / Feedback)
                 {
                     data: 'id',
                     render: function(data, type, row) {
                         var baseUrl = "{{ route('tickets.store') }}";
                         var viewBtn = `<a href="${baseUrl}?view=${data}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
+                        var feedbackBtn;
+                        if (row.has_feedback) {
+                            feedbackBtn = `<button type="button" class="btn btn-sm btn-secondary text-white me-1" disabled data-bs-toggle="tooltip" title="Feedback already submitted"><i class="ti ti-forms me-1"></i>Feedback Submitted</button>`;
+                        } else {
+                            feedbackBtn = `<button type="button" class="btn btn-sm btn-success text-white btn-submitfeedback me-1 text-nowrap" data-id="${data}" data-bs-toggle="tooltip" title="Submit Feedback"><i class="ti ti-forms me-1"></i>Submit Feedback</button>`;
+                        }
 
-                        return viewBtn;
+                        return `<div class="text-nowrap">` + viewBtn + feedbackBtn + `</div>`;
                     }
                 }
             ],
@@ -400,6 +409,9 @@
         });
         $(document).on('ticketResolvedAdded', function() {
             dataTableResolved.ajax.reload();
+        });
+        dataTableResolved.on('draw', function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
         });
 
 
@@ -682,6 +694,83 @@
                     assignedInput.val('');
                 }
             });
+        });
+    });
+
+    /* ================= Feedback modal (ClientSatisfactory) ================= */
+    var feedbackLabels = {
+        1: 'Very Dissatisfied',
+        2: 'Dissatisfied',
+        3: 'Neutral',
+        4: 'Satisfied',
+        5: 'Very Satisfied'
+    };
+
+    function setFeedbackRating(value) {
+        $('#feedback_rating').val(value || '');
+        $('#emojiRatingGroup .emoji-btn').removeClass('active');
+        if (value) {
+            $('#emojiRatingGroup .emoji-btn[data-value="' + value + '"]').addClass('active');
+            $('#emojiRatingLabel').text(feedbackLabels[value]).css('color', '#111');
+        } else {
+            $('#emojiRatingLabel').text('Choose your experience').css('color', '#e5b8c4');
+        }
+    }
+
+    $(document).on('click', '#emojiRatingGroup .emoji-btn', function() {
+        setFeedbackRating($(this).data('value'));
+    });
+
+    // Open modal from Resolved table feedback button
+    $(document).on('click', '.btn-submitfeedback', function() {
+        var ticketId = $(this).data('id');
+        $('#submitFeedbackForm')[0].reset();
+        setFeedbackRating('');
+        $('#feedback_ticket_id').val(ticketId);
+        $('#feedbackTicketNo').text('Ticket #');
+
+        $.ajax({
+            url: ticketFeedbackShowBase + '/' + ticketId,
+            type: 'GET',
+            success: function(res) {
+                $('#feedbackTicketNo').text('Ticket #' + (res.ticket_number || ticketId));
+                if (res.rating) setFeedbackRating(res.rating);
+                if (res.feedback) $('#feedback_text').val(res.feedback);
+            }
+        });
+
+        $('#submitfeedTicketModal').modal('show');
+    });
+
+    $('#submitFeedbackForm').submit(function(event) {
+        event.preventDefault();
+
+        if (!$('#feedback_rating').val()) {
+            toastr.warning('Please choose your experience rating.');
+            return;
+        }
+
+        $.ajax({
+            url: ticketFeedbackSubmitRoute,
+            type: 'POST',
+            data: $(this).serialize(),
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    $('#submitfeedTicketModal').modal('hide');
+                    // Refresh resolved table so the button flips to disabled "Feedback Submitted"
+                    $(document).trigger('ticketResolvedAdded');
+                    $(document).trigger('ticketListChanged');
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function(xhr) {
+                var msg = 'An error occurred';
+                try { msg = JSON.parse(xhr.responseText).message || msg; } catch (e) {}
+                toastr.error(msg);
+            }
         });
     });
 </script>

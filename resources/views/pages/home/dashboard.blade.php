@@ -38,16 +38,10 @@
                             <div class="card overflow-hidden position-relative welcome-hero-card">
                                 <div class="card-body p-4 d-flex flex-column justify-content-between position-relative z-1">
                                     <div>
-                                        <!-- Badge & Role Header -->
-                                        <div class="d-flex align-items-center gap-2 mb-2">
-                                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 small">
-                                                <i class="ti ti-circle-filled me-1 small"></i> Active
-                                            </span>
-                                        </div>
 
                                         <!-- Welcome Greeting -->
-                                        <h3 class="fw-bold mb-2">
-                                            Welcome {{ auth()->user()->fname }} {{ auth()->user()->lname }}!
+                                        <h3 class="fw-bold mt-2 mb-2">
+                                            Welcome {{ auth()->user()->fname }}!
                                         </h3>
 
                                         <!-- Team Performance Summary -->
@@ -492,7 +486,7 @@
                                             </span>
                                         </div>
                                         <h3 class="fw-bold mb-2">
-                                            Welcome, {{ auth()->user()->fname }} {{ auth()->user()->lname }}! <br> How can we assist you today?
+                                            Welcome, {{ auth()->user()->fname }}! <br> How can we assist you today?
                                         </h3>
                                         <p class="text-secondary mb-3 fs-6">
                                             Check your daily tasks, submit new tickets, and stay updated with the latest support activities.

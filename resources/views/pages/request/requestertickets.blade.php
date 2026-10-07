@@ -129,7 +129,7 @@
                                                     <th>Category</th>
                                                     <th>Sub-Category</th>
                                                     <th>Status</th>
-                                                    <th width="10%">Actions</th>
+                                                    <th width="20%">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -189,7 +189,7 @@
 
                     <!-- Modal Body -->
                     <div class="modal-body">
-                        <div class="row g-3">  
+                        <div class="row g-3">
                             <!-- Name -->
                             <div class="col-md-6">
                                 <label for="name" class="form-label fw-semibold">Name: <span class="text-danger">*</span></label>
@@ -273,7 +273,7 @@
                                 </label>
                                 <input class="form-control form-control-sm" type="file" id="attachment" name="attachment" accept="image/*" onchange="previewImage(event)">
                                 <div class="form-text small">Upload an image file (.png, .jpg, .jpeg) showing the error message or hardware issue.</div>
-                                
+
                                 <!-- Image Preview Container -->
                                 <div id="preview-container" class="mt-3 d-none">
                                     <span class="d-block small text-muted mb-1">Image Preview:</span>
@@ -298,6 +298,67 @@
         </div>
     </div>
 
+    <div class="modal fade" id="submitfeedTicketModal" tabindex="-1" aria-labelledby="submitfeedTicketModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+            <div class="modal-content border-0 p-2" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 60%, #15803d 100%); border-radius: 22px;">
+                <div class="bg-white px-4 pt-4 pb-3" style="border-radius: 16px;">
+                    <!-- Modal Header -->
+                    <div class="d-flex justify-content-between align-items-start border-0 p-0 mb-1">
+                        <div class="w-100 text-center">
+                            <h5 class="fw-bold mb-0" id="submitfeedTicketModalLabel" style="font-size: 1.1rem; color: #111;">
+                                How was your experience?
+                            </h5>
+                            <small class="text-muted" id="feedbackTicketNo">Ticket #</small>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form action="#" method="POST" id="submitFeedbackForm">
+                        @csrf
+                        <input type="hidden" name="ticket_id" id="feedback_ticket_id">
+                        <input type="hidden" name="rating" id="feedback_rating" value="">
+
+                        <!-- Emoji rating -->
+                        <div class="d-flex justify-content-center align-items-center gap-2 my-3" id="emojiRatingGroup">
+                            <button type="button" class="emoji-btn" data-value="1" title="Very Dissatisfied" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">😣</button>
+                            <button type="button" class="emoji-btn" data-value="2" title="Dissatisfied" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">😟</button>
+                            <button type="button" class="emoji-btn" data-value="3" title="Neutral" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">😐</button>
+                            <button type="button" class="emoji-btn" data-value="4" title="Satisfied" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">🙂</button>
+                            <button type="button" class="emoji-btn" data-value="5" title="Very Satisfied" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">😁</button>
+                        </div>
+                        <p class="text-center small mb-3" id="emojiRatingLabel" style="color: #e5b8c4;">Choose your experience</p>
+
+                        <!-- Suggestion -->
+                        <div class="mb-3">
+                            <textarea class="form-control border-0" id="feedback_text" name="feedback" rows="3" placeholder="Suggest anything we can improve.." style="background: #f3f6ff; border-radius: 12px; resize: none;"></textarea>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="btn w-100 text-white fw-semibold" style="background: #2f7bff; border-radius: 999px; padding: 10px 0;">
+                            Send Feedback
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        #emojiRatingGroup .emoji-btn {
+            cursor: pointer;
+            opacity: .55;
+        }
+        #emojiRatingGroup .emoji-btn:hover {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+        #emojiRatingGroup .emoji-btn.active {
+            transform: scale(1.35);
+            opacity: 1;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)) !important;
+        }
+    </style>
+
     <style>
         .avatar-circle-sm {
             width: 32px;
@@ -316,6 +377,8 @@
         var ticketResolvedRoute = "{{ route('tickets.showreqresolved') }}";
         var ticketClosedRoute = "{{ route('tickets.showreqclosed') }}";
         var ticketCreateRoute = "{{ route('ticketsrequester.create') }}";
+        var ticketFeedbackShowBase = "{{ url('/tickets/requester/tickets/feedback') }}";
+        var ticketFeedbackSubmitRoute = "{{ route('ticketsrequester.feedback.submit') }}";
 
         function previewImage(event) {
             var reader = new FileReader();
