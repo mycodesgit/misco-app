@@ -11,9 +11,14 @@ class ClientFeedbackController extends Controller
 {
     public function index()
     {
-        $offices = Office::orderBy('office_abbr')->get(['id', 'office_abbr', 'office_name']);
+        $isAdmin = auth()->user()->role === 'Administrator';
 
-        return view('pages.reports.clientfeedback', compact('offices'));
+        // Non-admins only ever see their own office's feedback
+        $offices = $isAdmin
+            ? Office::orderBy('office_abbr')->get(['id', 'office_abbr', 'office_name'])
+            : Office::where('id', auth()->user()->office_id)->get(['id', 'office_abbr', 'office_name']);
+
+        return view('pages.reports.clientfeedback', compact('offices', 'isAdmin'));
     }
 
     public function show(Request $request)
@@ -28,11 +33,17 @@ class ClientFeedbackController extends Controller
 
         $month = (int) $request->month;
 
+        // Only Administrators may view all offices / pick any office.
+        // Everyone else is locked to their own office's feedback.
+        $offId = auth()->user()->role === 'Administrator'
+            ? ($request->filled('off_id') ? $request->off_id : null)
+            : auth()->user()->office_id;
+
         $data = ClientFeedback::with(['ticket.requester', 'ticket.category', 'ticket.subcategory', 'supportOffice'])
             ->whereYear('clientfeedback.created_at', $request->year)
             ->whereMonth('clientfeedback.created_at', $month)
-            ->when($request->filled('off_id'), function ($query) use ($request) {
-                $query->where('clientfeedback.off_id', $request->off_id);
+            ->when($offId, function ($query) use ($offId) {
+                $query->where('clientfeedback.off_id', $offId);
             })
             ->orderBy('clientfeedback.created_at', 'DESC')
             ->get()

@@ -67,12 +67,17 @@
 
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold">Office:</label>
-                                                <select id="filterOffice" class="form-control form-control-sm">
-                                                    <option value="">All Offices</option>
+                                                <select id="filterOffice" class="form-control form-control-sm" {{ ($isAdmin ?? false) ? '' : 'disabled' }}>
+                                                    @if ($isAdmin ?? false)
+                                                        <option value="">All Offices</option>
+                                                    @endif
                                                     @foreach ($offices as $office)
                                                         <option value="{{ $office->id }}">{{ $office->office_abbr }} - {{ $office->office_name }}</option>
                                                     @endforeach
                                                 </select>
+                                                @unless ($isAdmin ?? false)
+                                                    <small class="text-muted">Locked to your office.</small>
+                                                @endunless
                                             </div>
 
                                             <div class="col-md-2">
