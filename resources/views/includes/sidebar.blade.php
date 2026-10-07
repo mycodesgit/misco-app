@@ -2,6 +2,7 @@
     $current_route=request()->route()->getName();
 
     $dashActive = in_array($current_route, ['dashboard.index']) ? 'active' : '';
+    $projectActive = in_array($current_route, ['project.index']) ? 'active' : '';
     $ticketsActive = in_array($current_route, ['tickets.index', 'tickets.store']) ? 'active' : '';
     $dailyTaskActive = in_array($current_route, ['daily-task.index']) ? 'active' : '';
     $categoryActive = in_array($current_route, ['category.index']) ? 'active' : '';
@@ -34,6 +35,11 @@
         <li>
             <a class="nav-link {{ $dailyTaskActive }}" href="{{ route('daily-task.index') }}" data-tooltip="Daily Task">
                 <i class="ti ti-calendar"></i><span class="nav-text">Daily Task</span>
+            </a>
+        </li>
+        <li>
+            <a class="nav-link {{ $projectActive }}" href="{{ route('project.index') }}" data-tooltip="Work Progress">
+                <i class="ti ti-chart-pie-3"></i><span class="nav-text">Work Progress</span>
             </a>
         </li>
     @else

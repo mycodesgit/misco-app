@@ -308,6 +308,9 @@
     @if (request()->routeIs('audittrail.index'))
         @include('script.mnge.audittrailjs')
     @endif
+    @if (request()->routeIs('project.index'))
+        @include('script.project.projectjs')
+    @endif
     @if (request()->routeIs('user.index'))
         @include('script.usr.userjs')
     @endif

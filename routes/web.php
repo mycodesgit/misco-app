@@ -20,6 +20,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClientFeedbackController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuditTrailController;
+use App\Http\Controllers\ProjectController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -110,6 +111,15 @@ Route::group(['middleware'=>['login_auth']],function(){
     // Personal account page — outside /users/* so Requester role can access it
     Route::get('/account', [AccountController::class, 'index'])->name('account.index');
     Route::post('/account/password', [AccountController::class, 'updatePassword'])->name('account.password');
+
+    Route::prefix('/projects')->group(function () {
+        Route::get('/tracker', [ProjectController::class, 'index'])->name('project.index');
+        Route::get('/fetch', [ProjectController::class, 'show'])->name('project.show');
+        Route::get('/members/{officeId}', [ProjectController::class, 'membersByOffice'])->name('project.members');
+        Route::post('/create', [ProjectController::class, 'store'])->name('project.create');
+        Route::post('/update', [ProjectController::class, 'update'])->name('project.update');
+        Route::delete('/delete/{id}', [ProjectController::class, 'destroy'])->name('project.delete');
+    });
 
     Route::prefix('/users')->group(function () {
         Route::get('/list/view/all/supports',[UserController::class,'index'])->name('user.index');
