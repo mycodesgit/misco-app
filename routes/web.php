@@ -18,6 +18,7 @@ use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\MonitoringDashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClientFeedbackController;
+use App\Http\Controllers\AccountController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -101,6 +102,10 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/clientfeedback/view', [ClientFeedbackController::class, 'index'])->name('clientfeedback.index');
         Route::get('/clientfeedback/fetch', [ClientFeedbackController::class, 'show'])->name('clientfeedback.show');
     });
+
+    // Personal account page — outside /users/* so Requester role can access it
+    Route::get('/account', [AccountController::class, 'index'])->name('account.index');
+    Route::post('/account/password', [AccountController::class, 'updatePassword'])->name('account.password');
 
     Route::prefix('/users')->group(function () {
         Route::get('/list/view/all/supports',[UserController::class,'index'])->name('user.index');

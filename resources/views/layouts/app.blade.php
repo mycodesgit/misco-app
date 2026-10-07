@@ -113,11 +113,8 @@
                                 </div>
                             </div>
                             <div class="p-3 d-flex flex-column gap-1 medium lh-lg">
-                                <a href="#!" class="text-secondary">
-                                    <i class="ti ti-settings"></i> <span>Account Settings</span>
-                                </a>
-                                <a href="#!" class="text-success">
-                                    <i class="ti ti-message"></i><span> Chat Message</span>
+                                <a href="{{ route('account.index') }}" class="text-secondary">
+                                    <i class="ti ti-user-cog"></i> <span>Account Settings</span>
                                 </a>
                                 <a href="#" class="text-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="ti ti-logout"></i><span> Signout</span>
@@ -319,6 +316,9 @@
     @endif
     @if (request()->routeIs('roles.index'))
         @include('script.usr.rolejs')
+    @endif
+    @if (request()->routeIs('account.index'))
+        @include('script.usr.accountjs')
     @endif
     @if (request()->routeIs('clientfeedback.index'))
         @include('script.report.clientfeedbackjs')
