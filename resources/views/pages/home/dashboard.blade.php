@@ -433,16 +433,27 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Predicted Ticket Volume Card -->
+                                <!-- Monitoring Card -->
                                 <div class="col-md-12">
                                     <div class="card card-animate">
                                         <div class="card-header pt-3">
                                             <h6 class="card-title">
-                                                <i class="ti ti-calendar"></i> Predicted Ticket Volume for the Next 5 Working Days
+                                                <i class="ti ti-monitor"></i> Monitoring
                                             </h6>
                                         </div>
-                                        <div class="card-body" id="predicted-volume-container">
-                                            <!-- Dynamically populated -->
+                                        <div class="card-body" id="monitoring-container">
+                                            <div class="row text-center g-2">
+                                                @foreach ($monitoring ?? [] as $item)
+                                                    <div class="col">
+                                                        <div class="p-2 border rounded card-body-bg-color">
+                                                            <i class="ti {{ $item['icon'] }} fs-5 {{ $item['color'] }}"></i>
+                                                            <span class="fw-bold fs-5 d-block">{{ $item['value'] }}</span>
+                                                            <small class="d-block fw-semibold">{{ $item['label'] }}</small>
+                                                            <small class="d-block text-muted" style="font-size: 0.7rem;">{{ $item['sub'] }}</small>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

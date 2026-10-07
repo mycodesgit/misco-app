@@ -140,25 +140,26 @@
             $('#top-categories-container').html(html);
         }
 
-        function renderPredictedVolume(predictions) {
+        function renderMonitoring(items) {
             let html = '<div class="row text-center g-2">';
-            if (!predictions || predictions.length === 0) {
-                html += '<div class="text-muted">No prediction available</div>';
+            if (!items || items.length === 0) {
+                html += '<div class="text-muted">No monitoring data available</div>';
             } else {
-                predictions.forEach(p => {
+                items.forEach(m => {
                     html += `
                         <div class="col">
                             <div class="p-2 border rounded card-body-bg-color">
-                                <small class="text-muted d-block">${p.day}</small>
-                                <span class="fw-bold fs-5 text-primary">${p.predicted_count}</span>
-                                <small class="d-block text-muted" style="font-size: 0.7rem;">${p.date}</small>
+                                <i class="ti ${m.icon} fs-5 ${m.color}"></i>
+                                <span class="fw-bold fs-5 d-block">${m.value}</span>
+                                <small class="d-block fw-semibold">${m.label}</small>
+                                <small class="d-block text-muted" style="font-size: 0.7rem;">${m.sub}</small>
                             </div>
                         </div>
                     `;
                 });
             }
             html += '</div>';
-            $('#predicted-volume-container').html(html);
+            $('#monitoring-container').html(html);
         }
 
         function renderTopOffices(offices) {
@@ -267,7 +268,7 @@
                     // Render Cards
                     renderLeaderboard(data.leaderboard);
                     renderTopCategories(data.topCategories);
-                    renderPredictedVolume(data.predictedVolume);
+                    renderMonitoring(data.monitoring);
                     renderTopOffices(data.topOffices);
                     renderPersonnelPerformance(data.personnelPerformance);
                 }
@@ -411,7 +412,7 @@
             renderLeaderboard(initialLeaderboard);
 
             renderTopCategories(@json($topCategories ?? []));
-            renderPredictedVolume(@json($predictedVolume ?? []));
+            renderMonitoring(@json($monitoring ?? []));
             renderTopOffices(@json($topOffices ?? []));
             renderPersonnelPerformance(@json($personnelPerformance ?? []));
 

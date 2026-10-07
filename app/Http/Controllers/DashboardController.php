@@ -17,6 +17,7 @@ use PDF;
 use Jenssegers\Agent\Agent;
 
 use App\Models\TicketDB\User;
+use App\Models\TicketDB\ClientFeedback;
 use App\Models\TicketDB\UserRole;
 use App\Models\TicketDB\Office;
 use App\Models\TicketDB\Category;
@@ -80,32 +81,45 @@ class DashboardController extends Controller
 
     private function getDashboardData($year, $timeframe, $user)
     {
+        // Support accounts (any role except Requester and Administrator) only
+        // ever see data that belongs to their own office.
+        $isAdmin = $user->role === 'Administrator';
+        $officeScope = (!$isAdmin && $user->role !== 'Requester') ? $user->office_id : null;
+
         // --- 1. Metric Cards ---
-        $totalRequests = DailyTicketRequest::where('off_id', $user->office_id)->whereYear('created_at', $year)->count();
+        $totalRequests = DailyTicketRequest::whereYear('created_at', $year)
+            ->when(!$isAdmin, fn ($q) => $q->where('off_id', $user->office_id))
+            ->count();
 
         $newTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->whereIn('status', ['Pending', 'Open'])
             ->whereDate('created_at', now()->today())
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
             ->count();
 
         $pendingTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->whereIn('status', ['Pending', 'Open'])
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
             ->count();
         $highPendingTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->whereIn('status', ['Pending', 'Open'])
             ->where('priority', 'High')
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
             ->count();
         $urgentPendingTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->whereIn('status', ['Pending', 'Open'])
             ->where('priority', 'Urgent')
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
             ->count();
 
         $inProgressTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->whereIn('status', ['In Progress', 'Working'])
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
             ->count();
 
         $resolvedTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->where('status', 'Resolved')
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
             ->count();
         $resolutionRate = $totalRequests > 0
             ? round(($resolvedTickets / $totalRequests) * 100, 1)
@@ -113,6 +127,7 @@ class DashboardController extends Controller
 
         $closedTickets = DailyTicketRequest::whereYear('created_at', $year)
             ->where('status', 'Cancelled')
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
             ->count();
         $closedRate = $totalRequests > 0
             ? round(($closedTickets / $totalRequests) * 100, 1)
@@ -151,12 +166,14 @@ class DashboardController extends Controller
 
         // --- 2. Bar Chart Data ---
         $createdPerDay = DailyTicketRequest::whereYear('created_at', $year)
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
             ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
             ->groupBy('date')
             ->pluck('total', 'date');
 
         $resolvedPerDay = DailyTicketRequest::whereYear('created_at', $year)
             ->whereNotNull('resolved_at')
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
             ->selectRaw('DATE(resolved_at) as date, COUNT(*) as total')
             ->groupBy('date')
             ->pluck('total', 'date');
@@ -226,11 +243,24 @@ class DashboardController extends Controller
             $leaderboardQuery->whereMonth('resolved_at', now()->month);
         }
 
-        $leaderboardRaw = $leaderboardQuery
-            ->selectRaw('assigned_to as user_id, COUNT(*) as resolved_count')
-            ->groupBy('assigned_to')
-            ->orderByDesc('resolved_count')
-            ->get();
+        if ($officeScope) {
+            // Office view: rank only personnel of the viewer's office
+            $leaderboardRaw = (clone $leaderboardQuery)
+                ->join('users', function ($join) {
+                    $join->whereRaw('FIND_IN_SET(users.id, REPLACE(dailyticketrequest.assigned_to, " ", ""))');
+                })
+                ->where('users.office_id', $officeScope)
+                ->selectRaw('users.id as user_id, COUNT(*) as resolved_count')
+                ->groupBy('users.id')
+                ->orderByDesc('resolved_count')
+                ->get();
+        } else {
+            $leaderboardRaw = $leaderboardQuery
+                ->selectRaw('assigned_to as user_id, COUNT(*) as resolved_count')
+                ->groupBy('assigned_to')
+                ->orderByDesc('resolved_count')
+                ->get();
+        }
 
         $leaderboard = [];
         $rank = 1;
@@ -254,34 +284,41 @@ class DashboardController extends Controller
         // --- 5. Top Issue Categories ---
         $topCategories = DailyTicketRequest::whereYear('dailyticketrequest.created_at', $year)
             ->join('categories', 'dailyticketrequest.cat_id', '=', 'categories.id')
+            ->when($officeScope, fn ($q) => $q->where('dailyticketrequest.off_id', $officeScope))
             ->selectRaw('categories.ticketcatname as name, COUNT(*) as total')
             ->groupBy('categories.id', 'categories.ticketcatname')
             ->orderByDesc('total')
             ->limit(5)
             ->get();
 
-        // --- 6. Predicted Ticket Volume (Next 5 Working Days Simple Moving Average Prediction) ---
-        $avgDailyTickets = DailyTicketRequest::whereYear('created_at', $year)
-            ->selectRaw('COUNT(*) / 200 as avg_per_day') // approximate annual working days
-            ->value('avg_per_day') ?? 0;
+        // --- 6. Monitoring (replaces predicted volume) ---
+        // Overdue = still unresolved and created more than 7 days ago
+        $overdueTickets = DailyTicketRequest::whereIn('status', ['Pending', 'Open', 'In Progress', 'Working'])
+            ->where('created_at', '<', now()->subDays(7))
+            ->when($officeScope, fn ($q) => $q->where('off_id', $officeScope))
+            ->count();
 
-        $predictedVolume = [];
-        $currentDate = now()->addDay();
-        while (count($predictedVolume) < 5) {
-            if (!$currentDate->isWeekend()) {
-                $predictedVolume[] = [
-                    'date' => $currentDate->format('M d, Y'),
-                    'day' => $currentDate->format('l'),
-                    'predicted_count' => max(1, round($avgDailyTickets + rand(-2, 2)))
-                ];
-            }
-            $currentDate->addDay();
-        }
+        // Resolved tickets whose requester has not submitted feedback yet
+        $pendingFeedback = ClientFeedback::whereNull('rating')
+            ->whereHas('ticket', fn ($q) => $q->where('status', 'Resolved')
+                ->when($officeScope, fn ($q2) => $q2->where('off_id', $officeScope)))
+            ->count();
+
+        $requesterUsers = User::where('role', 'Requester')->where('ustatus', '!=', 3)->count();
+        $supportUsers = User::where('role', '!=', 'Requester')->where('ustatus', '!=', 3)->count();
+
+        $monitoring = [
+            ['label' => 'Overdue Tickets', 'value' => $overdueTickets, 'sub' => 'unresolved > 7 days', 'icon' => 'ti-alarm', 'color' => 'text-danger'],
+            ['label' => 'Pending Feedback', 'value' => $pendingFeedback, 'sub' => 'resolved, no feedback', 'icon' => 'ti-forms', 'color' => 'text-warning'],
+            ['label' => 'Requesters', 'value' => $requesterUsers, 'sub' => 'requester accounts', 'icon' => 'ti-users', 'color' => 'text-info'],
+            ['label' => 'Support Users', 'value' => $supportUsers, 'sub' => 'non-requester accounts', 'icon' => 'ti-user-cog', 'color' => 'text-success'],
+        ];
 
         // --- 7. Top 10 Offices/Colleges ---
         $topOffices = DailyTicketRequest::whereYear('dailyticketrequest.created_at', $year)
             ->join('users', 'dailyticketrequest.user_id', '=', 'users.id')
             ->join('offices', 'users.office_id', '=', 'offices.id')
+            ->when($officeScope, fn ($q) => $q->where('dailyticketrequest.off_id', $officeScope))
             ->selectRaw('offices.office_abbr as name, COUNT(dailyticketrequest.id) as total')
             ->groupBy('offices.id', 'offices.office_abbr')
             ->orderByDesc('total')
@@ -294,6 +331,7 @@ class DashboardController extends Controller
             ->whereNotNull('assigned_to')
             ->whereNotNull('started_at')
             ->join('users', 'dailyticketrequest.assigned_to', '=', 'users.id')
+            ->when($officeScope, fn ($q) => $q->where('users.office_id', $officeScope))
             ->selectRaw('users.fname, users.lname, COUNT(*) as total_resolved, AVG(TIMESTAMPDIFF(MINUTE, started_at, resolved_at)) as avg_time_minutes')
             ->groupBy('users.id', 'users.fname', 'users.lname')
             ->get()
@@ -330,7 +368,7 @@ class DashboardController extends Controller
             'requesterHeatmapData' => $requesterHeatmapData,
             'leaderboard' => $leaderboard,
             'topCategories' => $topCategories,
-            'predictedVolume' => $predictedVolume,
+            'monitoring' => $monitoring,
             'topOffices' => $topOffices,
             'personnelPerformance' => $personnelPerformance,
         ];
