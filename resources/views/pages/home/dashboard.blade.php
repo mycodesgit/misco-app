@@ -122,7 +122,7 @@
                                                 for ($d = 0; $d < 7; $d++) {
                                                     if ($curr->month == $m && $curr->year == $selectedYear) {
                                                         $weekDays[] = [
-                                                            'date' => $curr->format('M j, Y'),
+                                                            'date' => $curr->format('M d, Y'),
                                                             'db_date' => $curr->format('Y-m-d'),
                                                             'day_idx' => $curr->dayOfWeekIso,
                                                             'active' => true
@@ -187,7 +187,9 @@
                                                                                     data-date="{{ $day['db_date'] }}"
                                                                                     data-bs-toggle="tooltip"
                                                                                     data-bs-placement="top"
-                                                                                    title="{{ $taskCount }} {{ Str::plural('task', $taskCount) }} resolved on {{ $day['date'] }}">
+                                                                                    data-bs-html="true"
+                                                                                    data-bs-custom-class="heatmap-tooltip"
+                                                                                    title="{{ $taskCount }} {{ Str::plural('Task', $taskCount) }}, {{ $day['date'] }}">
                                                                                 </div>
                                                                             @else
                                                                                 <div class="heatmap-cell level-empty"></div>
@@ -480,12 +482,7 @@
                             <div class="card overflow-hidden position-relative welcome-hero-card mb-3">
                                 <div class="card-body p-4 d-flex flex-column justify-content-between position-relative z-1">
                                     <div>
-                                        <div class="d-flex align-items-center gap-2 mb-2">
-                                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 small">
-                                                <i class="bi bi-circle-fill me-1 small"></i> Active Session
-                                            </span>
-                                        </div>
-                                        <h3 class="fw-bold mb-2">
+                                        <h3 class="fw-bold mt-2 mb-2">
                                             Welcome, {{ auth()->user()->fname }}! <br> How can we assist you today?
                                         </h3>
                                         <p class="text-secondary mb-3 fs-6">
@@ -511,7 +508,7 @@
                                     <h6 class="card-title mb-0 fw-bold">Quick Actions</h6>
                                 </div>
                                 <div class="card-body d-flex flex-column gap-2">
-                                    <a href="#" class="btn btn-primary text-start py-2 px-3 d-flex align-items-center justify-content-between">
+                                    <a href="#" class="btn btn-primary text-start py-2 px-3 d-flex align-items-center justify-content-between" data-bs-toggle="modal" data-bs-target="#createNewTicketModal">
                                         <span><i class="ti ti-plus me-2 fs-5"></i> New Ticket - Create a new support ticket</span>
                                         <i class="ti ti-chevron-right small"></i>
                                     </a>
@@ -559,7 +556,7 @@
                                                 for ($d = 0; $d < 7; $d++) {
                                                     if ($curr->month == $m && $curr->year == $selectedYear) {
                                                         $weekDays[] = [
-                                                            'date' => $curr->format('M j, Y'),
+                                                            'date' => $curr->format('M d, Y'),
                                                             'db_date' => $curr->format('Y-m-d'),
                                                             'day_idx' => $curr->dayOfWeekIso,
                                                             'active' => true
@@ -624,7 +621,9 @@
                                                                                     data-date="{{ $day['db_date'] }}"
                                                                                     data-bs-toggle="tooltip"
                                                                                     data-bs-placement="top"
-                                                                                    title="{{ $taskCount }} {{ Str::plural('task', $taskCount) }} resolved on {{ $day['date'] }}">
+                                                                                    data-bs-html="true"
+                                                                                    data-bs-custom-class="heatmap-tooltip"
+                                                                                    title="{{ $taskCount }} {{ Str::plural('Task', $taskCount) }}, {{ $day['date'] }}">
                                                                                 </div>
                                                                             @else
                                                                                 <div class="heatmap-cell level-empty"></div>
@@ -653,6 +652,135 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row g-3 mt-1 mb-3">
+                                <!-- 1. My New Tickets -->
+                                <div class="col-md-4">
+                                    <div class="card card-animate">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="text-muted fw-semibold">My New Tickets</span>
+                                                    <h3 id="card-req-new-tickets" class="fw-bold mb-0 mt-1">{{ $requesterMetrics['newTickets'] ?? 0 }}</h3>
+                                                </div>
+                                                <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                                                    <i class="ti ti-ticket fs-4"></i>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 small text-muted">
+                                                <span class="text-primary fw-semibold"><i class="ti ti-ticket me-1"></i></span> My requests today
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2. My Pending Tickets -->
+                                <div class="col-md-4">
+                                    <div class="card card-animate">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="text-muted small fw-semibold">My Pending Tickets</span>
+                                                    <h3 id="card-req-pending-tickets" class="fw-bold mb-0 mt-1 text-warning">{{ $requesterMetrics['pendingTickets'] ?? 0 }}</h3>
+                                                </div>
+                                                <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle">
+                                                    <i class="ti ti-clock fs-4"></i>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 small">
+                                                <span id="req-urgent-wrap" class="text-danger fw-semibold" style="{{ (($requesterMetrics['urgentPendingTickets'] ?? 0) > 0) ? '' : 'display:none;' }}">
+                                                    <i class="ti ti-alert-circle me-1"></i><span id="req-urgent-count">{{ $requesterMetrics['urgentPendingTickets'] ?? 0 }}</span> Urgent
+                                                </span>
+                                                <span id="req-high-wrap" class="text-warning fw-semibold ms-2" style="{{ (($requesterMetrics['highPendingTickets'] ?? 0) > 0) ? '' : 'display:none;' }}">
+                                                    <i class="ti ti-alert-triangle me-1"></i><span id="req-high-count">{{ $requesterMetrics['highPendingTickets'] ?? 0 }}</span> High
+                                                </span>
+                                                <span id="req-nohigh-wrap" class="text-success fw-semibold" style="{{ (($requesterMetrics['urgentPendingTickets'] ?? 0) == 0 && ($requesterMetrics['highPendingTickets'] ?? 0) == 0) ? '' : 'display:none;' }}">
+                                                    <i class="ti ti-circle-check me-1"></i> No high-priority tickets
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 3. My In Progress -->
+                                <div class="col-md-4">
+                                    <div class="card card-animate">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="text-muted small fw-semibold">My In Progress</span>
+                                                    <h3 id="card-req-inprogress-tickets" class="fw-bold mb-0 mt-1 text-info">{{ $requesterMetrics['inProgressTickets'] ?? 0 }}</h3>
+                                                </div>
+                                                <div class="bg-info bg-opacity-10 text-info p-3 rounded-circle">
+                                                    <i class="ti ti-progress fs-4"></i>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 small text-muted">
+                                                <span class="text-info fw-semibold"><i class="ti ti-user-check me-1"></i></span> Being worked on
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 4. My Resolved -->
+                                <div class="col-md-4">
+                                    <div class="card card-animate">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="text-muted small fw-semibold">My Resolved</span>
+                                                    <h3 id="card-req-resolved-tickets" class="fw-bold mb-0 mt-1 text-success">{{ $requesterMetrics['resolvedTickets'] ?? 0 }}</h3>
+                                                </div>
+                                                <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle">
+                                                    <i class="ti ti-circle-check fs-4"></i>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 small text-muted">
+                                                <span class="text-success fw-semibold"><i class="ti ti-check me-1"></i><span id="card-req-resolution-rate">{{ $requesterMetrics['resolutionRate'] ?? 0 }}</span>%</span> resolution rate
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 5. My Closed -->
+                                <div class="col-md-4">
+                                    <div class="card card-animate">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="text-muted small fw-semibold">My Closed</span>
+                                                    <h3 id="card-req-closed-tickets" class="fw-bold mb-0 mt-1 text-danger">{{ $requesterMetrics['closedTickets'] ?? 0 }}</h3>
+                                                </div>
+                                                <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-circle">
+                                                    <i class="ti ti-circle-x fs-4"></i>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 small text-muted">
+                                                <span class="text-danger fw-semibold"><i class="ti ti-check me-1"></i><span id="card-req-closed-rate">{{ $requesterMetrics['closedRate'] ?? 0 }}</span>%</span> of my requests
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 6. My Total Requests -->
+                                <div class="col-md-4">
+                                    <div class="card card-animate">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="text-muted small fw-semibold">My Total Requests</span>
+                                                    <h3 id="card-req-total-requests" class="fw-bold mb-0 mt-1">{{ $requesterMetrics['totalRequests'] ?? 0 }}</h3>
+                                                </div>
+                                                <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                                                    <i class="ti ti-ticket fs-4"></i>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 small text-muted">
+                                                <span class="text-success fw-semibold"><i class="ti ti-trending-up me-1"></i></span> All my tickets ({{ $selectedYear }})
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -660,6 +788,8 @@
             </div>
         </div>
     </div>
+
+    @include('pages.request.modals.addticketmodal')
 
     <!-- Heatmap & Hero Styles -->
     <style>
@@ -751,6 +881,29 @@
         .heatmap-cell.level-3 { background-color: #26a641; }
         .heatmap-cell.level-4 { background-color: #39d353; }
 
+        /* Beautiful heatmap tooltips (Bootstrap 5, arrow follows bubble color) */
+        .heatmap-tooltip {
+            --bs-tooltip-bg: #1f2937;
+            --bs-tooltip-color: #ffffff;
+            --bs-tooltip-opacity: 1;
+            --bs-tooltip-max-width: 240px;
+        }
+        .heatmap-tooltip .tooltip-inner {
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            line-height: 1.35;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+            text-align: center;
+            white-space: nowrap;
+        }
+        .heatmap-tooltip .tooltip-inner strong {
+            font-size: 0.82rem;
+        }
+        .heatmap-tooltip .tooltip-inner small {
+            opacity: 0.75;
+        }
+
         /* Timeframe Navigation Pills */
         .nav-pills-custom {
             background-color: var(--bs-light, #f8f9fa);
@@ -836,5 +989,19 @@
         }
     </style>
 
+    <script>
+        var ticketCreateRoute = "{{ route('ticketsrequester.create') }}";
 
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('image-preview');
+                output.src = reader.result;
+                document.getElementById('preview-container').classList.remove('d-none');
+            };
+            if(event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+    </script>
 @endsection

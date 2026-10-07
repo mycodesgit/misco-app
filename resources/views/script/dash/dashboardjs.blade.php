@@ -275,8 +275,26 @@
         }
 
         function formatHeatmapDate(dateObj) {
-            const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
-            return `${months[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`;
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${months[dateObj.getMonth()]} ${day}, ${dateObj.getFullYear()}`;
+        }
+
+        /* Beautiful Bootstrap 5 tooltips for heatmap cells (bubble + arrow) */
+        function initHeatmapTooltips(containerId) {
+            if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) return;
+            $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
+                let instance = bootstrap.Tooltip.getInstance(this);
+                if (instance) instance.dispose();
+                new bootstrap.Tooltip(this, {
+                    html: true,
+                    placement: 'top',
+                    trigger: 'hover focus',
+                    container: 'body',
+                    customClass: 'heatmap-tooltip',
+                    delay: { show: 100, hide: 50 }
+                });
+            });
         }
 
         function renderHeatmapHTML(containerId, heatmapData, selectedYear) {
@@ -311,14 +329,16 @@
                             let formattedDate = formatHeatmapDate(curr);
                             let count = heatmapData ? (heatmapData[dbDate] || 0) : 0;
                             let level = getHeatmapLevel(count);
-                            let taskLabel = count === 1 ? 'task' : 'tasks';
+                            let taskLabel = count === 1 ? 'Task' : 'Tasks';
 
                             weekHTML += `
                                 <div class="heatmap-cell level-${level}"
                                     data-date="${dbDate}"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
-                                    title="${count} ${taskLabel} resolved on ${formattedDate}">
+                                    data-bs-html="true"
+                                    data-bs-custom-class="heatmap-tooltip"
+                                    title="${count} ${taskLabel}, ${formattedDate}">
                                 </div>`;
                         } else {
                             weekHTML += `<div class="heatmap-cell level-empty"></div>`;
@@ -360,23 +380,9 @@
                     <span>More</span>
                 </div>`;
 
-            // 1. Destroy existing Tooltips inside container to prevent leaks
-            $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
-                if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-                    let instance = bootstrap.Tooltip.getInstance(this);
-                    if (instance) instance.dispose();
-                }
-            });
-
-            // 2. Inject newly generated HTML layout
+            // Inject newly generated HTML layout, then attach beautiful tooltips (with arrow)
             $(containerId).html(fullHeatmapHTML);
-
-            // 3. Re-initialize Bootstrap 5 tooltips
-            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-                $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
-                    new bootstrap.Tooltip(this);
-                });
-            }
+            initHeatmapTooltips(containerId);
         }
 
         function updateHeatmaps(supportData, requesterData, selectedYear) {
@@ -408,6 +414,10 @@
             renderPredictedVolume(@json($predictedVolume ?? []));
             renderTopOffices(@json($topOffices ?? []));
             renderPersonnelPerformance(@json($personnelPerformance ?? []));
+
+            // Beautify tooltips on the initial server-rendered heatmaps (bubble + arrow)
+            initHeatmapTooltips('#supportprogress');
+            initHeatmapTooltips('#requesterprogress');
 
             $(document).on('click', '.timeframe-btn', function(e) {
                 e.preventDefault();
@@ -452,6 +462,23 @@
                 dataType: "json",
                 success: function(data) {
                     $('#displayRequesterSelectedYear').text(year);
+                    // Own-ticket metric cards (logged-in requester only)
+                    if (data.requesterMetrics) {
+                        var rm = data.requesterMetrics;
+                        $('#card-req-new-tickets').text(rm.newTickets);
+                        $('#card-req-pending-tickets').text(rm.pendingTickets);
+                        $('#card-req-inprogress-tickets').text(rm.inProgressTickets);
+                        $('#card-req-resolved-tickets').text(rm.resolvedTickets);
+                        $('#card-req-resolution-rate').text(rm.resolutionRate);
+                        $('#card-req-closed-tickets').text(rm.closedTickets);
+                        $('#card-req-closed-rate').text(rm.closedRate);
+                        $('#card-req-total-requests').text(rm.totalRequests);
+                        $('#req-urgent-count').text(rm.urgentPendingTickets);
+                        $('#req-high-count').text(rm.highPendingTickets);
+                        $('#req-urgent-wrap').toggle(rm.urgentPendingTickets > 0);
+                        $('#req-high-wrap').toggle(rm.highPendingTickets > 0);
+                        $('#req-nohigh-wrap').toggle(rm.urgentPendingTickets == 0 && rm.highPendingTickets == 0);
+                    }
                     // Pass selected 'year' to updateHeatmaps
                     updateHeatmaps(data.supportHeatmapData, data.requesterHeatmapData, year);
                 }
@@ -459,8 +486,26 @@
         }
 
         function formatHeatmapDate(dateObj) {
-            const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
-            return `${months[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`;
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${months[dateObj.getMonth()]} ${day}, ${dateObj.getFullYear()}`;
+        }
+
+        /* Beautiful Bootstrap 5 tooltips for heatmap cells (bubble + arrow) */
+        function initHeatmapTooltips(containerId) {
+            if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) return;
+            $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
+                let instance = bootstrap.Tooltip.getInstance(this);
+                if (instance) instance.dispose();
+                new bootstrap.Tooltip(this, {
+                    html: true,
+                    placement: 'top',
+                    trigger: 'hover focus',
+                    container: 'body',
+                    customClass: 'heatmap-tooltip',
+                    delay: { show: 100, hide: 50 }
+                });
+            });
         }
 
         function renderHeatmapHTML(containerId, heatmapData, selectedYear) {
@@ -495,14 +540,16 @@
                             let formattedDate = formatHeatmapDate(curr);
                             let count = heatmapData ? (heatmapData[dbDate] || 0) : 0;
                             let level = getHeatmapLevel(count);
-                            let taskLabel = count === 1 ? 'task' : 'tasks';
+                            let taskLabel = count === 1 ? 'Task' : 'Tasks';
 
                             weekHTML += `
                                 <div class="heatmap-cell level-${level}"
                                     data-date="${dbDate}"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
-                                    title="${count} ${taskLabel} resolved on ${formattedDate}">
+                                    data-bs-html="true"
+                                    data-bs-custom-class="heatmap-tooltip"
+                                    title="${count} ${taskLabel}, ${formattedDate}">
                                 </div>`;
                         } else {
                             weekHTML += `<div class="heatmap-cell level-empty"></div>`;
@@ -544,23 +591,9 @@
                     <span>More</span>
                 </div>`;
 
-            // 1. Destroy existing Tooltips inside container to prevent leaks
-            $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
-                if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-                    let instance = bootstrap.Tooltip.getInstance(this);
-                    if (instance) instance.dispose();
-                }
-            });
-
-            // 2. Inject newly generated HTML layout
+            // Inject newly generated HTML layout, then attach beautiful tooltips (with arrow)
             $(containerId).html(fullHeatmapHTML);
-
-            // 3. Re-initialize Bootstrap 5 tooltips
-            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-                $(containerId + ' [data-bs-toggle="tooltip"]').each(function() {
-                    new bootstrap.Tooltip(this);
-                });
-            }
+            initHeatmapTooltips(containerId);
         }
 
         function updateHeatmaps(supportData, requesterData, selectedYear) {
@@ -579,7 +612,12 @@
             return 4;
         }
 
-        $(document).ready(function() {$(document).on('click', '.timeframe-btn', function(e) {
+        $(document).ready(function() {
+            // Beautify tooltips on the initial server-rendered heatmaps (bubble + arrow)
+            initHeatmapTooltips('#supportprogress');
+            initHeatmapTooltips('#requesterprogress');
+
+            $(document).on('click', '.timeframe-btn', function(e) {
                 e.preventDefault();
                 $('.timeframe-btn').removeClass('active text-white').addClass('text-muted');$(this).addClass('active text-white').removeClass('text-muted');
 

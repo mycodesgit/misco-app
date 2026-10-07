@@ -126,6 +126,11 @@
     </div>
 
     <div style="padding-right: 20px; padding-left: 20px;">
+        <p style="font-family: Arial, sans-serif; font-size: 11px; margin: 0 0 8px 0;">
+            <strong>Summary:</strong> {{ $taskTotal ?? 0 }} completed task(s) + {{ $ticketTotal ?? 0 }} resolved ticket(s)
+        </p>
+
+        <p class="title_task" style="font-size: 11pt; text-align: left; margin: 12px 0 6px 0;">Daily Tasks</p>
         <table>
             <thead>
                 <tr>
@@ -182,6 +187,52 @@
                                 <ul style="margin: 5px 0 0 0; padding-left: 15px;">
                                     @foreach ($group as $item)
                                         <li>{{ $item->dailytaskdesc }}</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
+            </tbody>
+        </table>
+
+        <p class="title_task" style="font-size: 11pt; text-align: left; margin: 16px 0 6px 0;">Resolved Tickets</p>
+        <table>
+            <thead>
+                <tr>
+                    <th width="5%">No.</th>
+                    <th>Category</th>
+                    <th>Sub Category</th>
+                    <th>Ticket/Accomodation</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (($groupedTickets ?? collect())->isEmpty())
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No Resolved Tickets Found.</td>
+                    </tr>
+                @else
+                    @php $tno = 1; @endphp
+                    @foreach ($groupedTickets as $group)
+                        @php
+                            $firstTicket = $group->first();
+                            $ticketCount = $group->count();
+                            $ticketSubcat = $firstTicket->subcategory->ticketsubcatname ?? 'item(s)';
+                        @endphp
+                        <tr>
+                            <td style="text-align: center; vertical-align: top;">{{ $tno++ }}</td>
+                            <td style="vertical-align: top;">{{ $firstTicket->category->ticketcatname ?? '-' }}</td>
+                            <td style="vertical-align: top;">{{ $ticketSubcat }}</td>
+                            <td>
+                                <strong>Resolved {{ $ticketCount }} {{ $ticketSubcat }} request(s):</strong>
+                                <ul style="margin: 5px 0 0 0; padding-left: 15px;">
+                                    @foreach ($group as $ticket)
+                                        <li>
+                                            <strong>[{{ $ticket->ticket_number }}]</strong> {{ $ticket->issue_description }}
+                                            @if (!empty($ticket->resolved_at))
+                                                <span style="color: #666;">({{ \Carbon\Carbon::parse($ticket->resolved_at)->format('M d, Y') }})</span>
+                                            @endif
+                                        </li>
                                     @endforeach
                                 </ul>
                             </td>

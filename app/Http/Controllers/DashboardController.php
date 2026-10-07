@@ -17,6 +17,7 @@ use PDF;
 use Jenssegers\Agent\Agent;
 
 use App\Models\TicketDB\User;
+use App\Models\TicketDB\UserRole;
 use App\Models\TicketDB\Office;
 use App\Models\TicketDB\Category;
 use App\Models\TicketDB\Subcategory;
@@ -56,12 +57,24 @@ class DashboardController extends Controller
             ]));
         }
 
+        $currentUserRole = Auth::user()->role;
+
+        $urole = UserRole::where('status', 1)
+            ->whereNotIn('rolename', ['Administrator', 'Requester'])
+            ->when($currentUserRole == 'Administrator', function ($query) use ($currentUserRole) {
+                $query->where('rolename', $currentUserRole);
+            })
+            ->get();
+
+        $cat = Category::with('user')->where('status', 1)->get();
+
         return view('pages.home.dashboard', array_merge([
             'selectedYear' => $selectedYear,
             'selectedTimeframe' => $timeframe,
             'pendingCount'       => $pendingCount,
             'inProgressCount'    => $inProgressCount,
             'resolvedTodayCount' => $resolvedTodayCount,
+            'urole' => $urole
         ], $dashboardData));
     }
 
@@ -104,6 +117,37 @@ class DashboardController extends Controller
         $closedRate = $totalRequests > 0
             ? round(($closedTickets / $totalRequests) * 100, 1)
             : 0;
+
+        // --- 1b. Requester personal metrics (own tickets of the logged-in user only) ---
+        $reqBase = DailyTicketRequest::where('user_id', $user->id)->whereYear('created_at', $year);
+
+        $reqTotalRequests = (clone $reqBase)->count();
+        $reqNewTickets = (clone $reqBase)->whereIn('status', ['Pending', 'Open'])->whereDate('created_at', now()->today())->count();
+        $reqPendingTickets = (clone $reqBase)->whereIn('status', ['Pending', 'Open'])->count();
+        $reqHighPendingTickets = (clone $reqBase)->whereIn('status', ['Pending', 'Open'])->where('priority', 'High')->count();
+        $reqUrgentPendingTickets = (clone $reqBase)->whereIn('status', ['Pending', 'Open'])->where('priority', 'Urgent')->count();
+        $reqInProgressTickets = (clone $reqBase)->whereIn('status', ['In Progress', 'Working'])->count();
+        $reqResolvedTickets = (clone $reqBase)->where('status', 'Resolved')->count();
+        $reqResolutionRate = $reqTotalRequests > 0
+            ? round(($reqResolvedTickets / $reqTotalRequests) * 100, 1)
+            : 0;
+        $reqClosedTickets = (clone $reqBase)->where('status', 'Cancelled')->count();
+        $reqClosedRate = $reqTotalRequests > 0
+            ? round(($reqClosedTickets / $reqTotalRequests) * 100, 1)
+            : 0;
+
+        $requesterMetrics = [
+            'newTickets' => $reqNewTickets,
+            'pendingTickets' => $reqPendingTickets,
+            'highPendingTickets' => $reqHighPendingTickets,
+            'urgentPendingTickets' => $reqUrgentPendingTickets,
+            'inProgressTickets' => $reqInProgressTickets,
+            'resolvedTickets' => $reqResolvedTickets,
+            'resolutionRate' => $reqResolutionRate,
+            'closedTickets' => $reqClosedTickets,
+            'closedRate' => $reqClosedRate,
+            'totalRequests' => $reqTotalRequests,
+        ];
 
         // --- 2. Bar Chart Data ---
         $createdPerDay = DailyTicketRequest::whereYear('created_at', $year)
@@ -281,6 +325,7 @@ class DashboardController extends Controller
                 'created' => $createdData,
                 'resolved' => $resolvedData,
             ],
+            'requesterMetrics' => $requesterMetrics,
             'supportHeatmapData' => $supportHeatmapData,
             'requesterHeatmapData' => $requesterHeatmapData,
             'leaderboard' => $leaderboard,
