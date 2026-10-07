@@ -44,7 +44,7 @@ class DashboardController extends Controller
         $version = Cache::rememberForever('dashboard_version', fn() => 1);
         $cacheKey = "dashboard_data_v{$version}_{$selectedYear}_{$timeframe}_role_{$user->role}_user_{$user->id}";
 
-        $dashboardData = Cache::remember($cacheKey, 300, function () use ($selectedYear, $timeframe, $user) {
+        $dashboardData = Cache::remember($cacheKey, 100, function () use ($selectedYear, $timeframe, $user) {
             return $this->getDashboardData($selectedYear, $timeframe, $user);
         });
 
@@ -196,22 +196,39 @@ class DashboardController extends Controller
 
         if ($user->role !== 'Requester') {
             // Fetch completed tasks grouped by date
+            // (office view: only tasks completed by resolvers of that office)
             $resolvedTasks = DailyTask::whereYear('completed_at', $year)
                 ->where('status', 'Completed')
+                ->when($officeScope, fn ($q) => $q->whereHas('user', fn ($u) => $u->where('office_id', $officeScope)))
                 ->selectRaw('DATE(completed_at) as date, COUNT(*) as total')
                 ->groupBy('date')
                 ->pluck('total', 'date')
                 ->toArray();
 
             // Fetch resolved tickets grouped by date
-            $resolvedTicketsMap = DailyTicketRequest::whereYear('resolved_at', $year)
+            // (office view: resolved by ANY user of that office, not just self)
+            $resolvedTicketsQuery = DailyTicketRequest::whereYear('resolved_at', $year)
                 ->where('status', 'Resolved')
-                ->where('off_id', $user->office_id)
-                ->whereRaw('FIND_IN_SET(?, REPLACE(assigned_to, " ", ""))', [$user->id])
-                ->selectRaw('DATE(resolved_at) as date, COUNT(*) as total')
-                ->groupBy('date')
-                ->pluck('total', 'date')
-                ->toArray();
+                ->where('off_id', $officeScope ?? $user->office_id);
+
+            if ($officeScope) {
+                $resolvedTicketsMap = (clone $resolvedTicketsQuery)
+                    ->join('users', function ($join) {
+                        $join->whereRaw('FIND_IN_SET(users.id, REPLACE(dailyticketrequest.assigned_to, " ", ""))');
+                    })
+                    ->where('users.office_id', $officeScope)
+                    ->selectRaw('DATE(resolved_at) as date, COUNT(DISTINCT dailyticketrequest.id) as total')
+                    ->groupBy('date')
+                    ->pluck('total', 'date')
+                    ->toArray();
+            } else {
+                $resolvedTicketsMap = $resolvedTicketsQuery
+                    ->whereRaw('FIND_IN_SET(?, REPLACE(assigned_to, " ", ""))', [$user->id])
+                    ->selectRaw('DATE(resolved_at) as date, COUNT(*) as total')
+                    ->groupBy('date')
+                    ->pluck('total', 'date')
+                    ->toArray();
+            }
 
             // Collect all unique string dates
             $allResolvedDates = array_unique(array_merge(array_keys($resolvedTasks), array_keys($resolvedTicketsMap)));
