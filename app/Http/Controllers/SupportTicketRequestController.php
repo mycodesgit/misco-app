@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -220,6 +221,34 @@ class SupportTicketRequestController extends Controller
         $chat->load('sender');
         broadcast(new \App\Events\MessageSent($chat))->toOthers();
 
+        // Notify ticket participants (except the sender) of the new chat message
+        $ticket = DailyTicketRequest::find($request->ticket_id);
+        if ($ticket) {
+            $participantIds = collect(explode(',', (string) $ticket->assigned_to))
+                ->map(fn ($id) => (int) trim($id))
+                ->filter()
+                ->push((int) $ticket->user_id)
+                ->unique()
+                ->reject(fn ($id) => $id === (int) auth()->id())
+                ->values();
+
+            $recipients = User::whereIn('id', $participantIds)->get();
+            if ($recipients->isNotEmpty()) {
+                $senderName = trim((auth()->user()->fname ?? '') . ' ' . (auth()->user()->lname ?? '')) ?: 'User';
+                $excerpt = $request->filled('message')
+                    ? Str::limit($request->message, 80)
+                    : 'sent an attachment';
+                $chatNotif = new \App\Notifications\ChatMessageNotification(
+                    ticketId: $ticket->id,
+                    ticketNumber: $ticket->ticket_number,
+                    senderName: $senderName,
+                    excerpt: $excerpt,
+                );
+                Notification::send($recipients, $chatNotif);
+                \App\Events\UserNotified::dispatchFor($recipients, $chatNotif); // realtime Reverb ping
+            }
+        }
+
         return response()->json([
             'success' => true,
             'data'    => [
@@ -294,6 +323,26 @@ class SupportTicketRequestController extends Controller
         Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
         broadcast(new \App\Events\TicketStatusUpdated($ticket))->toOthers();
         broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'status_changed'));
+
+        // Notify the requester (own ticket status changed)
+        if ($ticket->user_id && (int) $ticket->user_id !== (int) auth()->id()) {
+            $requester = User::find($ticket->user_id);
+            if ($requester) {
+                $eventMap = [
+                    'In Progress' => 'in_progress',
+                    'Resolved'    => 'resolved',
+                    'Cancelled'   => 'cancelled',
+                ];
+                $requester->notify($notif = new \App\Notifications\TicketEventNotification(
+                    ticketId: $ticket->id,
+                    ticketNumber: $ticket->ticket_number,
+                    event: $eventMap[$ticket->status] ?? 'updated',
+                    title: 'Ticket #' . $ticket->ticket_number . ' is now ' . $ticket->status,
+                    message: 'Your ticket "' . Str::limit($ticket->issue_description, 80) . '" was marked as ' . $ticket->status . '.',
+                ));
+                broadcast(new \App\Events\UserNotified((int) $requester->id, $notif->toDatabase($requester))); // realtime Reverb ping
+            }
+        }
 
         return response()->json([
             'success' => true,

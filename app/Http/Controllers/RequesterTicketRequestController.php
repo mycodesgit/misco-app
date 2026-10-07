@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -173,6 +174,24 @@ class RequesterTicketRequestController extends Controller
 
             Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
             broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'));
+
+            // Notify all support users (everyone except Requester role) of the new pending ticket
+            $supportUsers = User::where('role', '!=', 'Requester')
+                ->where('ustatus', '!=', 3)
+                ->where('id', '!=', Auth::id())
+                ->get();
+            if ($supportUsers->isNotEmpty()) {
+                $requesterName = trim((Auth::user()->fname ?? '') . ' ' . (Auth::user()->lname ?? '')) ?: 'A requester';
+                $notif = new \App\Notifications\TicketEventNotification(
+                    ticketId: $ticket->id,
+                    ticketNumber: $ticketNumber,
+                    event: 'created',
+                    title: 'New Pending Ticket #' . $ticketNumber,
+                    message: $requesterName . ' submitted a new ticket: ' . Str::limit($request->issue_description, 80),
+                );
+                Notification::send($supportUsers, $notif);
+                \App\Events\UserNotified::dispatchFor($supportUsers, $notif); // realtime Reverb ping
+            }
 
             // 5. Log Audit
             $userPayload = $ticket->toArray();

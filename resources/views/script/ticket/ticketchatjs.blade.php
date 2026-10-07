@@ -18,6 +18,19 @@
         // Initial load
         loadMessages(true);
 
+        // Auto mark this ticket's notifications (ticket + chat) as read while viewing it
+        $.ajax({
+            url: "{{ route('notifications.readTicket') }}",
+            type: 'POST',
+            data: { ticket_id: ticketId },
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            complete: function () {
+                if (typeof fetchNotifications === 'function') {
+                    fetchNotifications();
+                }
+            }
+        });
+
         // Auto-poll for new messages every 3 seconds
         // setInterval(function() {
         //     loadMessages(false);

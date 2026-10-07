@@ -56,10 +56,38 @@
         <div>
             <!-- Navbar nav -->
             <ul class="list-unstyled d-flex align-items-center mb-0 gap-1">
-                <!-- Dropdown -->
-                <button class="btn btn-sm btn-outline-secondary" onclick="togglePageFullscreen(this)">
-                    <i class="ti ti-maximize zoom-icon"></i>
-                </button>
+                <!-- Ticket notifications -->
+                <li class="nav-item dropdown">
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="position-relative btn-icon btn-sm btn-light btn rounded-circle" title="Ticket notifications">
+                        <i class="ti ti-bell"></i>
+                        <span id="notifTicketBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none; font-size:0.6rem;">0</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end p-0" style="width: 340px;">
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                            <strong class="small">Ticket Notifications</strong>
+                            <button type="button" class="btn btn-link btn-sm p-0 small notif-mark-all" data-kind="ticket">Mark all read</button>
+                        </div>
+                        <ul id="notifTicketList" class="list-unstyled p-0 m-0" style="max-height: 320px; overflow-y: auto;">
+                            <li class="px-3 py-3 text-center text-muted small">Loading...</li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Chat notifications -->
+                <li class="nav-item dropdown">
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="position-relative btn-icon btn-sm btn-light btn rounded-circle" title="Chat messages">
+                        <i class="ti ti-message"></i>
+                        <span id="notifChatBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="display:none; font-size:0.6rem;">0</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end p-0" style="width: 340px;">
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                            <strong class="small">Chat Messages</strong>
+                            <button type="button" class="btn btn-link btn-sm p-0 small notif-mark-all" data-kind="chat">Mark all read</button>
+                        </div>
+                        <ul id="notifChatList" class="list-unstyled p-0 m-0" style="max-height: 320px; overflow-y: auto;">
+                            <li class="px-3 py-3 text-center text-muted small">Loading...</li>
+                        </ul>
+                    </div>
+                </li>
                 <li>
                     <label class="theme-switch" for="themeToggle">
                         <input type="checkbox" id="themeToggle">
@@ -172,6 +200,7 @@
     <script src="{{ asset('uilibs/plugins/jquery-validation/additional-methods.min.js') }}"></script>
     <!-- Theme -->
     <script src="{{ asset('uilibs/js/theme.js') }}"></script>
+    @include('script.notify.topbarnotifyjs')
 
     <script>
         $(function () {

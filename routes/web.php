@@ -16,7 +16,7 @@ use App\Http\Controllers\UserRolesController;
 use App\Http\Controllers\LogoutController;
 
 use App\Http\Controllers\MonitoringDashboardController;
-
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -120,4 +120,11 @@ Route::group(['middleware'=>['login_auth']],function(){
 
     Route::get('/dashboard/monitoring',[MonitoringDashboardController::class,'index'])->name('monitoring-dashboard.index');
     Route::get('/dashboard/monitoring/helpdesk',[MonitoringDashboardController::class,'helpdesk'])->name('monitoring.helpdesk');
+
+    Route::prefix('/notifications')->group(function () {
+        Route::get('/fetch', [NotificationController::class, 'fetch'])->name('notifications.fetch');
+        Route::post('/read/{id}', [NotificationController::class, 'read'])->name('notifications.read');
+        Route::post('/read-all', [NotificationController::class, 'readAll'])->name('notifications.readAll');
+        Route::post('/read-ticket', [NotificationController::class, 'readTicket'])->name('notifications.readTicket');
+    });
 });
