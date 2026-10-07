@@ -39,7 +39,7 @@
         </li>
         <li>
             <a class="nav-link {{ $projectActive }}" href="{{ route('project.index') }}" data-tooltip="Work Progress">
-                <i class="ti ti-chart-pie-3"></i><span class="nav-text">Work Progress</span>
+                <i class="ti ti-chart-line"></i><span class="nav-text">Work Progress</span>
             </a>
         </li>
     @else

@@ -13,6 +13,21 @@ use App\Models\TicketDB\Office;
 
 class ProjectController extends Controller
 {
+    /**
+     * Only team members (plus the creator and Administrators) may
+     * edit, update or delete a project.
+     */
+    private function authorizeProjectMember(Project $project): void
+    {
+        $user = auth()->user();
+
+        $isMember = $project->members()->where('users.id', $user->id)->exists();
+        $isCreator = (int) $project->created_by === (int) $user->id;
+        $isAdmin = $user->role === 'Administrator';
+
+        abort_unless($isMember || $isCreator || $isAdmin, 403, 'Only team members can manage this project.');
+    }
+
     public function index()
     {
         $myOffice = Office::find(auth()->user()->office_id);
@@ -46,8 +61,14 @@ class ProjectController extends Controller
             ->get()
             ->map(function ($p) {
                 $remaining = $p->days_remaining;
+                $user = auth()->user();
+                $memberIds = $p->members->pluck('id');
+                $canManage = $memberIds->contains($user->id)
+                    || (int) $p->created_by === (int) $user->id
+                    || $user->role === 'Administrator';
                 return [
                     'id'            => $p->id,
+                    'can_manage'    => $canManage,
                     'name'          => $p->name,
                     'office_id'     => $p->office_id,
                     'office'        => $p->office->office_abbr ?? '-',
@@ -153,6 +174,7 @@ class ProjectController extends Controller
 
         $project = Project::findOrFail($request->id);
         abort_unless((int) $project->office_id === (int) auth()->user()->office_id, 403);
+        $this->authorizeProjectMember($project);
         $project->update([
             'office_id'  => $request->office_id,
             'name'       => $request->name,
@@ -171,6 +193,7 @@ class ProjectController extends Controller
     {
         $project = Project::findOrFail($id);
         abort_unless((int) $project->office_id === (int) auth()->user()->office_id, 403);
+        $this->authorizeProjectMember($project);
         $project->delete();
 
         return response()->json(['success' => true, 'message' => 'Project deleted successfully!']);

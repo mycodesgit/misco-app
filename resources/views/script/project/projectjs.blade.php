@@ -45,7 +45,7 @@
 
     function initMemberTooltips() {
         if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) return;
-        $('#projectTable .member-avatar[data-bs-toggle="tooltip"]').each(function() {
+        $('#projectTable [data-bs-toggle="tooltip"]').each(function() {
             var instance = bootstrap.Tooltip.getInstance(this);
             if (instance) instance.dispose();
             new bootstrap.Tooltip(this, { placement: 'top', container: 'body' });
@@ -218,6 +218,9 @@
                     data: 'id',
                     orderable: false,
                     render: function(data, type, row) {
+                        if (!row.can_manage) {
+                            return '<span class="text-muted" data-bs-toggle="tooltip" title="Only team members can manage this project"><i class="ti ti-lock"></i></span>';
+                        }
                         return '<button type="button" class="btn btn-sm btn-success text-white btn-project-edit me-1" data-row=\'' + JSON.stringify(row).replace(/'/g, "&#39;") + '\' title="Edit"><i class="ti ti-pencil"></i></button>' +
                             '<button type="button" class="btn btn-sm btn-danger btn-project-delete" data-id="' + data + '" data-name="' + $('<div>').text(row.name).html() + '" title="Delete"><i class="ti ti-trash"></i></button>';
                     }
