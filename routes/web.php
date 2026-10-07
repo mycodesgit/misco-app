@@ -19,6 +19,7 @@ use App\Http\Controllers\MonitoringDashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClientFeedbackController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AuditTrailController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -94,6 +95,9 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/office/list/fetch', [OfficeController::class, 'show'])->name('office.show');
         Route::post('/office/list/add', [OfficeController::class, 'create'])->name('office.create');
         Route::post('/office/list/update', [OfficeController::class, 'update'])->name('office.update');
+
+        Route::get('/audittrail/view', [AuditTrailController::class, 'index'])->name('audittrail.index');
+        Route::get('/audittrail/fetch', [AuditTrailController::class, 'show'])->name('audittrail.show');
     });
 
     Route::prefix('/reports')->group(function () {

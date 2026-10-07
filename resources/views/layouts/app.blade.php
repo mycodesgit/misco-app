@@ -305,6 +305,9 @@
     @if (request()->routeIs('office.index'))
         @include('script.mnge.officejs')
     @endif
+    @if (request()->routeIs('audittrail.index'))
+        @include('script.mnge.audittrailjs')
+    @endif
     @if (request()->routeIs('user.index'))
         @include('script.usr.userjs')
     @endif

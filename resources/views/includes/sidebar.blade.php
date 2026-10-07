@@ -6,6 +6,7 @@
     $dailyTaskActive = in_array($current_route, ['daily-task.index']) ? 'active' : '';
     $categoryActive = in_array($current_route, ['category.index']) ? 'active' : '';
     $officeActive = in_array($current_route, ['office.index']) ? 'active' : '';
+    $auditActive = in_array($current_route, ['audittrail.index']) ? 'active' : '';
     $accomplishmentActive = in_array($current_route, ['accomplishment-report.index']) ? 'active' : '';
     $clientfeedbackActive = in_array($current_route, ['clientfeedback.index']) ? 'active' : '';
     $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
@@ -59,6 +60,13 @@
                 <i class="ti ti-server"></i><span class="nav-text">Categories</span>
             </a>
         </li>
+        @if(Auth::guard('web')->user()->role == 'Administrator')
+            <li>
+                <a class="nav-link {{ $auditActive }}" href="{{ route('audittrail.index') }}" data-tooltip="Audit Trail">
+                    <i class="ti ti-history"></i><span class="nav-text">Audit Trail</span>
+                </a>
+            </li>
+        @endif
     @endif
 
     @if(Auth::guard('web')->user()->role != 'Requester')
