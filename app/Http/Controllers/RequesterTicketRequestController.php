@@ -20,9 +20,9 @@ use App\Models\TicketDB\UserRole;
 use App\Models\TicketDB\Category;
 use App\Models\TicketDB\Subcategory;
 use App\Models\TicketDB\DailyTicketRequest;
-use App\Models\TicketDB\ClientSatisfactory;
+use App\Models\TicketDB\ClientFeedback;
 use App\Models\TicketDB\AuditTrailDailyTicketRequest;
-use App\Models\TicketDB\AuditTrailClientSatisfactory;
+use App\Models\TicketDB\AuditTrailClientFeedback;
 
 class RequesterTicketRequestController extends Controller
 {
@@ -162,7 +162,7 @@ class RequesterTicketRequestController extends Controller
                 'status'            => 'Pending',
             ]);
 
-            $clientsat = ClientSatisfactory::create([
+            $clientsat = ClientFeedback::create([
                 'user_id'   => Auth::id(),
                 'cat_id'    => $request->input('cat_id'),
                 'subcat_id' => $request->input('subcat_id'),
@@ -231,7 +231,7 @@ class RequesterTicketRequestController extends Controller
             ->get();
 
         // Detect from DB which tickets already have feedback submitted
-        $submittedTicketIds = ClientSatisfactory::whereIn('ticket_id', $data->pluck('id'))
+        $submittedTicketIds = ClientFeedback::whereIn('ticket_id', $data->pluck('id'))
             ->whereNotNull('rating')
             ->pluck('ticket_id')
             ->toArray();
@@ -265,7 +265,7 @@ class RequesterTicketRequestController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        $satisfaction = ClientSatisfactory::where('ticket_id', $ticket->id)
+        $satisfaction = ClientFeedback::where('ticket_id', $ticket->id)
             ->where('user_id', Auth::id())
             ->first();
 
@@ -277,7 +277,7 @@ class RequesterTicketRequestController extends Controller
     }
 
     /**
-     * Store / update requester feedback using ClientSatisfactory model.
+     * Store / update requester feedback using ClientFeedback model.
      */
     public function submitFeedback(Request $request)
     {
@@ -306,7 +306,7 @@ class RequesterTicketRequestController extends Controller
             ], 404);
         }
 
-        $satisfaction = ClientSatisfactory::firstOrNew([
+        $satisfaction = ClientFeedback::firstOrNew([
             'ticket_id' => $ticket->id,
             'user_id'   => Auth::id(),
         ]);
@@ -317,7 +317,7 @@ class RequesterTicketRequestController extends Controller
         $satisfaction->feedback   = $request->feedback;
         $satisfaction->save();
 
-        $this->logAuditSatisfactory($request, 'Submit_ClientSatisfactory', $satisfaction->toArray());
+        $this->logAuditSatisfactory($request, 'Submit_ClientFeedback', $satisfaction->toArray());
 
         return response()->json([
             'success' => true,
@@ -356,7 +356,7 @@ class RequesterTicketRequestController extends Controller
         $browser  = $agent->browser();
         $platform = $agent->platform();
 
-        AuditTrailClientSatisfactory::create([
+        AuditTrailClientFeedback::create([
             'user_id'    => auth()->id(),
             'email'      => auth()->user()->email ?? 'System',
             'action'     => $action,
