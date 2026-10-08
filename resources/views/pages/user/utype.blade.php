@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-12">
             <div class="mb-4">
-                
+
                 <!-- Dashboard Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                     <div>
@@ -52,7 +52,7 @@
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>   
+                                    </div>
                                 </form>
                             </div>
                         </div>

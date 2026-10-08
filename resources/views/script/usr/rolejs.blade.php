@@ -74,7 +74,7 @@
                 },
             ],
             "createdRow": function (row, data, index) {
-                $(row).attr('id', 'tr-' + data.id); 
+                $(row).attr('id', 'tr-' + data.id);
             }
         });
         $(document).on('roleAdded', function() {
@@ -90,7 +90,7 @@
         var roleName = $(this).data('rolename');
         var roleStatus = $(this).data('status');
 
-        $('#editYearId').val(id);
+        $('#editRoleId').val(id);
         $('#editRoleName').val(roleName);
         $('#editYearStatus').val(roleStatus);
         $('#editRoleModal').modal('show');
@@ -138,7 +138,7 @@
             errorElement: 'span',
             errorPlacement: function (error, element) {
                 error.addClass('invalid-feedback');
-                element.closest('.col-md-12').append(error);        
+                element.closest('.col-md-12').append(error);
             },
             highlight: function (element, errorClass, validClass) {
                 $(element).addClass('is-invalid');

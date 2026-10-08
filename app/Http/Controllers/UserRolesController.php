@@ -12,8 +12,8 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 use Jenssegers\Agent\Agent;
-   
-use App\Models\TicketDB\UserRole;   
+
+use App\Models\TicketDB\UserRole;
 use App\Models\TicketDB\AuditTrailUserRole;
 
 class UserRolesController extends Controller
@@ -23,21 +23,21 @@ class UserRolesController extends Controller
         return view('pages.user.utype');
     }
 
-    public function show() 
+    public function show()
     {
         $data = UserRole::orderBy('rolename', 'ASC')->get();
 
         return response()->json(['data' => $data]);
     }
 
-    public function create(Request $request) 
+    public function create(Request $request)
     {
         if ($request->isMethod('post')) {
             $request->validate([
                 'rolename' => 'required',
             ]);
 
-            $rolesName = $request->input('rolename'); 
+            $rolesName = $request->input('rolename');
             $existingRole = UserRole::where('rolename', $rolesName)->first();
 
             if ($existingRole) {
@@ -60,14 +60,14 @@ class UserRolesController extends Controller
         }
     }
 
-    public function update(Request $request) 
+    public function update(Request $request)
     {
         $request->validate([
             'id' => 'required',
             'rolename' => 'required',
         ]);
 
-        try {
+        //try {
             $rolesName = $request->input('rolename');
             $existingRole = UserRole::where('rolename', $rolesName)->where('id', '!=', $request->input('id'))->first();
 
@@ -90,9 +90,9 @@ class UserRolesController extends Controller
             $this->logAudit($request, 'Edit_Role', $auditPayload);
 
             return response()->json(['success' => true, 'message' => 'Updated Successfully'], 200);
-        } catch (\Exception $e) {
+        //} catch (\Exception $e) {
             return response()->json(['error' => true, 'message' => 'Failed to update Role!'], 404);
-        }
+        //}
     }
 
     /**
@@ -103,7 +103,7 @@ class UserRolesController extends Controller
         $agent = new Agent();
         $agent->setUserAgent($request->userAgent());
 
-        $browser  = $agent->browser();   
+        $browser  = $agent->browser();
         $platform = $agent->platform();
 
         AuditTrailUserRole::create([
@@ -112,7 +112,7 @@ class UserRolesController extends Controller
             'action'     => $action,
             'actiondata' => json_encode($payload),
             'ip_address' => $request->ip(),
-            'user_agent' => $browser . ' on ' . $platform, 
+            'user_agent' => $browser . ' on ' . $platform,
             'login_at'   => now(),
         ]);
     }
