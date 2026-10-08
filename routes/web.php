@@ -21,6 +21,7 @@ use App\Http\Controllers\ClientFeedbackController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuditTrailController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectKanbanController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -120,6 +121,12 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::post('/create', [ProjectController::class, 'store'])->name('project.create');
         Route::post('/update', [ProjectController::class, 'update'])->name('project.update');
         Route::delete('/delete/{id}', [ProjectController::class, 'destroy'])->name('project.delete');
+
+        Route::get('/kanban/{projectId}', [ProjectKanbanController::class, 'board'])->name('project.kanban.board');
+        Route::post('/kanban', [ProjectKanbanController::class, 'store'])->name('project.kanban.store');
+        Route::post('/kanban/update', [ProjectKanbanController::class, 'update'])->name('project.kanban.update');
+        Route::post('/kanban/reorder', [ProjectKanbanController::class, 'reorder'])->name('project.kanban.reorder');
+        Route::delete('/kanban/{id}', [ProjectKanbanController::class, 'destroy'])->name('project.kanban.delete');
     });
 
     Route::prefix('/users')->group(function () {

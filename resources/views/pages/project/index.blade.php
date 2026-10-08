@@ -232,7 +232,129 @@
         </div>
     </div>
 
+    <!-- Kanban Board Modal -->
+    <div class="modal fade" id="kanbanModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="kanbanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 1140px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="overflow-hidden" style="min-width:0;">
+                        <h5 class="modal-title mb-0 text-truncate" id="kanbanModalLabel"><i class="ti ti-kanban me-1"></i> <span id="kanbanProjectName">Project Board</span></h5>
+                        <small class="text-muted" id="kanbanProjectMeta"></small>
+                    </div>
+                    {{-- <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-success text-white" id="kanbanAddTaskBtn">
+                            <i class="ti ti-plus me-1"></i> Add Task
+                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div> --}}
+                </div>
+                <div class="modal-body">
+                    <div class="kanban-board" id="kanbanBoard">
+                        <div class="kanban-column" data-status="todo">
+                            <div class="kanban-col-header">
+                                <span class="badge bg-secondary">To Do <span class="kanban-count" data-count="todo">0</span></span>
+                                <button type="button" class="btn btn-sm btn-link text-secondary p-0 kanban-col-add" data-status="todo" title="Add task"><i class="ti ti-plus"></i></button>
+                            </div>
+                            <div class="kanban-list" data-status="todo"></div>
+                        </div>
+                        <div class="kanban-column" data-status="in_progress">
+                            <div class="kanban-col-header">
+                                <span class="badge bg-info">In Progress <span class="kanban-count" data-count="in_progress">0</span></span>
+                                <button type="button" class="btn btn-sm btn-link text-secondary p-0 kanban-col-add" data-status="in_progress" title="Add task"><i class="ti ti-plus"></i></button>
+                            </div>
+                            <div class="kanban-list" data-status="in_progress"></div>
+                        </div>
+                        <div class="kanban-column" data-status="on_hold">
+                            <div class="kanban-col-header">
+                                <span class="badge bg-warning text-dark">On Hold <span class="kanban-count" data-count="on_hold">0</span></span>
+                                <button type="button" class="btn btn-sm btn-link text-secondary p-0 kanban-col-add" data-status="on_hold" title="Add task"><i class="ti ti-plus"></i></button>
+                            </div>
+                            <div class="kanban-list" data-status="on_hold"></div>
+                        </div>
+                        <div class="kanban-column" data-status="done">
+                            <div class="kanban-col-header">
+                                <span class="badge bg-success">Done <span class="kanban-count" data-count="done">0</span></span>
+                                <button type="button" class="btn btn-sm btn-link text-secondary p-0 kanban-col-add" data-status="done" title="Add task"><i class="ti ti-plus"></i></button>
+                            </div>
+                            <div class="kanban-list" data-status="done"></div>
+                        </div>
+                    </div>
+                    <small class="text-muted d-block mt-2"><i class="ti ti-arrows-move me-1"></i>Drag cards between columns — the board saves automatically and stays for the whole project duration.</small>
+                </div>
+                <div class="modal-footer d-flex justify-content-end">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kanban Task Modal (Add / Edit) -->
+    <div class="modal fade" id="kanbanTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="kanbanTaskModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="kanbanTaskModalLabel"><i class="ti ti-plus me-1"></i> <span id="kanbanTaskFormTitle">Add Task</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="kanbanTaskForm">
+                    @csrf
+                    <input type="hidden" name="id" id="kanbanTaskId">
+                    <input type="hidden" name="project_id" id="kanbanTaskProjectId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">What are you working on? <span class="text-danger">*</span></label>
+                            <input type="text" name="title" id="kanbanTaskTitle" class="form-control form-control-sm" placeholder="e.g. Configure server backup" required maxlength="255">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Details:</label>
+                            <textarea name="description" id="kanbanTaskDescription" rows="3" class="form-control" placeholder="Steps, notes, links..."></textarea>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Assigned To:</label>
+                                <select name="assigned_to" id="kanbanTaskAssignee" class="form-control form-control-sm">
+                                    <option value="">Unassigned</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Column:</label>
+                                <select name="status" id="kanbanTaskStatus" class="form-control form-control-sm">
+                                    <option value="todo">To Do</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="on_hold">On Hold</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i> Close</button>
+                        <button type="submit" class="btn btn-success text-white"><i class="fas fa-save me-1"></i> Save Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <style>
+        /* Kanban board */
+        .kanban-board { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; min-height: 320px; }
+        .kanban-column { flex: 1 0 240px; min-width: 240px; max-width: 320px; background: var(--bs-light, #f8f9fa); border: 1px solid var(--bs-border-color, #dee2e6); border-radius: 10px; display: flex; flex-direction: column; max-height: 60vh; }
+        [data-bs-theme="dark"] .kanban-column { background: #2b3035; }
+        .kanban-col-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px 6px; }
+        .kanban-list { flex-grow: 1; overflow-y: auto; padding: 6px 10px 12px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; border-radius: 0 0 10px 10px; }
+        .kanban-list.drag-over { outline: 2px dashed #198754; outline-offset: -4px; background: rgba(25, 135, 84, 0.06); }
+        .kanban-card { background: var(--bs-body-bg, #fff); border: 1px solid var(--bs-border-color, #dee2e6); border-radius: 8px; padding: 10px 12px; cursor: grab; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+        .kanban-card:active { cursor: grabbing; }
+        .kanban-card.dragging { opacity: 0.45; }
+        .kanban-card .kanban-title { font-weight: 600; }
+        .kanban-card.done-card .kanban-title { text-decoration: line-through; color: var(--bs-secondary, #6c757d); }
+        .kanban-desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .kanban-assignee { display: inline-flex; align-items: center; gap: 6px; }
+        .kanban-assignee .member-avatar { width: 24px; height: 24px; font-size: 0.6rem; border: none; margin: 0; }
+        /* SweetAlert must sit above stacked Bootstrap modals (board + task form) */
+        .swal2-container { z-index: 2060 !important; }
+        .kanban-empty { border: 1px dashed var(--bs-border-color, #dee2e6); border-radius: 8px; text-align: center; color: var(--bs-secondary, #6c757d); font-size: 0.75rem; padding: 14px 6px; }
         .gantt-wrapper { overflow-x: auto; }
         .gantt-chart { min-width: 100%; font-size: 0.75rem; }
         .gantt-row { display: flex; align-items: center; border-bottom: 1px solid var(--bs-border-color, #eee); min-height: 38px; }
@@ -265,5 +387,12 @@
         var projectUpdateRoute = "{{ route('project.update') }}";
         var projectDeleteBase = "{{ url('/projects/delete') }}";
         var projectMembersBase = "{{ url('/projects/members') }}";
+        var kanbanAuthUserId = "{{ auth()->id() }}";
+        var kanbanAuthUserName = @json(trim(auth()->user()->fname . ' ' . auth()->user()->lname));
+        var kanbanBoardBase = "{{ url('/projects/kanban') }}";
+        var kanbanCreateRoute = "{{ route('project.kanban.store') }}";
+        var kanbanUpdateRoute = "{{ route('project.kanban.update') }}";
+        var kanbanReorderRoute = "{{ route('project.kanban.reorder') }}";
+        var kanbanDeleteBase = "{{ url('/projects/kanban') }}";
     </script>
 @endsection

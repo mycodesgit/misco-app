@@ -221,7 +221,8 @@
                         if (!row.can_manage) {
                             return '<span class="text-muted" data-bs-toggle="tooltip" title="Only team members can manage this project"><i class="ti ti-lock"></i></span>';
                         }
-                        return '<button type="button" class="btn btn-sm btn-success text-white btn-project-edit me-1" data-row=\'' + JSON.stringify(row).replace(/'/g, "&#39;") + '\' title="Edit"><i class="ti ti-pencil"></i></button>' +
+                        return '<button type="button" class="btn btn-sm btn-info text-white btn-project-kanban me-1" data-id="' + data + '" data-name="' + $('<div>').text(row.name).html() + '" title="Kanban Board"><i class="ti ti-artboard"></i></button>' +
+                            '<button type="button" class="btn btn-sm btn-success text-white btn-project-edit me-1" data-row=\'' + JSON.stringify(row).replace(/'/g, "&#39;") + '\' title="Edit"><i class="ti ti-pencil"></i></button>' +
                             '<button type="button" class="btn btn-sm btn-danger btn-project-delete" data-id="' + data + '" data-name="' + $('<div>').text(row.name).html() + '" title="Delete"><i class="ti ti-trash"></i></button>';
                     }
                 }
@@ -331,6 +332,305 @@
                         },
                         error: function() {
                             toastr.error('Failed to delete project.');
+                        }
+                    });
+                }
+            });
+        });
+        /* ================= Kanban Board ================= */
+        var kanbanProjectId = null;
+        var kanbanProjectMembers = [];
+        var kanbanStatuses = ['todo', 'in_progress', 'on_hold', 'done'];
+
+        function kanbanCsrf() {
+            return $('meta[name="csrf-token"]').attr('content');
+        }
+
+        function kanbanAssigneeHtml(task) {
+            if (!task.assigned_to) {
+                return '<span class="text-muted" style="font-size:0.72rem;">Unassigned</span>';
+            }
+            var name = task.assignee_name || ('User #' + task.assigned_to);
+            var safeName = $('<div>').text(name).html();
+            return '<span class="kanban-assignee"><span class="member-avatar avatar-stack" style="background:#0d6efd;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;color:#fff;font-weight:700;" title="' + safeName + '">' + memberInitials(name) + '</span>' +
+                '<small class="fw-semibold text-truncate" style="max-width:110px;" title="' + safeName + '">' + safeName + '</small></span>';
+        }
+
+        function kanbanCardHtml(task) {
+            var safeTitle = $('<div>').text(task.title).html();
+            var desc = task.description
+                ? '<div class="kanban-desc small text-muted mt-1">' + $('<div>').text(task.description).html() + '</div>'
+                : '';
+            // Only the member who added the card may drag / edit / delete it
+            var isMine = parseInt(task.created_by, 10) === parseInt(kanbanAuthUserId, 10);
+            var controls = isMine
+                ? '<button type="button" class="btn btn-sm btn-link text-secondary p-0 kanban-edit" data-id="' + task.id + '" title="Edit"><i class="ti ti-pencil"></i></button>' +
+                  '<button type="button" class="btn btn-sm btn-link text-danger p-0 kanban-delete" data-id="' + task.id + '" title="Delete"><i class="ti ti-trash"></i></button>'
+                : '<span class="text-muted" title="Only the member who added this task can edit it"><i class="ti ti-lock"></i></span>';
+            return '<div class="kanban-card' + (task.status === 'done' ? ' done-card' : '') + '" draggable="' + (isMine ? 'true' : 'false') + '" data-id="' + task.id + '" data-mine="' + (isMine ? '1' : '0') + '">' +
+                '<div class="d-flex justify-content-between align-items-start gap-2">' +
+                    '<span class="kanban-title small" title="' + safeTitle + '">' + safeTitle + '</span>' +
+                    '<span class="d-flex gap-1 flex-shrink-0">' + controls + '</span>' +
+                '</div>' + desc +
+                '<div class="d-flex justify-content-between align-items-center mt-2">' +
+                    kanbanAssigneeHtml(task) +
+                    '<small class="text-muted" style="font-size:0.68rem;">' + (task.updated_label || '') + '</small>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function renderKanbanBoard(tasks) {
+            tasks = tasks || [];
+            var grouped = { todo: [], in_progress: [], on_hold: [], done: [] };
+            tasks.forEach(function (t) {
+                if (grouped[t.status]) grouped[t.status].push(t);
+                else grouped.todo.push(t);
+            });
+            kanbanStatuses.forEach(function (status) {
+                var $list = $('.kanban-list[data-status="' + status + '"]');
+                if (grouped[status].length === 0) {
+                    $list.html('<div class="kanban-empty">Drop tasks here</div>');
+                } else {
+                    $list.html(grouped[status].map(kanbanCardHtml).join(''));
+                }
+                $('.kanban-count[data-count="' + status + '"]').text(grouped[status].length);
+            });
+        }
+
+        function loadKanbanBoard() {
+            if (!kanbanProjectId) return;
+            $.ajax({
+                url: kanbanBoardBase + '/' + kanbanProjectId,
+                type: 'GET',
+                success: function (res) {
+                    kanbanProjectMembers = (res.project && res.project.members) || [];
+                    renderKanbanBoard(res.tasks || []);
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Failed to load board.');
+                }
+            });
+        }
+
+        function collectBoardOrder() {
+            var order = { todo: [], in_progress: [], on_hold: [], done: [] };
+            kanbanStatuses.forEach(function (status) {
+                $('.kanban-list[data-status="' + status + '"] .kanban-card').each(function () {
+                    order[status].push(parseInt($(this).data('id'), 10));
+                });
+            });
+            return order;
+        }
+
+        function saveBoardOrder() {
+            $.ajax({
+                url: kanbanReorderRoute,
+                type: 'POST',
+                data: { project_id: kanbanProjectId, order: collectBoardOrder() },
+                headers: { 'X-CSRF-TOKEN': kanbanCsrf() },
+                error: function () {
+                    toastr.error('Could not save board order — reloading.');
+                    loadKanbanBoard();
+                }
+            });
+        }
+
+        // Open board from table row button
+        $(document).on('click', '.btn-project-kanban', function () {
+            kanbanProjectId = $(this).data('id');
+            var name = $(this).data('name') || 'Project Board';
+            $('#kanbanProjectName').text(name);
+            $('#kanbanProjectMeta').text('Team board — everything members work on, for the whole project duration.');
+            renderKanbanBoard([]);
+            $('#kanbanModal').modal('show');
+            loadKanbanBoard();
+        });
+
+        // Native drag & drop between columns
+        var draggedCardId = null;
+        $(document).on('dragstart', '.kanban-card', function (e) {
+            draggedCardId = $(this).data('id');
+            e.originalEvent.dataTransfer.effectAllowed = 'move';
+            try { e.originalEvent.dataTransfer.setData('text/plain', String(draggedCardId)); } catch (err) {}
+            $(this).addClass('dragging');
+        });
+        $(document).on('dragend', '.kanban-card', function () {
+            $('.kanban-card').removeClass('dragging');
+            $('.kanban-list').removeClass('drag-over');
+        });
+        $(document).on('dragover', '.kanban-list', function (e) {
+            e.preventDefault();
+            e.originalEvent.dataTransfer.dropEffect = 'move';
+            $(this).addClass('drag-over');
+        });
+        $(document).on('dragleave', '.kanban-list', function () {
+            $(this).removeClass('drag-over');
+        });
+        $(document).on('drop', '.kanban-list', function (e) {
+            e.preventDefault();
+            var $list = $(this);
+            $list.removeClass('drag-over');
+            var $card = $('.kanban-card[data-id="' + draggedCardId + '"]');
+            if ($card.length === 0) return;
+            if ($card.data('mine') != 1) {
+                toastr.warning('Only the member who added this task can move it.');
+                loadKanbanBoard();
+                return;
+            }
+
+            // Insert before the card under the cursor, else append at end
+            var $after = null;
+            $list.find('.kanban-card').not($card).each(function () {
+                var rect = this.getBoundingClientRect();
+                if (e.originalEvent.clientY < rect.top + rect.height / 2 && !$after) {
+                    $after = $(this);
+                }
+            });
+            if ($after) { $card.insertBefore($after); } else { $list.append($card); }
+            $list.find('.kanban-empty').remove();
+
+            var newStatus = $list.data('status');
+            $card.toggleClass('done-card', newStatus === 'done');
+            renderKanbanCountsOnly();
+            saveBoardOrder();
+        });
+
+        function renderKanbanCountsOnly() {
+            kanbanStatuses.forEach(function (status) {
+                $('.kanban-count[data-count="' + status + '"]').text($('.kanban-list[data-status="' + status + '"] .kanban-card').length);
+            });
+        }
+
+        // Assignee picker shows only Unassigned + the logged-in user.
+        // In edit mode the task's current assignee is kept as an extra
+        // option so saving never silently reassigns someone else's pick.
+        function fillAssigneeSelect(selectedId, keepAssignee) {
+            var $sel = $('#kanbanTaskAssignee');
+            $sel.empty().append('<option value="">Unassigned</option>');
+            $sel.append($('<option>', { value: kanbanAuthUserId, text: kanbanAuthUserName }));
+            if (keepAssignee && keepAssignee.id && String(keepAssignee.id) !== String(kanbanAuthUserId)) {
+                $sel.append($('<option>', { value: keepAssignee.id, text: keepAssignee.name }));
+            }
+            if (selectedId) {
+                $sel.val(String(selectedId));
+            }
+        }
+
+        function openKanbanTaskModal(task, presetStatus) {
+            if (task) {
+                $('#kanbanTaskFormTitle').text('Edit Task');
+                $('#kanbanTaskId').val(task.id);
+                $('#kanbanTaskTitle').val(task.title);
+                $('#kanbanTaskDescription').val(task.description || '');
+                $('#kanbanTaskStatus').val(task.status).prop('disabled', true);
+                fillAssigneeSelect(task.assigned_to, task.assigned_to ? {
+                    id: task.assigned_to,
+                    name: task.assignee_name || ('User #' + task.assigned_to)
+                } : null);
+            } else {
+                $('#kanbanTaskFormTitle').text('Add Task');
+                $('#kanbanTaskId').val('');
+                $('#kanbanTaskForm')[0].reset();
+                $('#kanbanTaskStatus').val(presetStatus || 'todo').prop('disabled', false);
+                fillAssigneeSelect(kanbanAuthUserId, null);
+            }
+            $('#kanbanTaskProjectId').val(kanbanProjectId);
+            $('#kanbanTaskModal').modal('show');
+        }
+
+        $(document).on('click', '#kanbanAddTaskBtn', function () {
+            openKanbanTaskModal(null, 'todo');
+        });
+
+        $(document).on('click', '.kanban-col-add', function () {
+            openKanbanTaskModal(null, $(this).data('status'));
+        });
+
+        $(document).on('click', '.kanban-edit', function (e) {
+            e.stopPropagation();
+            var id = $(this).data('id');
+            $.ajax({
+                url: kanbanBoardBase + '/' + kanbanProjectId,
+                type: 'GET',
+                success: function (res) {
+                    var found = null;
+                    (res.tasks || []).forEach(function (t) {
+                        if (parseInt(t.id, 10) === parseInt(id, 10)) found = t;
+                    });
+                    if (found) {
+                        kanbanProjectMembers = (res.project && res.project.members) || kanbanProjectMembers;
+                        openKanbanTaskModal(found, null);
+                    }
+                }
+            });
+        });
+
+        $('#kanbanTaskForm').submit(function (event) {
+            event.preventDefault();
+            var id = $('#kanbanTaskId').val();
+            var isEdit = !!id;
+            var payload = {
+                title: $('#kanbanTaskTitle').val(),
+                description: $('#kanbanTaskDescription').val(),
+                assigned_to: $('#kanbanTaskAssignee').val() || null
+            };
+            var url;
+            if (isEdit) {
+                url = kanbanUpdateRoute;
+                payload.id = id;
+            } else {
+                url = kanbanCreateRoute;
+                payload.project_id = kanbanProjectId;
+                payload.status = $('#kanbanTaskStatus').val();
+            }
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: payload,
+                headers: { 'X-CSRF-TOKEN': kanbanCsrf() },
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $('#kanbanTaskModal').modal('hide');
+                        loadKanbanBoard();
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred');
+                }
+            });
+        });
+
+        // Moving a card to another column via the edit form is done by drag & drop;
+        // status select is locked when editing to keep board order consistent.
+        $(document).on('click', '.kanban-delete', function (e) {
+            e.stopPropagation();
+            var id = $(this).data('id');
+            Swal.fire({
+                title: 'Remove task?',
+                text: 'This task will be removed from the board.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, remove it!'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: kanbanDeleteBase + '/' + id,
+                        type: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': kanbanCsrf() },
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                                loadKanbanBoard();
+                            } else {
+                                toastr.error(response.message);
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Failed to delete task.');
                         }
                     });
                 }

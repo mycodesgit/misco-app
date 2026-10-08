@@ -39,6 +39,11 @@ class Project extends Model
         return $this->belongsToMany(User::class, 'project_members', 'project_id', 'user_id')->withTimestamps();
     }
 
+    public function kanbanTasks()
+    {
+        return $this->hasMany(ProjectKanbanTask::class, 'project_id')->orderBy('position');
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
