@@ -37,6 +37,7 @@ class LoginController extends Controller
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'action' => 'LOGIN',
+                'activity' => \App\Helpers\AuditActivity::describe('LOGIN', [], trim(($user->fname ?? '') . ' ' . ($user->lname ?? '')) ?: $user->email),
                 'ip_address' => $request->ip(),
                 'user_agent' => $browser . ' on ' . $platform,
                 'login_at' => now(),
@@ -54,6 +55,7 @@ class LoginController extends Controller
         AuditLog::create([
             'email' => $request->email,
             'action' => 'FAILED_LOGIN',
+            'activity' => \App\Helpers\AuditActivity::describe('FAILED_LOGIN', ['email' => $request->email]),
             'ip_address' => $request->ip(),
             'user_agent' => $browser . ' on ' . $platform,
             'login_at' => now(),

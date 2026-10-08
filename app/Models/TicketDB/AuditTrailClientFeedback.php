@@ -15,6 +15,7 @@ class AuditTrailClientFeedback extends Model
         'user_id',
         'email',
         'action',
+        'activity',
         'actiondata',
         'ip_address',
         'user_agent',

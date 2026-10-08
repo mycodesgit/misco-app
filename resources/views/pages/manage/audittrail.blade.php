@@ -97,6 +97,7 @@
                                                 <th>User</th>
                                                 <th>Email</th>
                                                 <th>Action</th>
+                                                <th>Activity</th>
                                                 <th>IP Address</th>
                                                 <th>User Agent</th>
                                                 <th>Date</th>

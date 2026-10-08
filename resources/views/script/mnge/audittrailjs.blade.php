@@ -38,7 +38,7 @@
             lengthChange: true,
             searching: true,
             paging: true,
-            order: [[5, "desc"]],
+            order: [[6, "desc"]],
             "columns": [
                 { data: 'user' },
                 { data: 'email' },
@@ -46,6 +46,12 @@
                     data: 'action',
                     render: function(data) {
                         return '<span class="badge bg-info">' + $('<div>').text(data ?? '-').html() + '</span>';
+                    }
+                },
+                {
+                    data: 'activity',
+                    render: function(data) {
+                        return '<span class="small">' + $('<div>').text(data ?? '-').html() + '</span>';
                     }
                 },
                 { data: 'ip' },

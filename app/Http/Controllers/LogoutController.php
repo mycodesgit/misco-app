@@ -29,6 +29,7 @@ class LogoutController extends Controller
                 'user_id' => auth()->id(),
                 'username' => auth()->user()->username,
                 'action' => 'LOGOUT',
+                'activity' => \App\Helpers\AuditActivity::describe('LOGOUT'),
                 'ip_address' => $request->ip(),
                 'user_agent' => $browser . ' on ' . $platform,
                 'logout_at' => now(),

@@ -16,6 +16,7 @@ class AuditTrailDailyTask extends Model
         'off_id',
         'email',
         'action',
+        'activity',
         'actiondata',
         'ip_address',
         'user_agent',

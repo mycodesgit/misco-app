@@ -72,6 +72,7 @@ class AccountController extends Controller
             'user_id'    => auth()->id(),
             'email'      => auth()->user()->email ?? 'System',
             'action'     => $action,
+            'activity'   => \App\Helpers\AuditActivity::describe($action, $payload),
             'actiondata' => json_encode($payload),
             'ip_address' => $request->ip(),
             'user_agent' => $agent->browser() . ' on ' . $agent->platform(),

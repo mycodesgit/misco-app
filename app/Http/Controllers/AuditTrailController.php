@@ -87,11 +87,16 @@ class AuditTrailController extends Controller
             }
 
             return [
-                'id'      => $row->id,
-                'user'    => $names[$row->user_id] ?? 'System',
-                'email'   => $row->email ?? '-',
-                'action'  => $row->action ?? '-',
-                'full'    => $pretty,
+                'id'       => $row->id,
+                'user'     => $names[$row->user_id] ?? 'System',
+                'email'    => $row->email ?? '-',
+                'action'   => $row->action ?? '-',
+                'activity' => $row->activity ?? \App\Helpers\AuditActivity::describe(
+                    $row->action ?? '',
+                    (array) (json_decode($row->actiondata ?? '[]', true) ?? []),
+                    $names[$row->user_id] ?? $row->email ?? null
+                ),
+                'full'     => $pretty,
                 'ip'      => $row->ip_address ?? '-',
                 'agent'   => $row->user_agent ? Str::limit($row->user_agent, 60) : '-',
                 'date'    => $row->created_at?->format('M d, Y h:i A'),
