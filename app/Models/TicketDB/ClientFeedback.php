@@ -17,6 +17,7 @@ class ClientFeedback extends Model
         'cat_id',
         'subcat_id',
         'off_id',
+        'resolved_by',
         'ticket_id',
         'rating',
         'feedback',
@@ -25,6 +26,14 @@ class ClientFeedback extends Model
     public function ticket()
     {
         return $this->belongsTo(DailyTicketRequest::class, 'ticket_id');
+    }
+
+    /**
+     * The IT staff member who resolved the ticket this feedback is for.
+     */
+    public function resolver()
+    {
+        return $this->belongsTo(User::class, 'resolved_by');
     }
 
     public function supportOffice()

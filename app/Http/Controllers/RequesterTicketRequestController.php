@@ -335,6 +335,7 @@ class RequesterTicketRequestController extends Controller
         $satisfaction->cat_id    = $ticket->cat_id;
         $satisfaction->subcat_id = $ticket->subcat_id;
         $satisfaction->off_id    = $ticket->off_id;
+        $satisfaction->resolved_by = $ticket->resolved_by;
         $satisfaction->rating     = $request->rating;
         $satisfaction->feedback   = $request->feedback;
         $satisfaction->save();

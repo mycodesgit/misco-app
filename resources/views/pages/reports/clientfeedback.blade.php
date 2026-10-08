@@ -37,7 +37,7 @@
 
                                     <div class="form-group">
                                         <div class="row g-3">
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="form-label fw-semibold">Month: <span class="text-danger">*</span></label>
                                                 <select id="filterMonth" class="form-control form-control-sm" required>
                                                     <option value="01">January</option>
@@ -55,7 +55,7 @@
                                                 </select>
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="form-label fw-semibold">Year: <span class="text-danger">*</span></label>
                                                 <select id="filterYear" class="form-control form-control-sm" required>
                                                     @php $currentYear = date('Y'); @endphp
@@ -65,9 +65,9 @@
                                                 </select>
                                             </div>
 
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
                                                 <label class="form-label fw-semibold">Office:</label>
-                                                <select id="filterOffice" class="form-control form-control-sm" {{ ($isAdmin ?? false) ? '' : 'disabled' }}>
+                                                <select id="filterOffice" class="form-control form-control-sm select2bs4" {{ ($isAdmin ?? false) ? '' : 'disabled' }}>
                                                     @if ($isAdmin ?? false)
                                                         <option value="">All Offices</option>
                                                     @endif
@@ -80,6 +80,14 @@
                                                 @endunless
                                             </div>
 
+                                            <div class="col-md-3">
+                                                <label class="form-label fw-semibold">User:</label>
+                                                <select id="filterUser" class="form-control form-control-sm" disabled>
+                                                    <option value="">All Users</option>
+                                                </select>
+                                                <small class="text-muted" id="filterUserHint">Select an office first.</small>
+                                            </div>
+
                                             <div class="col-md-2">
                                                 <div class="d-flex flex-column h-100">
                                                     <label class="form-label fw-semibold opacity-0 d-none d-md-block">Action</label>
@@ -90,6 +98,41 @@
                                     </div>
                                 </form>
                                 <div class="page-header" style="border-bottom: 1px solid #04401f;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="card card-animate">
+                            <div class="card-header pt-3 d-flex justify-content-between align-items-center">
+                                <h6 class="card-title mb-0">
+                                    <i class="ti ti-star"></i> Total Rating Summary
+                                </h6>
+                                <span class="badge bg-light text-dark border" id="cf-scope-label">-</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-3 text-center border-end">
+                                        <div class="text-muted small">Total Responses</div>
+                                        <h2 class="fw-bold mb-0" id="cf-total-count">0</h2>
+                                    </div>
+                                    <div class="col-md-3 text-center border-end">
+                                        <div class="text-muted small">Average Rating</div>
+                                        <h2 class="fw-bold mb-0"><span id="cf-avg-value">0</span><small class="text-muted fs-6"> / 5</small></h2>
+                                        <div id="cf-avg-stars"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        @foreach ([5, 4, 3, 2, 1] as $star)
+                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                <small class="fw-semibold text-muted" style="width: 28px;">{{ $star }}★</small>
+                                                <div class="progress flex-grow-1" style="height: 8px;">
+                                                    <div class="progress-bar bg-warning" id="cf-bar-{{ $star }}" role="progressbar" style="width: 0%;"></div>
+                                                </div>
+                                                <small class="fw-bold" style="width: 30px;" id="cf-count-{{ $star }}">0</small>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -109,6 +152,7 @@
                                                 <th>Ticket No.</th>
                                                 <th>Requester</th>
                                                 <th>Office</th>
+                                                <th>Resolved By</th>
                                                 <th>Category</th>
                                                 <th>Sub Category</th>
                                                 <th>Rating</th>
@@ -131,5 +175,6 @@
 
     <script>
         var clientfeedbackReadRoute = "{{ route('clientfeedback.show') }}";
+        var clientfeedbackUsersRoute = "{{ route('clientfeedback.users') }}";
     </script>
 @endsection

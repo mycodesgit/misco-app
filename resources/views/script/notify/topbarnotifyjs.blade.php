@@ -74,9 +74,9 @@
             html += '<li>' +
                 '<a href="#" class="notif-item d-flex gap-2 px-3 py-2 text-decoration-none ' + (n.read ? '' : 'bg-light') + '" data-id="' + n.id + '" data-url="' + escapeNotifHtml(n.url || '#') + '">' +
                     '<span class="' + style.color + ' fs-5 lh-1 mt-1"><i class="ti ' + style.icon + '"></i></span>' +
-                    '<span class="flex-grow-1 min-w-0">' +
+                    '<span class="flex-grow-1 overflow-hidden" style="min-width:0;">' +
                         '<span class="d-block small ' + (n.read ? 'text-dark' : 'fw-bold text-dark') + '">' + escapeNotifHtml(n.title) + '</span>' +
-                        '<span class="d-block small text-muted text-truncate">' + escapeNotifHtml(n.message) + '</span>' +
+                        '<span class="d-block small text-muted text-truncate" title="' + escapeNotifHtml(n.message) + '">' + escapeNotifHtml(n.message) + '</span>' +
                         '<span class="d-block text-muted" style="font-size:0.7rem;">' + escapeNotifHtml(n.time || '') + '</span>' +
                     '</span>' +
                     (n.read ? '' : '<span class="badge bg-primary rounded-pill align-self-center ms-1" style="width:8px;height:8px;padding:0;">&nbsp;</span>') +

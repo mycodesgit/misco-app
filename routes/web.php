@@ -106,6 +106,7 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/accomplishment/preview', [AccomplishmentReportController::class, 'previewPdf'])->name('accomplishment.preview');
         Route::get('/clientfeedback/view', [ClientFeedbackController::class, 'index'])->name('clientfeedback.index');
         Route::get('/clientfeedback/fetch', [ClientFeedbackController::class, 'show'])->name('clientfeedback.show');
+        Route::get('/clientfeedback/users', [ClientFeedbackController::class, 'users'])->name('clientfeedback.users');
     });
 
     // Personal account page — outside /users/* so Requester role can access it

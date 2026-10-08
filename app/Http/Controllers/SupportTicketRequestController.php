@@ -21,6 +21,7 @@ use App\Models\TicketDB\Category;
 use App\Models\TicketDB\Subcategory;
 use App\Models\TicketDB\DailyTicketRequest;
 use App\Models\TicketDB\TicketChat;
+use App\Models\TicketDB\ClientFeedback;
 use App\Models\TicketDB\AuditTrailCategory;
 use App\Models\TicketDB\AuditTrailCategorySub;
 use App\Models\TicketDB\AuditTrailDailyTicketRequest;
@@ -304,7 +305,11 @@ class SupportTicketRequestController extends Controller
             $ticket->update([
                 'status'      => 'Resolved',
                 'resolved_at' => Carbon::now(), // Sets resolved_at timestamp
+                'resolved_by' => Auth::id(), // Staff who resolved it
             ]);
+            // Carry the resolver onto the feedback row so reports show who it's for
+            ClientFeedback::where('ticket_id', $ticket->id)
+                ->update(['resolved_by' => Auth::id()]);
             $message = 'Ticket marked as Resolved.';
         } elseif ($status === 'cancelled') {
             $ticket->update([

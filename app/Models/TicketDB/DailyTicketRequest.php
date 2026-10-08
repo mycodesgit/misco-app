@@ -25,6 +25,7 @@ class DailyTicketRequest extends Model
         'attachment',
         'remarks',
         'assigned_to',
+        'resolved_by',
         'status',
         'started_at',
         'resolved_at',
@@ -67,6 +68,14 @@ class DailyTicketRequest extends Model
     public function assignedStaff()
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    /**
+     * The IT staff member who marked this ticket Resolved.
+     */
+    public function resolver()
+    {
+        return $this->belongsTo(User::class, 'resolved_by');
     }
 
     /**
