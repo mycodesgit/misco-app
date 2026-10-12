@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -222,7 +223,16 @@ class SupportTicketRequestController extends Controller
 
         // Load sender details for frontend rendering
         $chat->load('sender');
-        broadcast(new \App\Events\MessageSent($chat))->toOthers();
+
+        // Realtime fan-out must never fail the send itself: if Reverb or the
+        // notification store is misconfigured (e.g. new server), the message
+        // is already saved — log and still return success. Polling fallback
+        // on the client keeps delivery live without refresh.
+        try {
+            broadcast(new \App\Events\MessageSent($chat))->toOthers();
+        } catch (\Throwable $e) {
+            Log::warning('Reverb broadcast failed for chat ' . $chat->id . ': ' . $e->getMessage());
+        }
 
         // Notify ticket participants (except the sender) of the new chat message
         $ticket = DailyTicketRequest::find($request->ticket_id);
@@ -237,18 +247,22 @@ class SupportTicketRequestController extends Controller
 
             $recipients = User::whereIn('id', $participantIds)->get();
             if ($recipients->isNotEmpty()) {
-                $senderName = trim((auth()->user()->fname ?? '') . ' ' . (auth()->user()->lname ?? '')) ?: 'User';
-                $excerpt = $request->filled('message')
-                    ? Str::limit($request->message, 80)
-                    : 'sent an attachment';
-                $chatNotif = new \App\Notifications\ChatMessageNotification(
-                    ticketId: $ticket->id,
-                    ticketNumber: $ticket->ticket_number,
-                    senderName: $senderName,
-                    excerpt: $excerpt,
-                );
-                Notification::send($recipients, $chatNotif);
-                \App\Events\UserNotified::dispatchFor($recipients, $chatNotif); // realtime Reverb ping
+                try {
+                    $senderName = trim((auth()->user()->fname ?? '') . ' ' . (auth()->user()->lname ?? '')) ?: 'User';
+                    $excerpt = $request->filled('message')
+                        ? Str::limit($request->message, 80)
+                        : 'sent an attachment';
+                    $chatNotif = new \App\Notifications\ChatMessageNotification(
+                        ticketId: $ticket->id,
+                        ticketNumber: $ticket->ticket_number,
+                        senderName: $senderName,
+                        excerpt: $excerpt,
+                    );
+                    Notification::send($recipients, $chatNotif);
+                    \App\Events\UserNotified::dispatchFor($recipients, $chatNotif); // realtime Reverb ping
+                } catch (\Throwable $e) {
+                    Log::warning('Chat notification fan-out failed for ticket ' . $ticket->id . ': ' . $e->getMessage());
+                }
             }
         }
 

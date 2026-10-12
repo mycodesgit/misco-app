@@ -185,7 +185,17 @@
                         appendMessage(response.data);
                         userHasScrolledUp = false; // Reset user scroll state on new message send
                         scrollToBottom();
+                    } else {
+                        alert(response.message || 'Message could not be sent.');
                     }
+                },
+                error: function (xhr) {
+                    var msg = 'Message could not be sent.';
+                    try {
+                        var res = JSON.parse(xhr.responseText);
+                        msg = res.message || msg;
+                    } catch (e) {}
+                    alert(msg);
                 },
                 complete: function () {
                     $('#sendChatBtn').prop('disabled', false);
