@@ -22,7 +22,7 @@
     <div class="login-shell">
         <!-- Left: brand panel -->
         <aside class="login-hero">
-            <h1 class="hero-title">Ticket support system</h1>
+            <h1 class="hero-title"></h1>
             <p class="hero-subtitle">A ticketing system that turns every IT concern into a ticket — filed, tracked, and resolved in one place so no request goes unnoticed.</p>
             <div class="hero-dashes" aria-hidden="true"><span></span><span></span><span></span></div>
 
