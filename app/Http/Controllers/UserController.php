@@ -103,6 +103,7 @@ class UserController extends Controller
             'office',
             'assignedTasks:id,user_id,taskassigned',
         ])
+        ->where('users.role', '!=', 'Requester')
         ->where('users.ustatus', '!=', 3)
         ->get();
 
