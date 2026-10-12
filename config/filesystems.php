@@ -48,7 +48,7 @@ return [
         // ticket_attachments/{year}/ + chat_attachments/{year}/
         'external' => [
             'driver' => 'local',
-            'root' => '/var/www/storage/misco-app',
+            'root' => '/var/www/storage/snowticketingfiles',
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
