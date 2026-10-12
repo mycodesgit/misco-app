@@ -122,7 +122,7 @@ class SupportTicketRequestController extends Controller
             if ($request->hasFile('attachment')) {
                 $file = $request->file('attachment');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                // Store in /var/www/storage/misco-app/ticket_attachments/{YEAR}/
+                // Store in EXTERNAL_STORAGE_ROOT/ticket_attachments/{YEAR}/
                 $stored = $file->storeAs('ticket_attachments/' . date('Y'), $filename, 'external');
                 $attachmentPath = $stored ? '/storage/' . $stored : null;
             }
@@ -209,7 +209,7 @@ class SupportTicketRequestController extends Controller
             // Format: senderid_year_timestamp.extension (e.g., 12_2026_1710000000.png)
             $fileName = $senderId . '_' . $currentYear . '_' . time() . '.' . $extension;
 
-            // Save to /var/www/storage/misco-app/chat_attachments/2026/
+            // Save to EXTERNAL_STORAGE_ROOT/chat_attachments/2026/
             $attachmentPath = $file->storeAs("chat_attachments/{$currentYear}", $fileName, 'external');
         }
 

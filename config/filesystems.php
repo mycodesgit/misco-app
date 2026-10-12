@@ -44,11 +44,16 @@ return [
             'throw' => false,
         ],
 
-        // Shared file store outside the project: /var/www/storage/misco-app
-        // ticket_attachments/{year}/ + chat_attachments/{year}/
+        // Shared file store OUTSIDE the project (set per server in .env):
+        //   dev:  /var/www/storage/snowticketingfiles
+        //   prod: /var/www/html/storage/snowticketingfiles (mounted volume)
+        // Layout inside: ticket_attachments/{year}/ + chat_attachments/{year}/
+        // NOTE: never run `php artisan storage:link` — it overwrites the
+        // public/storage symlink below. Recreate it manually instead:
+        //   rm public/storage && ln -s <EXTERNAL_STORAGE_ROOT> public/storage
         'external' => [
             'driver' => 'local',
-            'root' => '/var/www/storage/snowticketingfiles',
+            'root' => env('EXTERNAL_STORAGE_ROOT', '/var/www/storage/snowticketingfiles'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
