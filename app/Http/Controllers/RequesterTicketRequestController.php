@@ -109,14 +109,20 @@ class RequesterTicketRequestController extends Controller
         try {
             DB::beginTransaction();
 
-            // 2. Generate Unique Ticket Number (e.g., TKT-20261002-0001)
+            // 2. Generate Unique Ticket Number (e.g., TKT-MIS-20261012-0001)
+            // Prefix = first 3 letters of the selected support role ("MIS Support" -> "MIS")
             $datePrefix = Carbon::now()->format('Ymd');
+            $supportCode = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', (string) $request->input('support_type', '')), 0, 3));
+            if ($supportCode === '') {
+                $supportCode = 'GEN';
+            }
             $latestTicket = DailyTicketRequest::whereDate('created_at', Carbon::today())
+                ->where('ticket_number', 'LIKE', 'TKT-' . $supportCode . '-' . $datePrefix . '-%')
                 ->latest('id')
                 ->first();
 
             $sequence = $latestTicket ? ((int) substr($latestTicket->ticket_number, -4)) + 1 : 1;
-            $ticketNumber = 'TKT-' . $datePrefix . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+            $ticketNumber = 'TKT-' . $supportCode . '-' . $datePrefix . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
 
             // 3. Handle File Upload (Formatted: userID_officeAbbr_yearTimestamp.extension)
             $attachmentPath = null;
