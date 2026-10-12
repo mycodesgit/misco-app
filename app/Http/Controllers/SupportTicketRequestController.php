@@ -122,7 +122,9 @@ class SupportTicketRequestController extends Controller
             if ($request->hasFile('attachment')) {
                 $file = $request->file('attachment');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $attachmentPath = $file->storeAs('ticket_attachments', $filename, 'public');
+                // Store in /var/www/storage/misco-app/ticket_attachments/{YEAR}/
+                $stored = $file->storeAs('ticket_attachments/' . date('Y'), $filename, 'external');
+                $attachmentPath = $stored ? '/storage/' . $stored : null;
             }
 
             // 4. Create Ticket Record
@@ -207,8 +209,8 @@ class SupportTicketRequestController extends Controller
             // Format: senderid_year_timestamp.extension (e.g., 12_2026_1710000000.png)
             $fileName = $senderId . '_' . $currentYear . '_' . time() . '.' . $extension;
 
-            // Save to storage/app/public/chat_attachments/2026/
-            $attachmentPath = $file->storeAs("chat_attachments/{$currentYear}", $fileName, 'public');
+            // Save to /var/www/storage/misco-app/chat_attachments/2026/
+            $attachmentPath = $file->storeAs("chat_attachments/{$currentYear}", $fileName, 'external');
         }
 
         $chat = TicketChat::create([

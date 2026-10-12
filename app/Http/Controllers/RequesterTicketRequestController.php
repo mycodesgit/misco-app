@@ -139,8 +139,8 @@ class RequesterTicketRequestController extends Controller
                 $currentYear = date('Y');
                 $folderPath = 'ticket_attachments/' . $currentYear;
 
-                // Store in storage/app/public/ticket_attachments/{YEAR}/
-                $file->storeAs($folderPath, $filename, 'public');
+                // Store in /var/www/storage/misco-app/ticket_attachments/{YEAR}/
+                $file->storeAs($folderPath, $filename, 'external');
 
                 // Relative path saved in DB
                 $attachmentPath = '/storage/' . $folderPath . '/' . $filename;
