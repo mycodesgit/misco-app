@@ -20,12 +20,18 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
+// Environment-agnostic: talk to whatever host serves the page, with a
+// matching scheme — so ONE build works on dev (http + :8080) and
+// production (https + :443 via reverse proxy). Only the app key still
+// comes from the build (it must match the server's REVERB_APP_KEY).
+const reverbUseTLS = window.location.protocol === 'https:';
+
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost: import.meta.env.VITE_REVERB_HOST ?? 'localhost',
-    wsPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
-    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https',
+    wsHost: window.location.hostname,
+    wsPort: reverbUseTLS ? 443 : (import.meta.env.VITE_REVERB_PORT ?? 8080),
+    wssPort: 443,
+    forceTLS: reverbUseTLS,
     enabledTransports: ['ws', 'wss'],
 });
