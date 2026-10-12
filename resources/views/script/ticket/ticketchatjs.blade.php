@@ -31,12 +31,33 @@
             }
         });
 
-        // Auto-poll for new messages every 3 seconds
-        // setInterval(function() {
-        //     loadMessages(false);
-        // }, 3000);
+        // Fallback polling: if Reverb/Echo is missing or can't connect
+        // (wrong host, server down, blocked port), chat still updates live
+        // without refresh. loadMessages() re-renders safely (no duplicates).
+        var echoConnected = false;
+        function startPollingFallback() {
+            setInterval(function() {
+                // Stop polling once live socket is working
+                if (echoConnected) return;
+                loadMessages(false);
+            }, 3000);
+        }
+
+        if (typeof Echo === 'undefined') {
+            startPollingFallback();
+        } else {
+            // If no successful socket connection in 6s, fall back to polling
+            setTimeout(function() {
+                if (!echoConnected) startPollingFallback();
+            }, 6000);
+        }
 
         if (typeof Echo !== 'undefined') {
+            try {
+                Echo.connector.pusher.connection.bind('connected', function () {
+                    echoConnected = true;
+                });
+            } catch (e) { /* pusher internals unavailable — timeout fallback covers it */ }
             Echo.private(`ticket.${ticketId}`)
                 .listen('MessageSent', (e) => {
                     // Skip if sent by the logged-in user (already handled by AJAX submit response)
