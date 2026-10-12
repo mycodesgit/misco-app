@@ -202,3 +202,83 @@ input:checked + .slider .slider-content {
 input:checked + .slider {
     background-color: #212529;
 }
+
+/* ===== Mobile bottom nav (Netflix-style, replaces hidden sidebar) ===== */
+.mobile-bottom-nav {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1035;
+        background: rgba(255, 255, 255, 0.96);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid #e5e5e5;
+        padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .mobile-bottom-nav .mbn-item {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 6px 2px;
+        border-radius: 10px;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.65rem;
+        font-weight: 500;
+        line-height: 1.2;
+        min-width: 0;
+    }
+
+    .mobile-bottom-nav .mbn-item i {
+        font-size: 1.35rem;
+        line-height: 1;
+    }
+
+    .mobile-bottom-nav .mbn-item span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    .mobile-bottom-nav .mbn-item.active {
+        color: #046706;
+    }
+
+    .mobile-bottom-nav .mbn-item.active i {
+        color: #65ac86;
+    }
+
+    .mobile-bottom-nav .mbn-item:active {
+        background-color: rgba(101, 172, 134, 0.15);
+    }
+
+    /* Keep page content (and fixed footer) clear of the bar */
+    .content {
+        padding-bottom: 84px;
+    }
+
+    [data-bs-theme="dark"] .mobile-bottom-nav {
+        background: rgba(33, 37, 41, 0.96);
+        border-top-color: #343a40;
+    }
+
+    [data-bs-theme="dark"] .mobile-bottom-nav .mbn-item {
+        color: #adb5bd;
+    }
+
+    [data-bs-theme="dark"] .mobile-bottom-nav .mbn-item.active {
+        color: #65ac86;
+    }
+}

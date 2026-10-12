@@ -294,3 +294,486 @@ body {
 .card-footer a:hover {
     color: var(--primary);
 }
+
+
+/* ===== Ticket support split layout (logo-green theme) ===== */
+:root {
+  --primary: #046706;             /* CPSU logo green */
+  --primary-hover: #035a06;
+  --primary-ring: rgba(4, 103, 6, 0.22);
+  --logo-yellow: #fdfa04;         /* CPSU logo yellow */
+}
+
+body {
+    overflow-y: auto;
+    padding: 0;
+}
+
+.login-shell {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    background-color: #ffffff;
+}
+
+/* ---- Left brand panel ---- */
+.login-hero {
+    background: linear-gradient(160deg, #034d05 0%, #046706 55%, #058a08 100%);
+    color: #ffffff;
+    padding: 2.75rem 2.5rem 2rem;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0.5rem 0 0;
+    text-align: center;
+    text-wrap: balance;
+}
+
+.hero-subtitle {
+    font-size: 0.85rem;
+    line-height: 1.65;
+    opacity: 0.9;
+    margin: 0 auto;
+    max-width: 42ch;
+    text-align: center;
+    text-wrap: pretty;
+}
+
+.hero-dashes {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.hero-dashes span {
+    display: block;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--logo-yellow);
+}
+
+.hero-dashes span:nth-child(1) { width: 34px; }
+.hero-dashes span:nth-child(2) { width: 18px; opacity: 0.7; }
+.hero-dashes span:nth-child(3) { width: 8px; opacity: 0.45; }
+
+/* Illustrated support scene (pure CSS + Tabler icons) */
+.hero-art {
+    position: relative;
+    flex-grow: 1;
+    width: 100%;
+    align-self: stretch;
+    min-height: 300px;
+    margin: 0.5rem 0;
+}
+
+.hero-dots {
+    position: absolute;
+    top: 0;
+    right: 6%;
+    width: 110px;
+    height: 90px;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1.5px, transparent 1.5px);
+    background-size: 12px 12px;
+}
+
+.float-badge {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: var(--primary);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    font-weight: 700;
+    animation: hero-float 4s ease-in-out infinite;
+}
+
+.fb-question { top: 6%; left: 5%; width: 52px; height: 52px; font-size: 1.5rem; border-radius: 14px 14px 14px 4px; }
+.fb-sla { top: 2%; right: 6%; min-width: 62px; height: 46px; padding: 0 10px; font-size: 1rem; background: var(--logo-yellow); color: #034d05; border-radius: 14px 14px 4px 14px; animation-delay: 0.6s; }
+.fb-gear { top: 32%; right: 2%; width: 56px; height: 56px; font-size: 1.4rem; animation-delay: 1.2s; }
+.fb-mail { top: 28%; left: 0%; width: 54px; height: 54px; font-size: 1.35rem; border-radius: 14px 4px 14px 14px; animation-delay: 1.8s; }
+.fb-chat { bottom: 24%; left: 8%; width: 50px; height: 50px; font-size: 1.25rem; animation-delay: 2.4s; }
+.fb-ticket { bottom: 20%; right: 6%; width: 48px; height: 48px; font-size: 1.2rem; border-radius: 4px 14px 14px 14px; animation-delay: 3s; }
+.fb-headset { bottom: 7%; left: 18%; width: 46px; height: 46px; font-size: 1.15rem; border-radius: 14px 14px 4px 14px; animation-delay: 1.1s; }
+.fb-life { bottom: 5%; right: 18%; width: 46px; height: 46px; font-size: 1.15rem; border-radius: 14px 14px 14px 4px; animation-delay: 1.7s; }
+.fb-clock { top: 52%; left: 3%; width: 44px; height: 44px; font-size: 1.1rem; animation-delay: 2.1s; }
+.fb-shield { top: 50%; right: 3%; width: 44px; height: 44px; font-size: 1.1rem; border-radius: 4px 14px 14px 14px; animation-delay: 2.8s; }
+
+@keyframes hero-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Centered support-agent illustration with badges floating around it */
+.hero-logo-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-man {
+    width: min(310px, 80%);
+    height: auto;
+    filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.3));
+    animation: hero-float 6s ease-in-out infinite;
+}
+
+.form-footer {
+    margin: 1.25rem 0 0;
+    font-size: 0.68rem;
+    line-height: 1.6;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* ---- Right sign-in stage ---- */
+.login-stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 2rem;
+    background-color: #ffffff;
+    background-image:
+        radial-gradient(circle at 88% 12%, rgba(4, 103, 6, 0.06) 0 120px, transparent 121px),
+        radial-gradient(circle at 8% 88%, rgba(4, 103, 6, 0.05) 0 150px, transparent 151px);
+    overflow: hidden;
+}
+
+.doodle {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--primary);
+    font-size: 1.25rem;
+    box-shadow: 0 6px 18px rgba(4, 103, 6, 0.12);
+    opacity: 0.85;
+    pointer-events: none;
+    animation: hero-float 5s ease-in-out infinite;
+}
+
+.dd-ticket-1 { top: 12%; left: 10%; }
+.dd-chat-1 { top: 20%; right: 12%; animation-delay: 1s; }
+.dd-bell-1 { bottom: 18%; left: 7%; animation-delay: 2s; }
+.dd-chart-1 { bottom: 12%; right: 9%; animation-delay: 0.5s; }
+.dd-mail-1 { top: 48%; left: 4%; animation-delay: 1.5s; }
+
+.doodle-dots {
+    position: absolute;
+    bottom: 8%;
+    left: 38%;
+    width: 120px;
+    height: 70px;
+    background-image: radial-gradient(rgba(4, 103, 6, 0.25) 1.5px, transparent 1.5px);
+    background-size: 12px 12px;
+    pointer-events: none;
+}
+
+.doodle-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(560px, 90%);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border: 1.5px dashed rgba(4, 103, 6, 0.12);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.sheet-logo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 18px;
+    background: #ffffff;
+    padding: 3px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Logo medallion overlapping the top of the login card */
+.sheet-logo {
+    display: block;
+    width: 72px;
+    height: 72px;
+    margin: -72px auto 1rem;
+    position: relative;
+    z-index: 3;
+}
+
+/* Centered login card (flattened chrome, right-side icons) */
+.login-stage .login-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 380px;
+    background: #ffffff;
+    border: 1px solid #eef1f5;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px -12px rgba(4, 103, 6, 0.18);
+    padding: 2.25rem 2rem;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.login-stage .card-header {
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+.login-stage .card-header h2 {
+    font-size: 1.45rem;
+}
+
+.login-stage .input-wrapper input {
+    height: 44px;
+    padding: 0 2.5rem 0 0.875rem;
+}
+
+.login-stage .input-wrapper .icon-right {
+    left: auto;
+    right: 0.8rem;
+}
+
+.login-stage .submit-btn {
+    height: 44px;
+    justify-content: space-between;
+    padding: 0 0.5rem 0 1rem;
+    font-weight: 600;
+}
+
+.login-stage .submit-btn i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.login-stage .submit-btn:hover i {
+    transform: translateX(2px);
+}
+
+/* ===== Tablets and below: stack panels ===== */
+@media (max-width: 991.98px) {
+    .login-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .login-hero {
+        display: flex;
+        padding: 2rem 1.75rem 1.75rem;
+    }
+
+    .hero-title {
+        font-size: 1.6rem;
+    }
+
+    .hero-art {
+        min-height: 230px;
+    }
+
+    .hero-man {
+        width: 250px;
+    }
+
+    .login-stage {
+        padding: 2rem 1.5rem 2.5rem;
+    }
+
+    .doodle { display: none; }
+    .doodle-ring { display: none; }
+}
+
+/* ===== Mobile phones: compact stacked layout ===== */
+@media (max-width: 575.98px) {
+    .login-hero {
+        padding: 1.5rem 1.25rem 1.25rem;
+    }
+
+    .hero-title {
+        font-size: 1.35rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .hero-art {
+        min-height: 190px;
+    }
+
+    .hero-man {
+        width: 210px;
+    }
+
+    .fb-question, .fb-gear, .fb-mail { width: 42px; height: 42px; font-size: 1.05rem; }
+    .fb-question { top: 0; left: 6px; }
+    .fb-gear { top: 38%; right: 6px; }
+    .fb-mail { top: 34%; left: 6px; }
+    .fb-sla { top: 0; right: 6px; min-width: 52px; height: 38px; font-size: 0.85rem; }
+    .fb-chat, .fb-ticket, .fb-headset, .fb-life, .fb-clock, .fb-shield { display: none !important; }
+
+    .login-stage {
+        padding: 1.5rem 1rem 2rem;
+    }
+
+    .login-stage .login-card {
+        padding: 1.5rem 1.25rem;
+    }
+}
+
+/* ===== Mobile bottom-sheet treatment (green hero + white form sheet, no scroll) ===== */
+@media (max-width: 575.98px) {
+    body {
+        overflow: hidden;
+        height: 100vh;
+        height: 100dvh;
+        padding: 0;
+        align-items: stretch;
+        background-color: #ffffff;
+    }
+
+    .login-shell {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        height: 100vh;
+        height: 100dvh;
+        background: linear-gradient(165deg, #034d05 0%, #046706 55%, #058a08 100%);
+    }
+
+    .login-hero {
+        background: transparent;
+        flex-shrink: 0;
+        gap: 0.55rem;
+        padding: 1.1rem 1.25rem 2rem;
+    }
+
+    .hero-title {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .hero-subtitle {
+        font-size: 0.72rem;
+        line-height: 1.5;
+    }
+
+    .hero-art {
+        min-height: 118px;
+        margin: 0;
+    }
+
+    .hero-man {
+        width: 148px;
+    }
+
+    .hero-dots {
+        width: 80px;
+        height: 60px;
+    }
+
+    .login-stage {
+        background: #ffffff;
+        background-image: none;
+        display: flex;
+        flex-direction: column;
+        flex: 1 0 auto;
+        min-height: 0;
+        padding: 0;
+        overflow: visible;
+    }
+
+    .doodle-dots {
+        display: none;
+    }
+
+    .login-stage .login-card {
+        max-width: none;
+        min-height: 0;
+        flex: 1 0 auto;
+        height: auto;
+        margin-top: -22px;
+        margin-bottom: 0;
+        border-radius: 24px 24px 0 0;
+        border: none;
+        padding: 1.4rem 1.4rem calc(1rem + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.22);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .sheet-logo {
+        display: block;
+        width: 60px;
+        height: 60px;
+        margin: -72px auto 0.7rem;
+        position: relative;
+        z-index: 3;
+    }
+
+    .login-stage .card-header {
+        text-align: center;
+        margin-bottom: 0.9rem;
+    }
+
+    .login-stage .card-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .login-stage .card-header p {
+        font-size: 0.75rem;
+    }
+
+    .login-stage .login-form {
+        gap: 0.8rem;
+    }
+
+    .login-stage .input-wrapper input {
+        height: 42px;
+        font-size: 0.82rem;
+    }
+
+    .login-stage .form-options {
+        font-size: 0.75rem;
+    }
+
+    .login-stage .submit-btn {
+        border-radius: 999px;
+        height: 46px;
+        justify-content: center;
+        padding: 0 1rem;
+        margin-top: 0.25rem;
+    }
+
+    .login-stage .submit-btn i {
+        display: none;
+    }
+
+    .login-stage .form-footer {
+        margin-top: 0.8rem;
+        font-size: 0.6rem;
+    }
+}

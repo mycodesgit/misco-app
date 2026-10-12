@@ -330,5 +330,7 @@
         @include('script.report.clientfeedbackjs')
     @endif
 
+    @include('includes.bottomnav')
+
 </body>
 </html>
