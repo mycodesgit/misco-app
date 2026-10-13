@@ -50,29 +50,25 @@
         </li>
     @endif
 
-    @if(Auth::guard('web')->user()->role != 'Requester')
+    @if(Auth::guard('web')->user()->role == 'Administrator')
         <li class="px-4 py-2">
             <small class="nav-text text-muted">Control Management</small>
         </li>
-        @if(Auth::guard('web')->user()->role == 'Administrator')
-            <li>
-                <a class="nav-link {{ $officeActive }}" href="{{ route('office.index') }}" data-tooltip="Offices">
-                    <i class="ti ti-building"></i><span class="nav-text">Offices</span>
-                </a>
-            </li>
-        @endif
+        <li>
+            <a class="nav-link {{ $officeActive }}" href="{{ route('office.index') }}" data-tooltip="Offices">
+                <i class="ti ti-building"></i><span class="nav-text">Offices</span>
+            </a>
+        </li>
         <li>
             <a class="nav-link {{ $categoryActive }}" href="{{ route('category.index') }}" data-tooltip="Categories">
                 <i class="ti ti-server"></i><span class="nav-text">Categories</span>
             </a>
         </li>
-        @if(Auth::guard('web')->user()->role == 'Administrator')
-            <li>
-                <a class="nav-link {{ $auditActive }}" href="{{ route('audittrail.index') }}" data-tooltip="Audit Trail">
-                    <i class="ti ti-history"></i><span class="nav-text">Audit Trail</span>
-                </a>
-            </li>
-        @endif
+        <li>
+            <a class="nav-link {{ $auditActive }}" href="{{ route('audittrail.index') }}" data-tooltip="Audit Trail">
+                <i class="ti ti-history"></i><span class="nav-text">Audit Trail</span>
+            </a>
+        </li>
     @endif
 
     @if(Auth::guard('web')->user()->role != 'Requester')
