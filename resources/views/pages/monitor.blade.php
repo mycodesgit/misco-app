@@ -65,88 +65,62 @@
                                         <i class="ti ti-users me-1"></i> Enrollment Queueing
                                     </h6>
                                     {{-- <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span> --}}
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small">
-                                        <i class="fas fa-circle me-1 style-dot blink-dot"></i>Live
+                                    <span id="queue-mode-badge" class="badge rounded-pill small {{ ($queue['mode'] ?? 'Off') === 'On' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}">
+                                        <i class="fas fa-circle me-1 style-dot blink-dot"></i>{{ ($queue['mode'] ?? 'Off') === 'On' ? 'Live' : 'Off' }}
                                     </span>
                                 </div>
                             </div>
                             <div class="card-body d-flex flex-column">
-                                <div class="row g-2 align-items-center">
-                                    <!-- Left Column: Main Serving Window -->
-                                    <div class="col-7 border-end pe-2">
-                                        <div class="text-center py-2">
-                                            <span class="badge bg-info-subtle text-info mb-1">Counter 02 Serving</span>
-                                            <h2 class="fw-bold mb-0 text-success display-6">A-084</h2>
-                                            <p class="text-muted small mb-0">Current Ticket</p>
+                                <div id="queue-on-view" class="{{ ($queue['mode'] ?? 'Off') === 'On' ? '' : 'd-none' }}">
+                                    <div class="row g-2 align-items-center">
+                                        <!-- Left Column: Main Serving Window -->
+                                        <div class="col-7 border-end pe-2">
+                                            <div class="text-center py-2">
+                                                <span class="badge bg-info-subtle text-info mb-1" id="queue-main-window">{{ $queue['main']['window'] ?? '—' }} Serving</span>
+                                                <h2 class="fw-bold mb-0 text-success display-6" id="queue-main-number">{{ $queue['main']['number'] ?? '—' }}</h2>
+                                                <p class="text-muted small mb-0">Current Ticket</p>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Right Column: Vertical Mini Cards for Other Counters -->
-                                    <div class="col-5 ps-2">
-                                        <!-- Infinite Scroll Wrapper -->
-                                        <div class="marquee-wrapper">
-                                            <div class="marquee-content">
-                                                <!-- ORIGINAL SET (1 to 6) -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 1</small>
-                                                    <span class="fw-bold small">A-083</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 2</small>
-                                                    <span class="fw-bold small">B-012</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 3</small>
-                                                    <span class="fw-bold small">A-085</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 4</small>
-                                                    <span class="fw-bold small">A-086</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 5</small>
-                                                    <span class="fw-bold small">A-087</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 6</small>
-                                                    <span class="fw-bold small">B-014</span>
-                                                </div>
-
-                                                <!-- DUPLICATE SET (Required for seamless infinite loop) -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 1</small>
-                                                    <span class="fw-bold small">A-083</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 2</small>
-                                                    <span class="fw-bold small">B-012</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 3</small>
-                                                    <span class="fw-bold small">A-085</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 4</small>
-                                                    <span class="fw-bold small">A-086</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 5</small>
-                                                    <span class="fw-bold small">A-087</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <small class="fw-medium text-muted">Win 6</small>
-                                                    <span class="fw-bold small">B-014</span>
+                                        <!-- Right Column: Per-window live numbers -->
+                                        <div class="col-5 ps-2">
+                                            <div class="marquee-wrapper">
+                                                <div class="marquee-content" id="queue-counter-list">
+                                                    @if (!empty($queue['counters']) && count($queue['counters']))
+                                                        {{-- Rendered twice for the seamless infinite marquee loop --}}
+                                                        @for ($r = 0; $r < 2; $r++)
+                                                            @foreach ($queue['counters'] as $c)
+                                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
+                                                                    <div class="text-truncate me-1">
+                                                                        <small class="fw-medium text-muted d-block text-truncate" style="max-width: 90px;">{{ $c['window'] }}</small>
+                                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">{{ $c['category'] }}</span>
+                                                                    </div>
+                                                                    <span class="fw-bold small">{{ $c['number'] }}</span>
+                                                                </div>
+                                                            @endforeach
+                                                        @endfor
+                                                    @else
+                                                        <div class="text-muted extra-small text-center py-2">No counters</div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="mt-auto">
+                                        <hr class="my-3">
+                                        <div class="d-flex justify-content-between text-muted small">
+                                            <span>Waiting in Queue: <strong id="queue-waiting-count">{{ $queue['waiting'] ?? 0 }}</strong></span>
+                                            <span>Windows: <strong id="queue-window-count">{{ count($queue['counters'] ?? []) }}</strong></span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="mt-auto">
-                                    <hr class="my-3">
-                                    <div class="d-flex justify-content-between text-muted small">
-                                        <span>Waiting in Queue: <strong>18</strong></span>
-                                        <span>Avg Service: <strong>4 mins</strong></span>
+                                <div id="queue-off-view" class="{{ ($queue['mode'] ?? 'Off') === 'On' ? 'd-none' : '' }}">
+                                    <div class="text-center py-4">
+                                        <i class="ti ti-power fs-1 text-secondary"></i>
+                                        <p class="fw-semibold mb-1 mt-2">Queueing is Off</p>
+                                        <p class="text-muted extra-small mb-0">Enrollment counters are currently closed.</p>
                                     </div>
                                 </div>
                             </div>

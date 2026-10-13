@@ -326,6 +326,7 @@
     @if (request()->routeIs('monitoring-dashboard.index', 'monitoring.index'))
         @include('script.tvmonitoring.helpdeskjs')
         @include('script.tvmonitoring.personneljs')
+        @include('script.tvmonitoring.queuejs')
     @endif
     @if (request()->routeIs('roles.index'))
         @include('script.usr.rolejs')

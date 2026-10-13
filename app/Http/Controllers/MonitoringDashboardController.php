@@ -20,6 +20,9 @@ use App\Models\TicketDB\Category;
 use App\Models\TicketDB\Subcategory;
 use App\Models\TicketDB\DailyTask;
 use App\Models\TicketDB\DailyTicketRequest;
+use App\Models\CoasDB\QueueCounter;
+use App\Models\CoasDB\QueueCustomer;
+use App\Models\CoasDB\QueueMode;
 
 class MonitoringDashboardController extends Controller
 {
@@ -27,6 +30,7 @@ class MonitoringDashboardController extends Controller
     {
         return view('pages.monitor', array_merge($this->helpdeskData(), [
             'personnel' => $this->personnelData(),
+            'queue'     => $this->queueData(),
         ]));
     }
 
@@ -44,6 +48,56 @@ class MonitoringDashboardController extends Controller
             'success' => true,
             'data'    => $this->personnelData(),
         ]);
+    }
+
+    public function queue()
+    {
+        return response()->json([
+            'success' => true,
+            'data'    => $this->queueData(),
+        ]);
+    }
+
+    private function queueData(): array
+    {
+        $mode = QueueMode::first();
+        $isOn = $mode && strcasecmp(trim((string) $mode->statusqueue), 'On') === 0;
+
+        $counters = QueueCounter::orderBy('windowname')
+            ->get(['id', 'windowname', 'category', 'activeidnumber', 'counterstatus']);
+
+        // Window number = the queued ticket assigned to it:
+        // counters.activeidnumber matches customers.id, display customers.queue_number.
+        $customersById = QueueCustomer::whereIn('id', $counters->pluck('activeidnumber')->filter())
+            ->get(['id', 'queue_number', 'status'])
+            ->keyBy('id');
+
+        $counters = $counters->map(function ($c) use ($customersById) {
+                $cust = $customersById->get($c->activeidnumber);
+                $number = $cust ? (string) $cust->queue_number : '—';
+                return [
+                    'id'       => $c->id,
+                    'window'   => 'Win ' . $c->windowname,
+                    'category' => $c->category,
+                    'number'   => $number,
+                    'serving'  => $cust !== null,
+                    'active'   => (string) $c->counterstatus === '1',
+                ];
+            })
+            ->values();
+
+        $main = $counters->firstWhere('serving', true) ?? $counters->first();
+
+        $waiting = QueueCustomer::where('status', 'waiting')
+            ->whereDate('created_at', today())
+            ->count();
+
+        return [
+            'mode'     => $isOn ? 'On' : 'Off',
+            'main'     => $main ? ['window' => $main['window'], 'number' => $main['number']] : null,
+            'counters' => $counters,
+            'waiting'  => $waiting,
+        ];
     }
 
     private function personnelData(): array
