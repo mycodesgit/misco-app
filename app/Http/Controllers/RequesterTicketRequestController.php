@@ -38,7 +38,7 @@ class RequesterTicketRequestController extends Controller
             })
             ->get();
 
-        $cat = Category::with('user')->where('status', 1)->whereJsonContains('cattype', $supportType)->get();
+        $cat = Category::with('user')->where('status', 1)->get();
 
         return view('pages.request.requestertickets', compact('urole', 'cat'));
     }
@@ -47,6 +47,7 @@ class RequesterTicketRequestController extends Controller
     {
         $categories = Category::where('status', 1)
             ->whereJsonContains('cattype', $supportType)
+            ->whereJsonContains('cattype', 'Requester')
             ->get([
                 'id',
                 'ticketcatname'
