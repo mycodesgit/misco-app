@@ -290,6 +290,7 @@
     @if (request()->routeIs('dashboard.index'))
         @include('script.dash.dashboardjs')
         @include('script.dash.dashaddticketjs')
+        @include('script.dash.stationjs')
     @endif
     @if (request()->routeIs('tickets.index'))
         @include('script.ticket.supportjs')

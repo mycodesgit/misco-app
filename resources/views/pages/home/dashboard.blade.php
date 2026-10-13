@@ -38,7 +38,11 @@
                             <div class="card overflow-hidden position-relative welcome-hero-card">
                                 <div class="card-body p-4 d-flex flex-column justify-content-between position-relative z-1">
                                     <div>
-
+                                        <div class="d-flex justify-content-end">
+                                            <span id="stationBadge" class="badge bg-success-subtle text-secondary border border-success-subtle rounded-pill small" title="Your current station">
+                                                {{ auth()->user()->station }}
+                                            </span>
+                                        </div>
                                         <!-- Welcome Greeting -->
                                         <h3 class="fw-bold mt-2 mb-2">
                                             Welcome {{ auth()->user()->fname }}!
@@ -85,6 +89,9 @@
                                         <a href="#" class="btn btn-secondary btn-sm rounded-pill px-3">
                                             <i class="ti ti-plus me-1"></i> Create Ticket
                                         </a>
+                                        <button type="button" class="btn btn-success btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#stationModal">
+                                            <i class="ti ti-map-pin me-1"></i> Station
+                                        </button>
                                     </div>
                                 </div>
                                 <!-- Decorative SVG background pattern -->
@@ -801,6 +808,7 @@
     </div>
 
     @include('pages.request.modals.addticketmodal')
+    @include('pages.home.modals.stationmodal')
 
     <!-- Heatmap & Hero Styles -->
     <style>

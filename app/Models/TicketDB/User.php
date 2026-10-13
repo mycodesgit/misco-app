@@ -34,6 +34,7 @@ class User extends Authenticatable
         'gender',
         'posted_by',
         'isAllowed',
+        'station',
         'remember_token'
     ];
 
@@ -57,7 +58,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'ustatus'  => 'integer',
     ];
-    
+
     public function hasRole($role)
     {
         return $this->role === $role;
@@ -65,7 +66,7 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === 'Administrator'; 
+        return $this->role === 'Administrator';
     }
 
     public function office()
@@ -80,10 +81,10 @@ class User extends Authenticatable
 
     public function pageTitle(string $title): string
     {
-        $prefix = ($this->role === 'Requester') 
-        ? $this->role 
+        $prefix = ($this->role === 'Requester')
+        ? $this->role
         : ($this->office->office_abbr ?? 'N/A');
 
-        return trim("{$prefix} {$title}");   
+        return trim("{$prefix} {$title}");
     }
 }

@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('gender')->nullable();
             $table->string('posted_by')->nullable();
             $table->string('isAllowed')->default('No');
+            $table->enum('station', ['Office', 'Field', 'Leave'])->default('Office');
             $table->rememberToken();
             $table->timestamps();
         });

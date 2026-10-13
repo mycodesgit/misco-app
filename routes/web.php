@@ -19,6 +19,7 @@ use App\Http\Controllers\MonitoringDashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClientFeedbackController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\StationController;
 use App\Http\Controllers\AuditTrailController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectKanbanController;
@@ -150,6 +151,11 @@ Route::group(['middleware'=>['login_auth']],function(){
 
     Route::get('/dashboard/monitoring',[MonitoringDashboardController::class,'index'])->name('monitoring-dashboard.index');
     Route::get('/dashboard/monitoring/helpdesk',[MonitoringDashboardController::class,'helpdesk'])->name('monitoring.helpdesk');
+
+    Route::prefix('/station')->group(function () {
+        Route::get('/', [StationController::class, 'show'])->name('station.show');
+        Route::post('/update', [StationController::class, 'update'])->name('station.update');
+    });
 
     Route::prefix('/notifications')->group(function () {
         Route::get('/fetch', [NotificationController::class, 'fetch'])->name('notifications.fetch');
