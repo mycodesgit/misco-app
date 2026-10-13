@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Toggle field input type
             passwordInput.type = isPassword ? "text" : "password";
+            toggleBtn.setAttribute("aria-pressed", String(isPassword));
+            toggleBtn.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+            passwordInput.focus({ preventScroll: true });
 
             // Toggle Tabler Icons
             if (toggleIcon.classList.contains("ti")) {
@@ -31,6 +34,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     } else {
         console.warn("Password toggle elements were not found in the DOM.");
+    }
+
+    /* --- 1b. Submit working state (UI.md: show progress/feedback) --- */
+    const loginForm = document.getElementById("login-form");
+    const submitBtn = document.getElementById("loginSubmit");
+    if (loginForm && submitBtn) {
+        loginForm.addEventListener("submit", () => {
+            if (!loginForm.checkValidity()) return; // let native validation speak first
+            submitBtn.disabled = true;
+            submitBtn.setAttribute("aria-busy", "true");
+        });
     }
 
     /* --- 2. Interactive Canvas Particle System --- */

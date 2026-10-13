@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8" />
@@ -33,9 +33,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('theme');
-            const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-            const theme = savedTheme || (systemPrefersLight ? 'light' : 'dark');
+            // Light is the default. Only a saved user choice can enable dark.
+            // No system-preference lookup here by design.
+            var theme = 'light';
+            try {
+                theme = localStorage.getItem('theme') || 'light';
+            } catch (e) {
+                theme = 'light';
+            }
             document.documentElement.setAttribute('data-bs-theme', theme);
         })();
     </script>
