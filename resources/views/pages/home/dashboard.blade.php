@@ -39,7 +39,7 @@
                                 <div class="card-body p-4 d-flex flex-column justify-content-between position-relative z-1">
                                     <div>
                                         <div class="d-flex justify-content-end">
-                                            <span id="stationBadge" class="badge bg-success-subtle text-secondary border border-success-subtle rounded-pill small" title="Your current station">
+                                            <span id="stationBadge" class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small" title="Your current station">
                                                 {{ auth()->user()->station }}
                                             </span>
                                         </div>
