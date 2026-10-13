@@ -25,7 +25,9 @@ class MonitoringDashboardController extends Controller
 {
     public function index()
     {
-        return view('pages.monitor', $this->helpdeskData());
+        return view('pages.monitor', array_merge($this->helpdeskData(), [
+            'personnel' => $this->personnelData(),
+        ]));
     }
 
     public function helpdesk()
@@ -34,6 +36,42 @@ class MonitoringDashboardController extends Controller
             'success' => true,
             'data'    => $this->helpdeskData(),
         ]);
+    }
+
+    public function personnel()
+    {
+        return response()->json([
+            'success' => true,
+            'data'    => $this->personnelData(),
+        ]);
+    }
+
+    private function personnelData(): array
+    {
+        $staff = User::with('office')
+            ->whereIn('role', ['MIS Support', 'Administrator'])
+            ->where('ustatus', '!=', 3)
+            ->orderBy('fname')
+            ->get(['id', 'fname', 'lname', 'office_id', 'role', 'station'])
+            ->map(function ($u) {
+                return [
+                    'id'         => $u->id,
+                    'name'       => trim(($u->fname ?? '') . ' ' . ($u->lname ?? '')),
+                    'short_name' => trim(strtoupper(substr((string) $u->fname, 0, 1)) . '. ' . ($u->lname ?? '')),
+                    'office'     => $u->office->office_abbr ?? 'N/A',
+                    'station'    => $u->station,
+                ];
+            })
+            ->values();
+
+        return [
+            'total'   => $staff->count(),
+            'onduty'  => $staff->where('station', '!=', 'Leave')->count(),
+            'office'  => $staff->where('station', 'Office')->count(),
+            'field'   => $staff->where('station', 'Field')->count(),
+            'leave'   => $staff->where('station', 'Leave')->count(),
+            'staff'   => $staff,
+        ];
     }
 
     private function helpdeskData(): array

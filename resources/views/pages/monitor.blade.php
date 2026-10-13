@@ -286,82 +286,33 @@
                                 <div class="row g-2 align-items-center">
                                     <!-- Left Column: Summary Metric -->
                                     <div class="col-5 border-end pe-2 text-center py-1">
-                                        <h2 class="fw-bold mb-0 text-primary display-6">5/6</h2>
-                                        <p class="text-muted extra-small mb-2">On-Duty Staff</p>
-                                        <span class="badge bg-success-subtle text-success extra-small">
-                                            <i class="ti ti-point-filled"></i> Active Field
+                                        <h2 class="fw-bold mb-0 text-info display-6"><span id="personnel-onduty-count">{{ $personnel['onduty'] ?? 0 }}</span>/<span id="personnel-total-count">{{ $personnel['total'] ?? 0 }}</span></h2>
+                                        <p class="text-muted extra-small mb-2">On-Duty Personnel</p>
+                                        <span class="badge bg-info-subtle text-info extra-small">
+                                            <i class="ti ti-point-filled"></i> Active Onsite
                                         </span>
                                     </div>
 
-                                    <!-- Right Column: Vertical Marquee of Staff Tasks -->
+                                    <!-- Right Column: Live staff station feed (looping marquee, fixed height) -->
                                     <div class="col-7 ps-2">
                                         <div class="marquee-wrapper" style="max-height: 160px; overflow: hidden; position: relative;">
-                                            <div class="marquee-content d-flex flex-column gap-1">
-                                                <!-- STAFF ITEM 1 -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 90px;">J. Dela Cruz</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Lab 1 • PC Repair</span>
-                                                    </div>
-                                                    <span class="badge bg-warning-subtle text-warning extra-small">Busy</span>
-                                                </div>
-
-                                                <!-- STAFF ITEM 2 -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 90px;">M. Santos</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Server Room • Backup</span>
-                                                    </div>
-                                                    <span class="badge bg-info-subtle text-info extra-small">In Progress</span>
-                                                </div>
-
-                                                <!-- STAFF ITEM 3 -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 90px;">R. Reyes</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Admin Office • Cable</span>
-                                                    </div>
-                                                    <span class="badge bg-warning-subtle text-warning extra-small">Busy</span>
-                                                </div>
-
-                                                <!-- STAFF ITEM 4 -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 90px;">A. Garcia</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">MIS Office • HelpDesk</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">Available</span>
-                                                </div>
-
-                                                <!-- DUPLICATE SET FOR SMOOTH INFINITE MARQUEE LOOP -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 90px;">J. Dela Cruz</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Lab 1 • PC Repair</span>
-                                                    </div>
-                                                    <span class="badge bg-warning-subtle text-warning extra-small">Busy</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 90px;">M. Santos</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Server Room • Backup</span>
-                                                    </div>
-                                                    <span class="badge bg-info-subtle text-info extra-small">In Progress</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 90px;">R. Reyes</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">Admin Office • Cable</span>
-                                                    </div>
-                                                    <span class="badge bg-warning-subtle text-warning extra-small">Busy</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 90px;">A. Garcia</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">MIS Office • HelpDesk</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">Available</span>
-                                                </div>
+                                            <div class="marquee-content d-flex flex-column gap-1" id="personnel-staff-list">
+                                                @if (!empty($personnel['staff']) && count($personnel['staff']))
+                                                    {{-- Rendered twice for the seamless infinite marquee loop --}}
+                                                    @for ($r = 0; $r < 2; $r++)
+                                                        @foreach ($personnel['staff'] as $s)
+                                                            <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
+                                                                <div class="text-truncate me-1">
+                                                                    <small class="fw-bold d-block text-truncate" style="max-width: 90px;">{{ $s['short_name'] }}</small>
+                                                                    <span class="text-muted extra-small d-block text-truncate" style="max-width: 90px;">{{ $s['office'] }}</span>
+                                                                </div>
+                                                                <span class="badge extra-small {{ ($s['station'] ?? '') === 'Office' ? 'bg-success-subtle text-success' : ((($s['station'] ?? '') === 'Field') ? 'bg-warning-subtle text-warning' : 'bg-secondary-subtle text-secondary') }}">{{ $s['station'] ?? '-' }}</span>
+                                                            </div>
+                                                        @endforeach
+                                                    @endfor
+                                                @else
+                                                    <div class="text-muted extra-small text-center py-2">No staff found</div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -371,8 +322,8 @@
                                 <div class="mt-auto">
                                     <hr class="my-3">
                                     <div class="d-flex justify-content-between text-muted extra-small">
-                                        <span>Field Deployment: <strong>3 Staff</strong></span>
-                                        <span>Office Support: <strong>2 Staff</strong></span>
+                                        <span>Field Deployment: <strong id="personnel-field-count">{{ $personnel['field'] ?? 0 }} Staff</strong></span>
+                                        <span>Office Support: <strong id="personnel-office-count">{{ $personnel['office'] ?? 0 }} Staff</strong></span>
                                     </div>
                                 </div>
                             </div>
