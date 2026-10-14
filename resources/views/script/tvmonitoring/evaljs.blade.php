@@ -28,7 +28,7 @@
                 $badge.addClass('bg-secondary-subtle text-secondary border-secondary-subtle');
                 $big.addClass('text-secondary');
             }
-            $('#eval-status-text').text(data.status);
+            $('#eval-status-text').text(isOn ? 'Live' : 'Off');
             $big.text(data.status);
 
             // Term + today's response count

@@ -136,7 +136,7 @@
                                         <i class="ti ti-clipboard-check me-1 text-warning"></i> Faculty Evaluation
                                     </h6>
                                     <span id="eval-status-badge" class="badge rounded-pill small {{ ($eval['status'] ?? 'Off') === 'On' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}">
-                                        <i class="fas fa-circle me-1 style-dot blink-dot"></i><span id="eval-status-text">{{ $eval['status'] ?? 'Off' }}</span>
+                                        <i class="fas fa-circle me-1 style-dot blink-dot"></i><span id="eval-status-text">{{ ($eval['status'] ?? 'Off') === 'On' ? 'Live' : 'Off' }}</span>
                                     </span>
                                 </div>
                             </div>
