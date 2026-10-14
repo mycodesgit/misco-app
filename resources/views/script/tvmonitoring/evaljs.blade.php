@@ -48,7 +48,7 @@
                         '<small class="fw-bold d-block text-truncate" style="max-width: 95px;">' + escapeHtml(title) + '</small>' +
                         '<span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">' + escapeHtml(sub) + '</span>' +
                         '</div>' +
-                        (e.average ? '<span class="badge bg-warning-subtle text-warning extra-small">' + escapeHtml(e.average) + '</span>' : '') +
+                        '<span class="badge bg-success-subtle text-success extra-small">Submitted</span>' +
                         '</div>';
                 });
                 // Duplicate set for the seamless infinite marquee loop (same as other TV cards)

@@ -166,9 +166,7 @@
                                                                     <small class="fw-bold d-block text-truncate" style="max-width: 95px;">{{ \Illuminate\Support\Str::limit($e['title'], 18) }}</small>
                                                                     <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">{{ \Illuminate\Support\Str::limit($e['sub'], 22) }}</span>
                                                                 </div>
-                                                                @if ($e['average'])
-                                                                    <span class="badge bg-warning-subtle text-warning extra-small">{{ $e['average'] }}</span>
-                                                                @endif
+                                                                <span class="badge bg-success-subtle text-success extra-small">Submitted</span>
                                                             </div>
                                                         @endforeach
                                                     @endfor
