@@ -379,28 +379,28 @@
                                     </span>
                                 </div>
                             </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="row g-2 align-items-center">
+                            <div class="card-body d-flex flex-column text-center">
+                                <div class="row g-2 align-items-center justify-content-center my-auto w-100 mx-0">
                                     <!-- Left Column: Available Vouchers & Share -->
                                     <div class="col-6 border-end pe-2 text-center py-1">
                                         <h3 class="fw-bold mb-0 text-success display-6" id="wifi-available-big">{{ $wifi['available'] ?? 0 }}</h3>
                                         <p class="text-muted extra-small mb-2">Available Vouchers</p>
-                                        <div class="progress" style="height: 6px;">
+                                        <div class="progress mx-auto" style="height: 6px; max-width: 140px;">
                                             <div class="progress-bar bg-success" id="wifi-available-bar" role="progressbar" style="width: {{ $wifi['pct'] ?? 0 }}%;" aria-valuenow="{{ $wifi['pct'] ?? 0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                                         </div>
                                     </div>
 
                                     <!-- Right Column: Available / Used Mini Cards -->
                                     <div class="col-6 ps-2">
-                                        <div class="d-flex flex-column gap-1">
-                                            <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
+                                        <div class="d-flex flex-column gap-1 mx-auto" style="max-width: 170px;">
+                                            <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center text-start">
                                                 <div class="text-truncate">
                                                     <small class="fw-medium text-muted d-block extra-small">Available</small>
                                                     <span class="fw-bold text-success small" id="wifi-available-count">{{ $wifi['available'] ?? 0 }}</span>
                                                 </div>
                                                 <i class="ti ti-ticket text-success fs-5"></i>
                                             </div>
-                                            <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
+                                            <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center text-start">
                                                 <div class="text-truncate">
                                                     <small class="fw-medium text-muted d-block extra-small">Used</small>
                                                     <span class="fw-bold text-secondary small" id="wifi-used-count">{{ $wifi['used'] ?? 0 }}</span>
@@ -414,7 +414,7 @@
                                 <!-- Footer: Voucher Totals & Current Term -->
                                 <div class="mt-auto">
                                     <hr class="my-3">
-                                    <div class="d-flex justify-content-between text-muted extra-small">
+                                    <div class="d-flex justify-content-center gap-3 text-muted extra-small">
                                         <span>Total Vouchers: <strong id="wifi-total-count">{{ $wifi['total'] ?? 0 }}</strong></span>
                                         <span>Term: <strong id="wifi-term">{{ $wifi['term'] ?? 'N/A' }}</strong></span>
                                     </div>
