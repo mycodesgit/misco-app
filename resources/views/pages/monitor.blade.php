@@ -414,7 +414,7 @@
                                 <!-- Footer: Voucher Totals & Current Term -->
                                 <div class="mt-auto">
                                     <hr class="my-3">
-                                    <div class="d-flex justify-content-center gap-3 text-muted extra-small">
+                                    <div class="d-flex justify-content-between text-muted small">
                                         <span>Total Vouchers: <strong id="wifi-total-count">{{ $wifi['total'] ?? 0 }}</strong></span>
                                         <span>Term: <strong id="wifi-term">{{ $wifi['term'] ?? 'N/A' }}</strong></span>
                                     </div>
