@@ -20,6 +20,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClientFeedbackController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\StationController;
+use App\Http\Controllers\WifiVoucherController;
 use App\Http\Controllers\AuditTrailController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectKanbanController;
@@ -158,6 +159,14 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::prefix('/station')->group(function () {
         Route::get('/', [StationController::class, 'show'])->name('station.show');
         Route::post('/update', [StationController::class, 'update'])->name('station.update');
+    });
+
+    Route::prefix('/wifi')->group(function () {
+        Route::get('/', [WifiVoucherController::class, 'index'])->name('wifi.index');
+        Route::get('/fetch', [WifiVoucherController::class, 'show'])->name('wifi.show');
+        Route::post('/upload', [WifiVoucherController::class, 'upload'])->name('wifi.upload');
+        Route::post('/status', [WifiVoucherController::class, 'updateStatus'])->name('wifi.status');
+        Route::post('/delete/{id}', [WifiVoucherController::class, 'delete'])->name('wifi.delete');
     });
 
     Route::prefix('/notifications')->group(function () {

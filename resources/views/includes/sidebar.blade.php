@@ -7,6 +7,7 @@
     $dailyTaskActive = in_array($current_route, ['daily-task.index']) ? 'active' : '';
     $categoryActive = in_array($current_route, ['category.index']) ? 'active' : '';
     $officeActive = in_array($current_route, ['office.index']) ? 'active' : '';
+    $wifiActive = in_array($current_route, ['wifi.index']) ? 'active' : '';
     $auditActive = in_array($current_route, ['audittrail.index']) ? 'active' : '';
     $accomplishmentActive = in_array($current_route, ['accomplishment-report.index']) ? 'active' : '';
     $clientfeedbackActive = in_array($current_route, ['clientfeedback.index']) ? 'active' : '';
@@ -62,6 +63,11 @@
         <li>
             <a class="nav-link {{ $categoryActive }}" href="{{ route('category.index') }}" data-tooltip="Categories">
                 <i class="ti ti-server"></i><span class="nav-text">Categories</span>
+            </a>
+        </li>
+        <li>
+            <a class="nav-link {{ $wifiActive }}" href="{{ route('wifi.index') }}" data-tooltip="Wifi Vouchers">
+                <i class="ti ti-wifi"></i><span class="nav-text">Wifi Vouchers</span>
             </a>
         </li>
         <li>
