@@ -23,6 +23,9 @@ use App\Models\TicketDB\DailyTicketRequest;
 use App\Models\CoasDB\QueueCounter;
 use App\Models\CoasDB\QueueCustomer;
 use App\Models\CoasDB\QueueMode;
+use App\Models\EvalDB\QCEfevalrate;
+use App\Models\EvalDB\QCEsemester;
+use App\Models\EvalDB\QCEsetting;
 
 class MonitoringDashboardController extends Controller
 {
@@ -31,6 +34,7 @@ class MonitoringDashboardController extends Controller
         return view('pages.monitor', array_merge($this->helpdeskData(), [
             'personnel' => $this->personnelData(),
             'queue'     => $this->queueData(),
+            'eval'      => $this->evaluationData(),
         ]));
     }
 
@@ -56,6 +60,63 @@ class MonitoringDashboardController extends Controller
             'success' => true,
             'data'    => $this->queueData(),
         ]);
+    }
+
+    public function evaluation()
+    {
+        return response()->json([
+            'success' => true,
+            'data'    => $this->evaluationData(),
+        ]);
+    }
+
+    private function evaluationData(): array
+    {
+        try {
+            $setting = QCEsetting::first();
+            $status = $setting ? trim((string) $setting->statuseval) : 'Off';
+            $status = strcasecmp($status, 'On') === 0 ? 'On' : 'Off';
+
+            $sem = QCEsemester::where('qcesemstat', '2')->orderBy('id', 'DESC')->first()
+                ?? QCEsemester::orderBy('id', 'DESC')->first();
+            $ord = ['1' => '1st Sem', '2' => '2nd Sem', '3' => '3rd Sem'][$sem->qcesemester ?? ''] ?? (($sem->qcesemester ?? '') . ' Sem');
+            $term = $sem ? ('A.Y. ' . $sem->qceschlyear . ' (' . $ord . ')') : 'N/A';
+
+            $today = QCEfevalrate::whereDate('created_at', today())->count();
+
+            $latest = QCEfevalrate::where('created_at', '>=', now()->subMinute())
+                ->orderBy('id', 'DESC')
+                ->limit(5)
+                ->get(['id', 'prog', 'subjidrate', 'qcefacname', 'evaluatorname', 'question_rate'])
+                ->map(function ($r) {
+                    $avg = null;
+                    if ($r->question_rate) {
+                        $rates = json_decode((string) $r->question_rate, true);
+                        if (is_array($rates) && count($rates)) {
+                            $nums = array_filter(array_values($rates), 'is_numeric');
+                            if (count($nums)) {
+                                $avg = number_format(array_sum($nums) / count($nums), 1);
+                            }
+                        }
+                    }
+                    return [
+                        'id'      => $r->id,
+                        'title'   => trim((string) $r->qcefacname) !== '' ? (string) $r->qcefacname : '—',
+                        'sub'     => trim(trim((string) ($r->prog ?? '')) . ' • ' . trim((string) ($r->evaluatorname ?? '')), ' •'),
+                        'average' => $avg,
+                    ];
+                })
+                ->values();
+
+            return [
+                'status'       => $status,
+                'term'         => $term,
+                'today'        => $today,
+                'latest'       => $latest,
+            ];
+        } catch (\Exception $e) {
+            return ['status' => 'Off', 'term' => 'N/A', 'today' => 0, 'latest' => []];
+        }
     }
 
     private function queueData(): array

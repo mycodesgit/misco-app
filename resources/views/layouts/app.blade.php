@@ -327,6 +327,7 @@
         @include('script.tvmonitoring.helpdeskjs')
         @include('script.tvmonitoring.personneljs')
         @include('script.tvmonitoring.queuejs')
+        @include('script.tvmonitoring.evaljs')
     @endif
     @if (request()->routeIs('roles.index'))
         @include('script.usr.rolejs')

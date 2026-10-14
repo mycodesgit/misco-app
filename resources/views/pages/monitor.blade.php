@@ -135,8 +135,8 @@
                                     <h6 class="mb-0 fw-semibold">
                                         <i class="ti ti-clipboard-check me-1 text-warning"></i> Faculty Evaluation
                                     </h6>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small">
-                                        <i class="fas fa-circle me-1 style-dot blink-dot"></i>Live
+                                    <span id="eval-status-badge" class="badge rounded-pill small {{ ($eval['status'] ?? 'Off') === 'On' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }}">
+                                        <i class="fas fa-circle me-1 style-dot blink-dot"></i><span id="eval-status-text">{{ $eval['status'] ?? 'Off' }}</span>
                                     </span>
                                 </div>
                             </div>
@@ -144,86 +144,37 @@
                                 <!-- Split Content Row -->
                                 <div class="row g-2 align-items-center">
 
-                                    <!-- Left Column: Primary Metrics & Progress Bar -->
+                                    <!-- Left Column: Evaluation Status + Today's Responses -->
                                     <div class="col-5 border-end pe-2 text-center py-1">
-                                        <h2 class="fw-bold mb-0 text-warning display-6">78%</h2>
-                                        <p class="text-muted extra-small mb-1">1,420 / 1,800 Submitted</p>
-                                        <div class="progress" style="height: 6px;">
-                                            <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" style="width: 78%;" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
+                                        <h2 class="fw-bold mb-0 display-6 {{ ($eval['status'] ?? 'Off') === 'On' ? 'text-success' : 'text-secondary' }}" id="eval-status-big">{{ $eval['status'] ?? 'Off' }}</h2>
+                                        <p class="text-muted extra-small mb-1">Evaluation Status</p>
+                                        <span class="badge bg-warning-subtle text-warning extra-small">
+                                            <i class="ti ti-point-filled"></i> <span id="eval-today-count">{{ $eval['today'] ?? 0 }}</span> today
+                                        </span>
                                     </div>
 
-                                    <!-- Right Column: Real-time Evaluation Submissions Live Feed -->
+                                    <!-- Right Column: Latest Evaluation Responses Live Feed -->
                                     <div class="col-7 ps-2">
                                         <div class="marquee-wrapper" style="max-height: 160px; overflow: hidden; position: relative;">
-                                            <div class="marquee-content d-flex flex-column gap-1">
-
-                                                <!-- SUBMISSION ITEM 1 -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSIT-3A • ITE 301</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Prof. R. Santos</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">Just now</span>
-                                                </div>
-
-                                                <!-- SUBMISSION ITEM 2 -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSCS-2B • CS 204</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Dr. M. Cruz</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">1m ago</span>
-                                                </div>
-
-                                                <!-- SUBMISSION ITEM 3 -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSEMC-1A • EMC 101</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Engr. A. Reyes</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">3m ago</span>
-                                                </div>
-
-                                                <!-- SUBMISSION ITEM 4 -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSIS-4A • IS 402</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Prof. J. Garcia</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">5m ago</span>
-                                                </div>
-
-                                                <!-- DUPLICATE SET FOR SMOOTH INFINITE MARQUEE LOOP -->
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSIT-3A • ITE 301</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Prof. R. Santos</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">Just now</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSCS-2B • CS 204</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Dr. M. Cruz</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">1m ago</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSEMC-1A • EMC 101</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Engr. A. Reyes</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">3m ago</span>
-                                                </div>
-                                                <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
-                                                    <div class="text-truncate me-1">
-                                                        <small class="fw-bold d-block text-truncate" style="max-width: 95px;">BSIS-4A • IS 402</small>
-                                                        <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">Prof. J. Garcia</span>
-                                                    </div>
-                                                    <span class="badge bg-success-subtle text-success extra-small">5m ago</span>
-                                                </div>
-
+                                            <div class="marquee-content d-flex flex-column gap-1" id="eval-latest-list">
+                                                @if (!empty($eval['latest']) && count($eval['latest']))
+                                                    {{-- Rendered twice for the seamless infinite marquee loop --}}
+                                                    @for ($r = 0; $r < 2; $r++)
+                                                        @foreach ($eval['latest'] as $e)
+                                                            <div class="p-1 px-2 border rounded card-body-content-bg-color d-flex justify-content-between align-items-center">
+                                                                <div class="text-truncate me-1">
+                                                                    <small class="fw-bold d-block text-truncate" style="max-width: 95px;">{{ \Illuminate\Support\Str::limit($e['title'], 18) }}</small>
+                                                                    <span class="text-muted extra-small d-block text-truncate" style="max-width: 95px;">{{ \Illuminate\Support\Str::limit($e['sub'], 22) }}</span>
+                                                                </div>
+                                                                @if ($e['average'])
+                                                                    <span class="badge bg-warning-subtle text-warning extra-small">{{ $e['average'] }}</span>
+                                                                @endif
+                                                            </div>
+                                                        @endforeach
+                                                    @endfor
+                                                @else
+                                                    <div class="text-muted extra-small text-center py-2">No new responses in the last minute</div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -234,8 +185,8 @@
                                 <div class="mt-auto">
                                     <hr class="my-3">
                                     <div class="d-flex justify-content-between text-muted extra-small">
-                                        <span>Active Term: <strong>Midterm 2026</strong></span>
-                                        <span>Days Left: <strong class="text-danger">5 Days</strong></span>
+                                        <span>Active Term: <strong id="eval-term">{{ $eval['term'] ?? 'N/A' }}</strong></span>
+                                        <span>Responses Today: <strong class="text-warning" id="eval-today-footer">{{ $eval['today'] ?? 0 }}</strong></span>
                                     </div>
                                 </div>
 
