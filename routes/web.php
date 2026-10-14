@@ -155,6 +155,7 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::get('/dashboard/monitoring/personnel',[MonitoringDashboardController::class,'personnel'])->name('monitoring.personnel');
     Route::get('/dashboard/monitoring/queue',[MonitoringDashboardController::class,'queue'])->name('monitoring.queue');
     Route::get('/dashboard/monitoring/evaluation',[MonitoringDashboardController::class,'evaluation'])->name('monitoring.evaluation');
+    Route::get('/dashboard/monitoring/wifi',[MonitoringDashboardController::class,'wifi'])->name('monitoring.wifi');
 
     Route::prefix('/station')->group(function () {
         Route::get('/', [StationController::class, 'show'])->name('station.show');

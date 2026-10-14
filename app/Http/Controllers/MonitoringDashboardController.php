@@ -20,6 +20,7 @@ use App\Models\TicketDB\Category;
 use App\Models\TicketDB\Subcategory;
 use App\Models\TicketDB\DailyTask;
 use App\Models\TicketDB\DailyTicketRequest;
+use App\Models\TicketDB\WifiVoucher;
 use App\Models\CoasDB\QueueCounter;
 use App\Models\CoasDB\QueueCustomer;
 use App\Models\CoasDB\QueueMode;
@@ -35,6 +36,7 @@ class MonitoringDashboardController extends Controller
             'personnel' => $this->personnelData(),
             'queue'     => $this->queueData(),
             'eval'      => $this->evaluationData(),
+            'wifi'      => $this->wifiData(),
         ]));
     }
 
@@ -68,6 +70,32 @@ class MonitoringDashboardController extends Controller
             'success' => true,
             'data'    => $this->evaluationData(),
         ]);
+    }
+
+    public function wifi()
+    {
+        return response()->json([
+            'success' => true,
+            'data'    => $this->wifiData(),
+        ]);
+    }
+
+    private function wifiData(): array
+    {
+        $available = WifiVoucher::where('status', 1)->count();
+        $used = WifiVoucher::where('status', 0)->count();
+        $total = $available + $used;
+
+        $latest = WifiVoucher::orderBy('id', 'DESC')->first(['schlyear', 'semester']);
+        $term = $latest ? ($latest->schlyear . ' (' . $latest->semester . ')') : 'N/A';
+
+        return [
+            'available' => $available,
+            'used'      => $used,
+            'total'     => $total,
+            'pct'       => $total > 0 ? (int) round($available / $total * 100) : 0,
+            'term'      => $term,
+        ];
     }
 
     private function evaluationData(): array
