@@ -36,9 +36,12 @@
             $('#eval-today-count').text(data.today);
             $('#eval-today-footer').text(data.today);
 
-            // Latest responses (no time badges — rows show faculty + evaluator + average)
+            // Latest responses (no time badges — rows show faculty + evaluator).
+            // Empty state stays steady (marquee animation off); live rows loop.
+            var $list = $('#eval-latest-list');
             var html = '';
             if (data.latest && data.latest.length > 0) {
+                $list.css({ 'animation': '', 'justify-content': '', 'min-height': '' });
                 var items = '';
                 data.latest.forEach(function (e) {
                     var title = e.title && e.title.length > 18 ? e.title.substring(0, 18) + '…' : (e.title || '—');
@@ -54,9 +57,10 @@
                 // Duplicate set for the seamless infinite marquee loop (same as other TV cards)
                 html = items + items;
             } else {
-                html = '<div class="text-muted extra-small text-center py-2">No new responses in the last minute</div>';
+                $list.css({ 'animation': 'none', 'justify-content': 'center', 'min-height': '160px' });
+                html = '<div class="text-muted extra-small text-center py-4">No new responses in the last minute</div>';
             }
-            $('#eval-latest-list').html(html);
+            $list.html(html);
         }
 
         function fetchEval() {

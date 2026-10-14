@@ -156,7 +156,7 @@
                                     <!-- Right Column: Latest Evaluation Responses Live Feed -->
                                     <div class="col-7 ps-2">
                                         <div class="marquee-wrapper" style="max-height: 160px; overflow: hidden; position: relative;">
-                                            <div class="marquee-content d-flex flex-column gap-1" id="eval-latest-list">
+                                            <div class="marquee-content d-flex flex-column gap-1" id="eval-latest-list" @if (empty($eval['latest'])) style="animation:none; justify-content:center; min-height:160px;" @endif>
                                                 @if (!empty($eval['latest']) && count($eval['latest']))
                                                     {{-- Rendered twice for the seamless infinite marquee loop --}}
                                                     @for ($r = 0; $r < 2; $r++)
@@ -171,7 +171,7 @@
                                                         @endforeach
                                                     @endfor
                                                 @else
-                                                    <div class="text-muted extra-small text-center py-2">No new responses in the last minute</div>
+                                                    <div class="text-muted extra-small text-center py-4">No new responses in the last minute</div>
                                                 @endif
                                             </div>
                                         </div>
