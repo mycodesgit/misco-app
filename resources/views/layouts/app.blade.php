@@ -202,6 +202,7 @@
     <script src="{{ asset('uilibs/plugins/jquery-validation/additional-methods.min.js') }}"></script>
     <!-- Theme -->
     <script src="{{ asset('uilibs/js/theme.js') }}"></script>
+    <script src="{{ asset('uilibs/js/contextmenu.js') }}"></script>
     @include('script.notify.topbarnotifyjs')
 
     <script>
