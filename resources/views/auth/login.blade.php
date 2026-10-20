@@ -24,6 +24,13 @@
             <h1>Log in</h1>
             <p class="loginb-sub">Continue to Service Now ticketing.</p>
 
+            @if (session('error_disabled'))
+                <div class="loginb-alert" role="alert">
+                    <i class="ti ti-alert-circle" aria-hidden="true"></i>
+                    <span>{{ session('error_disabled') }}</span>
+                </div>
+            @endif
+
             @if (session('error'))
                 <div class="loginb-alert" role="alert">
                     <i class="ti ti-alert-circle" aria-hidden="true"></i>

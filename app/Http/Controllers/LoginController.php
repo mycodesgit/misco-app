@@ -32,6 +32,22 @@ class LoginController extends Controller
         if (auth()->attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
             $user = auth()->user();
 
+            // Block disabled accounts (ustatus = 2). Log them out immediately.
+            if ((int) $user->ustatus === 2) {
+                auth()->logout();
+
+                AuditLog::create([
+                    'email' => $request->email,
+                    'action' => 'FAILED_LOGIN',
+                    'activity' => \App\Helpers\AuditActivity::describe('FAILED_LOGIN', ['email' => $request->email]),
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $browser . ' on ' . $platform,
+                    'login_at' => now(),
+                ]);
+
+                return redirect()->back()->with('error_disabled', 'Your account is disabled. Please contact the administrator.');
+            }
+
             // Record Login Audit Trail
             $auditLog = AuditLog::create([
                 'user_id' => $user->id,
