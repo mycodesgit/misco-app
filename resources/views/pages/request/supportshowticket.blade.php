@@ -10,27 +10,27 @@
             <div class="mb-4">
 
                 <!-- Page Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-                    <div class="d-flex align-items-start gap-2">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4 pb-2 border-bottom">
+                    <div class="d-flex align-items-start gap-2 w-100">
                         @if(Auth::guard('web')->user()->role != 'Requester')
-                            <a href="{{ route('tickets.index') }}" class="btn btn-light btn-sm" title="Back to Requests" aria-label="Back to Requests">
+                            <a href="{{ route('tickets.index') }}" class="btn btn-light btn-sm flex-shrink-0" title="Back to Requests" aria-label="Back to Requests">
                                 <i class="ti ti-arrow-left"></i>
                             </a>
                         @else
-                            <a href="{{ route('ticketsrequester.index') }}" class="btn btn-light btn-sm" title="Back to Requests" aria-label="Back to Requests">
+                            <a href="{{ route('ticketsrequester.index') }}" class="btn btn-light btn-sm flex-shrink-0" title="Back to Requests" aria-label="Back to Requests">
                                 <i class="ti ti-arrow-left"></i>
                             </a>
                         @endif
-                        <div>
-                            <h1 class="h4 fw-bold mb-1">
-                                <span class="text-primary">{{ $ticket->ticket_number }}</span> : &nbsp;
-                                <span>{{ $ticket->category->ticketcatname }}</span>
-                                <span>( {{ $ticket->subcategory->ticketsubcatname }} )</span>
+                        <div class="min-w-0">
+                            <h1 class="page-header-title h4 fw-bold mb-1">
+                                <span class="ticket-number text-primary">{{ $ticket->ticket_number }}</span> <span class="d-none d-md-inline">: &nbsp;</span>
+                                <span class="ticket-cat">{{ $ticket->category->ticketcatname }}</span>
+                                <span class="ticket-subcat">( {{ $ticket->subcategory->ticketsubcatname }} )</span>
                             </h1>
                             <p class="text-muted small mb-0">Submitted by <strong>{{ $ticket->requester->fname }} {{ $ticket->requester->lname }}</strong> &bull; {{ $ticket->requesteroffice->office_abbr }}</p>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
                         @php
                             $priorityConfig = match(strtolower($ticket->priority)) {
                                 'low'     => ['class' => 'bg-info text-dark', 'icon' => 'ti-info-circle'],
@@ -356,6 +356,32 @@
     </div>
 
     <style>
+        /* Responsive Page Header */
+        .page-header-title {
+            word-break: break-word;
+        }
+
+        @media (max-width: 767.98px) {
+            .page-header-title {
+                font-size: 1rem;
+                line-height: 1.4;
+            }
+
+            .page-header-title .ticket-number {
+                display: block;
+            }
+
+            .page-header-title .ticket-cat {
+                display: block;
+                font-size: 0.9rem;
+            }
+
+            .page-header-title .ticket-subcat {
+                display: block;
+                font-size: 0.85rem;
+            }
+        }
+
         /* Custom Attachment Card Styles */
         .attachment-card {
             transition: all 0.2s ease-in-out;
