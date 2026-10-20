@@ -222,6 +222,110 @@ class RequesterTicketRequestController extends Controller
         }
     }
 
+    /**
+     * Fetch a single requester ticket for editing.
+     */
+    public function edit($id)
+    {
+        $ticket = DailyTicketRequest::with(['category', 'subcategory'])
+            ->where('id', $id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$ticket) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ticket not found.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'id'                => $ticket->id,
+                'ticket_number'     => $ticket->ticket_number,
+                'category'          => $ticket->category->ticketcatname ?? '-',
+                'subcategory'       => $ticket->subcategory->ticketsubcatname ?? '-',
+                'priority'          => $ticket->priority,
+                'contactno'         => $ticket->contactno,
+                'issue_description' => $ticket->issue_description,
+                'remarks'           => $ticket->remarks,
+            ],
+        ]);
+    }
+
+    /**
+     * Update an existing requester ticket (priority, contact, description, remarks).
+     */
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ticket_id'         => 'required|exists:dailyticketrequest,id',
+            'priority'          => 'required|in:Low,Medium,High,Urgent',
+            'contactno'         => 'nullable|string|max:50',
+            'issue_description' => 'required|string',
+            'remarks'           => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        $ticket = DailyTicketRequest::where('id', $request->ticket_id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$ticket) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ticket not found.'
+            ], 404);
+        }
+
+        // Only Pending tickets can still be edited by the requester.
+        if ($ticket->status !== 'Pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'This ticket can no longer be edited because it is already ' . $ticket->status . '.'
+            ], 403);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $ticket->priority          = $request->priority;
+            $ticket->contactno         = $request->contactno;
+            $ticket->issue_description = $request->issue_description;
+            $ticket->remarks           = $request->remarks;
+            $ticket->save();
+
+            DB::commit();
+
+            Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
+            broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'updated'));
+
+            // Log Audit
+            $this->logAudit($request, 'Update_DailyTicket', $ticket->toArray());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket #' . $ticket->ticket_number . ' updated successfully!',
+                'data'    => $ticket
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update ticket: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function showreqpending()
     {
         $authuserID = Auth::user()->id;

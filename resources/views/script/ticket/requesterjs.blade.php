@@ -697,6 +697,75 @@
         });
     });
 
+    /* ================= Edit ticket modal ================= */
+    // Open edit modal and pre-fill fields from the server
+    $(document).on('click', '.btn-ticketedit', function() {
+        var ticketId = $(this).data('id');
+
+        $('#editTicketForm')[0].reset();
+        $('#edit_ticket_id').val('');
+        $('#edit_category, #edit_subcategory').val('');
+
+        $.ajax({
+            url: ticketEditBase + '/' + ticketId,
+            type: 'GET',
+            success: function(res) {
+                if (!res.success) {
+                    toastr.error(res.message || 'Unable to load ticket.');
+                    return;
+                }
+
+                var t = res.data;
+                $('#edit_ticket_id').val(t.id);
+                $('#editTicketNumber').text('#' + (t.ticket_number || ''));
+                $('#edit_category').val(t.category);
+                $('#edit_subcategory').val(t.subcategory);
+                $('#edit_priority').val(t.priority);
+                $('#edit_contactno').val(t.contactno);
+                $('#edit_issue_description').val(t.issue_description);
+                $('#edit_remarks').val(t.remarks);
+
+                $('#editTicketModal').modal('show');
+            },
+            error: function(xhr) {
+                var msg = 'Unable to load ticket.';
+                try { msg = JSON.parse(xhr.responseText).message || msg; } catch (e) {}
+                toastr.error(msg);
+            }
+        });
+    });
+
+    // Submit edited ticket
+    $('#editTicketForm').submit(function(event) {
+        event.preventDefault();
+
+        var $btn = $(this).find('button[type="submit"]').prop('disabled', true);
+
+        $.ajax({
+            url: ticketUpdateRoute,
+            type: 'POST',
+            data: $(this).serialize(),
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    $('#editTicketModal').modal('hide');
+                    $(document).trigger('ticketListChanged');
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function(xhr) {
+                var msg = 'An error occurred';
+                try { msg = JSON.parse(xhr.responseText).message || msg; } catch (e) {}
+                toastr.error(msg);
+            },
+            complete: function() {
+                $btn.prop('disabled', false);
+            }
+        });
+    });
+
     /* ================= Feedback modal (ClientSatisfactory) ================= */
     var feedbackLabels = {
         1: 'Very Dissatisfied',

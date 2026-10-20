@@ -174,6 +174,7 @@
     </div>
 
     @include('pages.request.modals.addticketmodal')
+    @include('pages.request.modals.editticketmodal')
 
     <div class="modal fade" id="submitfeedTicketModal" tabindex="-1" aria-labelledby="submitfeedTicketModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
@@ -256,6 +257,8 @@
         var ticketCreateRoute = "{{ route('ticketsrequester.create') }}";
         var ticketFeedbackShowBase = "{{ url('/tickets/requester/tickets/feedback') }}";
         var ticketFeedbackSubmitRoute = "{{ route('ticketsrequester.feedback.submit') }}";
+        var ticketEditBase = "{{ url('/tickets/requester/tickets/edit') }}";
+        var ticketUpdateRoute = "{{ route('ticketsrequester.update') }}";
 
         function previewImage(event) {
             var reader = new FileReader();

@@ -77,6 +77,9 @@ class AuditActivity
 
             case 'Add_DailyTicket':
                 return "{$actor} filed new Ticket '" . self::str($data, 'ticket_number') . "'";
+            case 'Edit_DailyTicket':
+            case 'Update_DailyTicket':
+                return "{$actor} updated Ticket '" . self::str($data, 'ticket_number') . "'";
 
             case 'Submit_ClientFeedback':
                 $rating = $data['rating'] ?? '?';
