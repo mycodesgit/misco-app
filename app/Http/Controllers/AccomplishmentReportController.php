@@ -78,7 +78,7 @@ class AccomplishmentReportController extends Controller
             'groupedTickets' => $groupedTickets,
             'taskTotal'   => $tasks->count(),
             'ticketTotal' => $tickets->count(),
-        ]);
+        ])->setPaper('Legal', 'portrait');
 
         return $pdf->stream('Accomplishment_Report.pdf');
     }

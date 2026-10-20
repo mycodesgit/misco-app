@@ -86,7 +86,7 @@
 <body>
     <div>
         <center>
-            <img src="{{ public_path('uilibs/images/headerLogoNew1.png') }}" width="95%" height="14%" style="margin-top: -8px;">
+            <img src="{{ public_path('uilibs/images/headerLogoNew1.png') }}" width="95%" height="12%" style="margin-top: -8px;">
         </center>
     </div>
 
@@ -185,8 +185,13 @@
                             <td>
                                 <strong>Completed {{ $taskCount }} {{ $subcatName }} request(s):</strong>
                                 <ul style="margin: 5px 0 0 0; padding-left: 15px;">
-                                    @foreach ($group as $item)
-                                        <li>{{ $item->dailytaskdesc }}</li>
+                                    @foreach ($group->groupBy(fn ($item) => strtolower(preg_replace('/\s+/', ' ', trim((string) $item->dailytaskdesc)))) as $items)
+                                        <li>
+                                            {{ trim(preg_replace('/\s+/', ' ', (string) $items->first()->dailytaskdesc)) }}
+                                            @if ($items->count() > 1)
+                                                (x{{ $items->count() }})
+                                            @endif
+                                        </li>
                                     @endforeach
                                 </ul>
                             </td>
@@ -226,12 +231,23 @@
                             <td>
                                 <strong>Resolved {{ $ticketCount }} {{ $ticketSubcat }} request(s):</strong>
                                 <ul style="margin: 5px 0 0 0; padding-left: 15px;">
-                                    @foreach ($group as $ticket)
+                                    @foreach ($group->groupBy(fn ($item) => strtolower(preg_replace('/\s+/', ' ', trim((string) $item->issue_description)))) as $ticketsInGroup)
                                         <li>
-                                            <strong>[{{ $ticket->ticket_number }}]</strong> {{ $ticket->issue_description }}
-                                            @if (!empty($ticket->resolved_at))
-                                                <span style="color: #666;">({{ \Carbon\Carbon::parse($ticket->resolved_at)->format('M d, Y') }})</span>
+                                            {{ trim(preg_replace('/\s+/', ' ', (string) $ticketsInGroup->first()->issue_description)) }}
+                                            @if ($ticketsInGroup->count() > 1)
+                                                (x{{ $ticketsInGroup->count() }})
                                             @endif
+                                            <span style="color: #666;">
+                                                [
+                                                @foreach ($ticketsInGroup as $ticket)
+                                                    <strong>{{ $ticket->ticket_number }}</strong>
+                                                    @if (!empty($ticket->resolved_at))
+                                                        ({{ \Carbon\Carbon::parse($ticket->resolved_at)->format('M d, Y') }})
+                                                    @endif
+                                                    @if (!$loop->last), @endif
+                                                @endforeach
+                                                ]
+                                            </span>
                                         </li>
                                     @endforeach
                                 </ul>
