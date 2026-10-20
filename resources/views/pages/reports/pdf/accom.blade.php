@@ -252,7 +252,7 @@
     </div>
 
     <div class="supervisor_person">
-        <p>&nbsp;&nbsp;JOHN DOE</p>
+        <p>&nbsp;&nbsp;ENGR. JEVY F. YEE</p>
     </div>
 
     <div class="supervisor_position">
