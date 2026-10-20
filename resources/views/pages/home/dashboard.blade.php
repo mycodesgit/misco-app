@@ -508,12 +508,9 @@
                                         </p>
                                     </div>
 
-                                    <div class="pt-2">
-                                        <a href="#" class="btn btn-success btn-sm rounded-pill px-3 me-2">
-                                            <i class="bi bi-plus-lg me-1"></i> New Activity
-                                        </a>
-                                        <a href="#" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                                            View Schedule
+                                    <div class="pt-4">
+                                        <a href="#" class="btn btn-outline-success btn-sm rounded-pill px-3 me-2">
+                                            <i class="ti ti-building me-1"></i> {{ auth()->user()->office->office_name }}
                                         </a>
                                     </div>
                                 </div>
@@ -526,19 +523,19 @@
                                     <h6 class="card-title mb-0 fw-bold">Quick Actions</h6>
                                 </div>
                                 <div class="card-body d-flex flex-column gap-2">
-                                    <a href="#" class="btn btn-primary text-start py-2 px-3 d-flex align-items-center justify-content-between" data-bs-toggle="modal" data-bs-target="#createNewTicketModal">
-                                        <span><i class="ti ti-plus me-2 fs-5"></i> New Ticket - Create a new support ticket</span>
+                                    <a href="#" class="btn btn-success text-start py-2 px-3 d-flex align-items-center justify-content-between" data-bs-toggle="modal" data-bs-target="#createNewTicketModal">
+                                        <span><i class="ti ti-plus me-2 fs-5"></i> New Ticket - Create a new ticket</span>
                                         <i class="ti ti-chevron-right small"></i>
                                     </a>
-                                    <a href="#" class="btn btn-success text-start py-2 px-3 d-flex align-items-center justify-content-between">
+                                    {{-- <a href="#" class="btn btn-success text-start py-2 px-3 d-flex align-items-center justify-content-between">
                                         <span><i class="ti ti-bulb me-2 fs-5"></i> Knowledge Base - Browse Help Articles & FAQs</span>
                                         <i class="ti ti-chevron-right small"></i>
                                     </a>
                                     <a href="#" class="btn btn-info text-start py-2 px-3 d-flex align-items-center justify-content-between">
                                         <span><i class="ti ti-help me-2 fs-5"></i> Get Help - Contact Support Team</span>
                                         <i class="ti ti-chevron-right small"></i>
-                                    </a>
-                                    <a href="#" class="btn btn-warning text-start py-2 px-3 d-flex align-items-center justify-content-between">
+                                    </a> --}}
+                                    <a href="#" class="btn btn-warning text-start py-2 px-3 d-flex align-items-center justify-content-between" data-bs-toggle="modal" data-bs-target="#createSelfReseticketModal">
                                         <span><i class="ti ti-lock me-2 fs-5"></i> Self Reset Password - Institutional Email / MS Teams</span>
                                         <i class="ti ti-chevron-right small"></i>
                                     </a>
@@ -808,6 +805,7 @@
     </div>
 
     @include('pages.request.modals.addticketmodal')
+    @include('pages.home.modals.selfresetmodal')
     @include('pages.home.modals.stationmodal')
 
     <!-- Heatmap & Hero Styles -->

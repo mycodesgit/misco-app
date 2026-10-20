@@ -97,6 +97,16 @@
                                     </div>
                                 </div>
 
+                                <!-- Detailed Remarks -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Remarks:</label>
+                                    <div class="p-3 card-body-content-bg-color shadow-sm rounded border">
+                                        <p class="mb-0">
+                                            " {{ $ticket->remarks }} "
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <!-- Photo Attached During Ticket Creation -->
                                 <div class="mb-3">
                                     <label class="form-label text-muted small fw-bold d-block mb-2">

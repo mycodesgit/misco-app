@@ -66,8 +66,26 @@ class DashboardController extends Controller
                 $query->where('rolename', $currentUserRole);
             })
             ->get();
-
         $cat = Category::with('user')->where('status', 1)->get();
+
+
+        $selfresetrole = UserRole::where('status', 1)
+            ->where('id', 2)
+            ->get();
+        $selfresetcat = Category::where('id', 6)->where('status', 1)->get();
+        $selfresetsubcat = Subcategory::where('id', 24)->where('status', 1)->get();
+        $selfresetpersonnel = User::where('ustatus', '!=', 3)
+            ->whereHas('assignedTasks', function ($query) {
+                $query->whereJsonContains('taskassigned', '6');
+            })
+            ->get([
+                'id',
+                'fname',
+                'lname',
+                'office_id'
+            ]);
+
+
 
         return view('pages.home.dashboard', array_merge([
             'selectedYear' => $selectedYear,
@@ -75,7 +93,11 @@ class DashboardController extends Controller
             'pendingCount'       => $pendingCount,
             'inProgressCount'    => $inProgressCount,
             'resolvedTodayCount' => $resolvedTodayCount,
-            'urole' => $urole
+            'urole' => $urole,
+            'selfresetrole' => $selfresetrole,
+            'selfresetcat' => $selfresetcat,
+            'selfresetsubcat' => $selfresetsubcat,
+            'selfresetpersonnel' => $selfresetpersonnel
         ], $dashboardData));
     }
 
