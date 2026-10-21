@@ -272,52 +272,63 @@ class DashboardController extends Controller
             ->toArray();
 
         // --- 4. Dynamic Timeframe Filtered Leaderboard ---
-        $leaderboardQuery = DailyTicketRequest::whereYear('resolved_at', $year)
+        // Credits the personnel who actually resolved each ticket, using the
+        // `resolved_by` column. Only tickets with status "Resolved" count.
+        $leaderboardQuery = DailyTicketRequest::query()
             ->where('status', 'Resolved')
-            ->whereNotNull('assigned_to');
+            ->whereNotNull('resolved_at')
+            ->whereYear('resolved_at', $year)
+            ->whereNotNull('resolved_by');
 
         if ($timeframe === 'daily') {
             $leaderboardQuery->whereDate('resolved_at', now()->toDateString());
         } elseif ($timeframe === 'monthly') {
             $leaderboardQuery->whereMonth('resolved_at', now()->month);
+            $leaderboardQuery->whereYear('resolved_at', now()->year);
         }
 
+        // Count resolved tickets per resolver.
+        $resolvedCounts = (clone $leaderboardQuery)
+            ->selectRaw('resolved_by, COUNT(*) as resolved_count')
+            ->groupBy('resolved_by')
+            ->orderByDesc('resolved_count')
+            ->pluck('resolved_count', 'resolved_by')
+            ->map(fn ($count) => (int) $count)
+            ->all();
+
+        // Office view: rank only personnel belonging to the viewer's office.
         if ($officeScope) {
-            // Office view: rank only personnel of the viewer's office
-            $leaderboardRaw = (clone $leaderboardQuery)
-                ->join('users', function ($join) {
-                    $join->whereRaw('FIND_IN_SET(users.id, REPLACE(dailyticketrequest.assigned_to, " ", ""))');
-                })
-                ->where('users.office_id', $officeScope)
-                ->selectRaw('users.id as user_id, COUNT(*) as resolved_count')
-                ->groupBy('users.id')
-                ->orderByDesc('resolved_count')
-                ->get();
-        } else {
-            $leaderboardRaw = $leaderboardQuery
-                ->selectRaw('assigned_to as user_id, COUNT(*) as resolved_count')
-                ->groupBy('assigned_to')
-                ->orderByDesc('resolved_count')
-                ->get();
+            $allowedUserIds = User::where('office_id', $officeScope)->pluck('id')->all();
+            $resolvedCounts = array_intersect_key($resolvedCounts, array_flip($allowedUserIds));
         }
+
+        arsort($resolvedCounts);
+
+        // Resolve names in one query instead of one per row.
+        $performers = User::whereIn('id', array_keys($resolvedCounts))->get()->keyBy('id');
 
         $leaderboard = [];
         $rank = 1;
 
-        foreach ($leaderboardRaw as $item) {
-            $performer = User::find($item->user_id);
-            if ($performer) {
-                $initials = strtoupper(substr($performer->fname, 0, 1) . substr($performer->lname, 0, 1));
-                $leaderboard[] = [
-                    'rank' => $rank++,
-                    'user_id' => $performer->id,
-                    'name' => $performer->fname . ' ' . $performer->lname,
-                    'short_name' => $performer->fname,
-                    'initials' => $initials,
-                    'points' => $item->resolved_count,
-                    'is_current_user' => ($performer->id === $user->id)
-                ];
+        foreach ($resolvedCounts as $performerId => $resolvedCount) {
+            $performer = $performers->get($performerId);
+            if (!$performer) {
+                continue;
             }
+
+            $initials = strtoupper(
+                mb_substr((string) $performer->fname, 0, 1) . mb_substr((string) $performer->lname, 0, 1)
+            );
+
+            $leaderboard[] = [
+                'rank' => $rank++,
+                'user_id' => $performer->id,
+                'name' => trim($performer->fname . ' ' . $performer->lname),
+                'short_name' => $performer->fname,
+                'initials' => $initials,
+                'points' => $resolvedCount,
+                'is_current_user' => ($performer->id === $user->id),
+            ];
         }
 
         // --- 5. Top Issue Categories ---
