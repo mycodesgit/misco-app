@@ -56,6 +56,14 @@ class LanguageDetectionService
             return false;
         }
 
+        // Only prose can be language-detected. Structured values such as email
+        // addresses, asset tags, ticket references and serial numbers look like
+        // prose to the detector but are not, and get misread as Malay/Indonesian
+        // or Tagalog. Leave those to the other validation rules.
+        if ($this->isStructuredValue($text)) {
+            return false;
+        }
+
         try {
             $result = $this->detector()->detect($text);
         } catch (\Throwable $e) {
@@ -74,6 +82,54 @@ class LanguageDetectionService
         $englishScore  = (float) ($scores['en'] ?? 0.0);
 
         return ($detectedScore - $englishScore) >= self::ENGLISH_MARGIN;
+    }
+
+    /**
+     * Decide whether a value is structured data rather than natural language.
+     *
+     * Anything with an email address, a URL, or no word-like tokens at all
+     * carries no reliable language signal, so it must not be judged by the
+     * detector.
+     */
+    private function isStructuredValue(string $text): bool
+    {
+        // Email addresses (the common case in the password-reset form).
+        if (filter_var($text, FILTER_VALIDATE_EMAIL) !== false) {
+            return true;
+        }
+
+        // A value that is mostly an email address or URL.
+        if (preg_match('/[\w.+-]+@[\w-]+\.[\w.-]+/', $text)) {
+            return true;
+        }
+        if (preg_match('#https?://|www\.#i', $text)) {
+            return true;
+        }
+
+        // Split on whitespace and keep only word-like tokens. A "word" needs at
+        // least two consecutive letters; that filters out codes such as
+        // "PRN-HP-0455" or "TKT-MIS-20261012-0001" and digits/symbols.
+        $words = preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $wordLike = 0;
+        foreach ($words as $word) {
+            if (preg_match('/[A-Za-z]{2,}/', $word)) {
+                $wordLike++;
+            }
+        }
+
+        // Fewer than two real words gives the detector nothing to work with.
+        if ($wordLike < 2) {
+            return true;
+        }
+
+        // Predominantly non-alphabetic content (codes, IDs, numbers).
+        $letterCount = preg_match_all('/[A-Za-z]/', $text);
+        $length      = max(mb_strlen($text), 1);
+        if (($letterCount / $length) < 0.5) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

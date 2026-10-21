@@ -137,7 +137,7 @@ class RequesterTicketRequestController extends Controller
             $datePrefix = Carbon::now()->format('Ymd');
             $supportCode = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', (string) $request->input('support_type', '')), 0, 3));
             if ($supportCode === '') {
-                $supportCode = 'GEN';
+                $supportCode = 'MIS';
             }
             $latestTicket = DailyTicketRequest::whereDate('created_at', Carbon::today())
                 ->where('ticket_number', 'LIKE', 'TKT-' . $supportCode . '-' . $datePrefix . '-%')
