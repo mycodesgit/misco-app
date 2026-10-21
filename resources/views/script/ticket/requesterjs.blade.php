@@ -4,9 +4,69 @@
         "progressBar": true,
         "positionClass": "toast-top-right"
     };
+    /* ============ English-only validation (Issue Description & Remarks) ============ */
+    // Allows only printable English/ASCII characters: letters, numbers, spaces,
+    // newline/tab, and basic punctuation. Rejects non-English scripts & symbols.
+    var englishOnlyRegex = /^[\x09\x0A\x0D\x20-\x7E‘’“”–—…]*$/;
+    var englishOnlyMessage = 'Only English characters, numbers, and basic punctuation are allowed.';
+
+    function validateEnglishField($field) {
+        var isValid = englishOnlyRegex.test(String($field.val() || ''));
+        $field.toggleClass('is-invalid', !isValid);
+        return isValid;
+    }
+
+    /**
+     * Apply a 422 JSON error response from the server to the form fields.
+     * Highlights each offending field and shows its message in the
+     * .invalid-feedback block beneath it.
+     */
+    function applyServerValidationErrors(xhr) {
+        var handled = false;
+        var response = null;
+        try { response = JSON.parse(xhr.responseText); } catch (e) { response = null; }
+
+        if (response && response.errors) {
+            $.each(response.errors, function(field, messages) {
+                var $field = $('[name="' + field + '"]');
+                if ($field.length) {
+                    $field.addClass('is-invalid');
+                    $field.closest('.col-md-12, .col-md-6, .mb-3')
+                        .find('.invalid-feedback').first().text(messages[0]);
+                    handled = true;
+                }
+            });
+            if (handled && response.message) {
+                toastr.error(response.message);
+            }
+        }
+        return handled;
+    }
+
     $(document).ready(function() {
+        // Live feedback while typing
+        $(document).on('input', '#issue_description, #remarks, #edit_issue_description, #edit_remarks', function() {
+            validateEnglishField($(this));
+        });
+
         $('#addNewTicket').submit(function(event) {
             event.preventDefault();
+
+            var $issueDesc = $('#issue_description');
+            var $remarks = $('#remarks');
+            var $invalidField = null;
+
+            if (!validateEnglishField($issueDesc)) {
+                $invalidField = $issueDesc;
+            } else if (!validateEnglishField($remarks)) {
+                $invalidField = $remarks;
+            }
+
+            if ($invalidField) {
+                toastr.error(englishOnlyMessage);
+                $invalidField.trigger('focus');
+                return false;
+            }
 
             var formData = new FormData(this);
 
@@ -23,6 +83,7 @@
                         $(document).trigger('ticketAdded');
                         $('#createNewTicketModal').modal('hide');
                         $('#addNewTicket')[0].reset();
+                        $('#issue_description, #remarks').removeClass('is-invalid');
                         // Clear image preview if you have one
                         $('#preview-container').addClass('d-none');
                         $('#image-preview').attr('src', '#');
@@ -32,7 +93,11 @@
                     }
                 },
                 error: function(xhr, status, error, message) {
-                    var errorMessage = xhr.responseText ? JSON.parse(xhr.responseText).message : 'An error occurred';
+                    if (applyServerValidationErrors(xhr)) {
+                        return;
+                    }
+                    var errorMessage = 'An error occurred';
+                    try { errorMessage = JSON.parse(xhr.responseText).message || errorMessage; } catch (e) {}
                     toastr.error(errorMessage);
                 }
             });
@@ -703,6 +768,7 @@
         var ticketId = $(this).data('id');
 
         $('#editTicketForm')[0].reset();
+        $('#edit_issue_description, #edit_remarks').removeClass('is-invalid');
         $('#edit_ticket_id').val('');
         $('#edit_category, #edit_subcategory').val('');
 
@@ -739,6 +805,22 @@
     $('#editTicketForm').submit(function(event) {
         event.preventDefault();
 
+        var $issueDesc = $('#edit_issue_description');
+        var $remarks = $('#edit_remarks');
+        var $invalidField = null;
+
+        if (!validateEnglishField($issueDesc)) {
+            $invalidField = $issueDesc;
+        } else if (!validateEnglishField($remarks)) {
+            $invalidField = $remarks;
+        }
+
+        if ($invalidField) {
+            toastr.error(englishOnlyMessage);
+            $invalidField.trigger('focus');
+            return false;
+        }
+
         var $btn = $(this).find('button[type="submit"]').prop('disabled', true);
 
         $.ajax({
@@ -756,6 +838,9 @@
                 }
             },
             error: function(xhr) {
+                if (applyServerValidationErrors(xhr)) {
+                    return;
+                }
                 var msg = 'An error occurred';
                 try { msg = JSON.parse(xhr.responseText).message || msg; } catch (e) {}
                 toastr.error(msg);

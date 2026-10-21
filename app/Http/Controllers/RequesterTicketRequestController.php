@@ -25,8 +25,17 @@ use App\Models\TicketDB\ClientFeedback;
 use App\Models\TicketDB\AuditTrailDailyTicketRequest;
 use App\Models\TicketDB\AuditTrailClientFeedback;
 
+use App\Services\LanguageDetectionService;
+
 class RequesterTicketRequestController extends Controller
 {
+    protected LanguageDetectionService $languageDetection;
+
+    public function __construct(LanguageDetectionService $languageDetection)
+    {
+        $this->languageDetection = $languageDetection;
+    }
+
     public function index()
     {
         $currentUserRole = Auth::user()->role;
@@ -94,9 +103,12 @@ class RequesterTicketRequestController extends Controller
             'assigned_to'       => 'required',
             'priority'          => 'required|in:Low,Medium,High,Urgent',
             'contactno'         => 'nullable|string|max:50',
-            'issue_description' => 'required|string',
-            'remarks'           => 'nullable|string',
+            'issue_description' => ['required', 'string', 'regex:/^[\x09\x0A\x0D\x20-\x7E\x{2018}\x{2019}\x{201C}\x{201D}\x{2013}\x{2014}\x{2026}]+$/u'],
+            'remarks'           => ['nullable', 'string', 'regex:/^[\x09\x0A\x0D\x20-\x7E\x{2018}\x{2019}\x{201C}\x{201D}\x{2013}\x{2014}\x{2026}]*$/u'],
             'attachment'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'issue_description.regex' => 'Issue Description must only contain English characters (letters, numbers, and basic punctuation).',
+            'remarks.regex'           => 'Additional Remarks / Notes must only contain English characters (letters, numbers, and basic punctuation).',
         ]);
 
         if ($validator->fails()) {
@@ -104,6 +116,16 @@ class RequesterTicketRequestController extends Controller
                 'success' => false,
                 'message' => $validator->errors()->first(),
                 'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        // Reject Philippine-language free text (Tagalog, Cebuano, Ilocano, etc.).
+        // English, other languages and non-Latin scripts are unaffected.
+        if ($languageError = $this->englishOnlyError($request)) {
+            return response()->json([
+                'success' => false,
+                'message' => $languageError['message'],
+                'errors'  => [$languageError['field'] => [$languageError['message']]],
             ], 422);
         }
 
@@ -263,8 +285,11 @@ class RequesterTicketRequestController extends Controller
             'ticket_id'         => 'required|exists:dailyticketrequest,id',
             'priority'          => 'required|in:Low,Medium,High,Urgent',
             'contactno'         => 'nullable|string|max:50',
-            'issue_description' => 'required|string',
-            'remarks'           => 'nullable|string',
+            'issue_description' => ['required', 'string', 'regex:/^[\x09\x0A\x0D\x20-\x7E\x{2018}\x{2019}\x{201C}\x{201D}\x{2013}\x{2014}\x{2026}]+$/u'],
+            'remarks'           => ['nullable', 'string', 'regex:/^[\x09\x0A\x0D\x20-\x7E\x{2018}\x{2019}\x{201C}\x{201D}\x{2013}\x{2014}\x{2026}]*$/u'],
+        ], [
+            'issue_description.regex' => 'Issue Description must only contain English characters (letters, numbers, and basic punctuation).',
+            'remarks.regex'           => 'Additional Remarks / Notes must only contain English characters (letters, numbers, and basic punctuation).',
         ]);
 
         if ($validator->fails()) {
@@ -272,6 +297,16 @@ class RequesterTicketRequestController extends Controller
                 'success' => false,
                 'message' => $validator->errors()->first(),
                 'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        // Reject Philippine-language free text (Tagalog, Cebuano, Ilocano, etc.).
+        // English, other languages and non-Latin scripts are unaffected.
+        if ($languageError = $this->englishOnlyError($request)) {
+            return response()->json([
+                'success' => false,
+                'message' => $languageError['message'],
+                'errors'  => [$languageError['field'] => [$languageError['message']]],
             ], 422);
         }
 
@@ -458,6 +493,35 @@ class RequesterTicketRequestController extends Controller
             'message' => 'Thank you for your feedback!',
             'data'    => $satisfaction
         ]);
+    }
+
+    /**
+     * Check the free-text fields that must be written in English.
+     *
+     * Returns an array describing the first offending field, or null when all
+     * fields pass. Only Philippine languages are rejected; other languages and
+     * non-Latin scripts are left to the regex rules above.
+     *
+     * @return array{field: string, message: string}|null
+     */
+    private function englishOnlyError(Request $request): ?array
+    {
+        $fields = [
+            'issue_description' => 'Issue Description',
+            'remarks'           => 'Additional Remarks / Notes',
+        ];
+
+        foreach ($fields as $field => $label) {
+            if ($this->languageDetection->isPhilippineLanguage($request->input($field))) {
+                return [
+                    'field'   => $field,
+                    'message' => $label . ' must be written in English. '
+                        . 'Please remove Filipino or other Philippine dialect words.',
+                ];
+            }
+        }
+
+        return null;
     }
 
     /**

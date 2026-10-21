@@ -82,13 +82,15 @@
                         <!-- Detailed Complaint Description -->
                         <div class="col-md-12">
                             <label for="issue_description" class="form-label fw-semibold">Issue Description: <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="issue_description" name="issue_description" rows="4" placeholder="Explain the problem in detail, including error codes or steps to reproduce..." required></textarea>
+                            <textarea class="form-control" id="issue_description" name="issue_description" rows="4" pattern="[\x09\x0A\x0D\x20-\x7E‘’“”–—…]+" title="Only English characters are allowed." placeholder="Explain the problem in detail, including error codes or steps to reproduce..." required></textarea>
+                            <div class="invalid-feedback">Only English characters, numbers, and basic punctuation are allowed.</div>
                         </div>
 
                         <!-- Remarks / Notes -->
                         <div class="col-md-12">
                             <label for="remarks" class="form-label fw-semibold">Additional Remarks / Notes:</label>
-                            <textarea class="form-control" id="remarks" name="remarks" rows="2" placeholder="Any additional notes (e.g., best time to visit desk, temporary workaround)..."></textarea>
+                            <textarea class="form-control" id="remarks" name="remarks" rows="2" pattern="[\x09\x0A\x0D\x20-\x7E‘’“”–—…]+" title="Only English characters are allowed." placeholder="Any additional notes (e.g., best time to visit desk, temporary workaround)..."></textarea>
+                            <div class="invalid-feedback">Only English characters, numbers, and basic punctuation are allowed.</div>
                         </div>
 
                         <!-- Attachment Field -->

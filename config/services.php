@@ -31,4 +31,20 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Language Detection
+    |--------------------------------------------------------------------------
+    |
+    | Used to keep free-text ticket fields (Issue Description, Remarks) in
+    | English. "database" selects the detector model size: small, medium,
+    | large or extralarge. Larger models are more accurate; see
+    | App\Services\LanguageDetectionService.
+    |
+    */
+
+    'language_detection' => [
+        'database' => env('LANGUAGE_DETECTION_DATABASE', 'large'),
+    ],
+
 ];
