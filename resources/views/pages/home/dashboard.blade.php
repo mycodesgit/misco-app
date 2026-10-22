@@ -107,7 +107,7 @@
                                 <div class="card-header pt-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="fw-semibold">
-                                            <i class="ti ti-device-laptop me-1"></i> Activity Progress (Jan 1 - Dec 31, <span id="displaySupportSelectedYear">{{ $selectedYear }}</span>)
+                                            <i class="ti ti-device-laptop me-1"></i> My Activity Progress (Jan 1 - Dec 31, <span id="displaySupportSelectedYear">{{ $selectedYear }}</span>)
                                         </h6>
                                         {{-- <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span> --}}
                                         <span class="small">
@@ -549,7 +549,7 @@
                                 <div class="card-header pt-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="fw-semibold">
-                                            <i class="ti ti-device-laptop me-1"></i> Ticket Progress (Jan 1 - Dec 31, <span id="displayRequesterSelectedYear">{{ $selectedYear }}</span>)
+                                            <i class="ti ti-device-laptop me-1"></i> My Ticket Progress (Jan 1 - Dec 31, <span id="displayRequesterSelectedYear">{{ $selectedYear }}</span>)
                                         </h6>
                                         {{-- <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span> --}}
                                         <span class="small">
