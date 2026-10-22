@@ -221,6 +221,7 @@ class DashboardController extends Controller
             // (office view: only tasks completed by resolvers of that office)
             $resolvedTasks = DailyTask::whereYear('completed_at', $year)
                 ->where('status', 'Completed')
+                ->where('user_id', $user)
                 ->when($officeScope, fn ($q) => $q->whereHas('user', fn ($u) => $u->where('office_id', $officeScope)))
                 ->selectRaw('DATE(completed_at) as date, COUNT(*) as total')
                 ->groupBy('date')
@@ -231,6 +232,7 @@ class DashboardController extends Controller
             // (office view: resolved by ANY user of that office, not just self)
             $resolvedTicketsQuery = DailyTicketRequest::whereYear('resolved_at', $year)
                 ->where('status', 'Resolved')
+                ->where('user_id', $user)
                 ->where('off_id', $officeScope ?? $user->office_id);
 
             if ($officeScope) {
