@@ -33,7 +33,9 @@ class DailyTaskController extends Controller
 
     public function show(Request $request)
     {
-        $query = DailyTask::with(['user', 'category', 'subcategory']);
+        // Only show the tasks created by the currently logged-in user
+        $query = DailyTask::with(['user', 'category', 'subcategory'])
+            ->where('user_id', Auth::id());
 
         // Filter by month if selected
         $year = $request->input('year', now()->year);
@@ -117,7 +119,8 @@ class DailyTaskController extends Controller
         ]);
 
         try {
-            $task = DailyTask::findOrFail($request->id);
+            // Scope the task to the logged-in user so only their own tasks can be updated
+            $task = DailyTask::where('user_id', Auth::id())->findOrFail($request->id);
             $newStatus = $request->status;
 
             $task->cat_id = $request->cat_id;
