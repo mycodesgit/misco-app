@@ -5,6 +5,11 @@
 @endsection
 
 @section('body')
+    @php
+        // The chat is closed once the ticket has been resolved (a reopened
+        // ticket goes back to Pending, which re-opens the chat).
+        $isChatLocked = strtolower((string) $ticket->status) === 'resolved';
+    @endphp
     <div class="row">
         <div class="col-12">
             <div class="mb-4">
@@ -260,7 +265,13 @@
                                         </small>
                                     </div>
                                 </div>
-                                <span class="badge bg-light text-dark border"><i class="ti ti-circle-filled text-success me-1"></i> Chat Active</span>
+                                <span class="badge bg-light text-dark border" id="chat-status-badge">
+                                    @if($isChatLocked)
+                                        <i class="ti ti-lock text-danger me-1"></i> Chat Closed
+                                    @else
+                                        <i class="ti ti-circle-filled text-success me-1"></i> Chat Active
+                                    @endif
+                                </span>
                             </div>
 
                             <!-- Chat Messages Body -->
@@ -284,28 +295,35 @@
                                     </div>
                                     <button type="button" class="btn-close btn-sm ms-2" id="removeAttachmentBtn" aria-label="Remove attachment"></button>
                                 </div>
-                                <form method="POST" id="chatOnlyForm" enctype="multipart/form-data">
+                                <form method="POST" id="chatOnlyForm" enctype="multipart/form-data" data-chat-locked="{{ $isChatLocked ? '1' : '0' }}">
                                     @csrf
                                     <input type="hidden" id="ticket_id" value="{{ $ticket->id }}">
-                                    <input type="file" id="chatAttachment" name="attachment" accept="image/*" class="d-none">
+                                    <input type="file" id="chatAttachment" name="attachment" accept="image/*" class="d-none" @if($isChatLocked) disabled @endif>
 
                                     <div class="position-relative d-flex align-items-center">
-                                        <input type="text" id="chatMessageInput" class="form-control custom-input-btn" placeholder="Type a text message to requester..." autocomplete="off">
+                                        <input type="text" id="chatMessageInput" class="form-control custom-input-btn" placeholder="@if($isChatLocked) Chat is closed for resolved tickets @else Type a text message to requester... @endif" autocomplete="off" @if($isChatLocked) disabled @endif>
 
                                         <!-- Action buttons container placed inside the input -->
                                         <div class="chat-input-actions d-flex align-items-center gap-1">
                                             <!-- Attach Icon -->
-                                            <label for="chatAttachment" class="btn btn-link text-secondary p-1 mb-0 border-0" title="Attach Image">
+                                            <label for="chatAttachment" class="btn btn-link text-secondary p-1 mb-0 border-0 @if($isChatLocked) d-none @endif" title="Attach Image">
                                                 <i class="ti ti-paperclip fs-5"></i>
                                             </label>
 
                                             <!-- Send Button -->
-                                            <button class="btn btn-success btn-inside-send" type="submit" id="sendChatBtn">
+                                            <button class="btn btn-success btn-inside-send" type="submit" id="sendChatBtn" @if($isChatLocked) disabled @endif>
                                                 <i class="ti ti-send me-1"></i> Send
                                             </button>
                                         </div>
                                     </div>
-                                    <small class="text-muted mt-1 d-block" style="font-size: 0.72rem;">
+
+                                    {{-- Notice shown while the ticket is resolved and the chat is closed --}}
+                                    <div id="chat-locked-notice" class="alert alert-warning py-2 px-3 mb-0 mt-2 d-flex align-items-center @if(!$isChatLocked) d-none @endif">
+                                        <i class="ti ti-lock me-2"></i>
+                                        <span class="small">This ticket is already <strong>Resolved</strong>, so the chat is closed. Reopen the ticket from your ticket list to continue the conversation.</span>
+                                    </div>
+
+                                    <small id="chat-attachment-hint" class="text-muted mt-1 d-block @if($isChatLocked) d-none @endif" style="font-size: 0.72rem;">
                                         <i class="ti ti-info-circle me-1"></i> Supports text & image attachments (PNG, JPG, JPEG up to 5MB).
                                     </small>
                                 </form>

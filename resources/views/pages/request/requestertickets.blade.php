@@ -66,22 +66,25 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
-                                        <table id="ticketpendingTable" class="table table-hover" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ticket No.</th>
-                                                    <th>Requester</th>
-                                                    <th>Subject</th>
-                                                    <th>Category</th>
-                                                    <th>Sub-Category</th>
-                                                    <th>Status</th>
-                                                    <th width="10%">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive p-2">
+                                            <table id="ticketpendingTable" class="table table-hover" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ticket No.</th>
+                                                        <th>Requester</th>
+                                                        <th>Subject</th>
+                                                        <th>Category</th>
+                                                        <th>Sub-Category</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th width="10%">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -93,22 +96,25 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
-                                        <table id="ticketprogressTable" class="table table-hover" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ticket No.</th>
-                                                    <th>Requester</th>
-                                                    <th>Subject</th>
-                                                    <th>Category</th>
-                                                    <th>Sub-Category</th>
-                                                    <th>Status</th>
-                                                    <th width="10%">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive p-2">
+                                            <table id="ticketprogressTable" class="table table-hover" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ticket No.</th>
+                                                        <th>Requester</th>
+                                                        <th>Subject</th>
+                                                        <th>Category</th>
+                                                        <th>Sub-Category</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th width="10%">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -120,22 +126,29 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
-                                        <table id="ticketresolvedTable" class="table table-hover" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ticket No.</th>
-                                                    <th>Requester</th>
-                                                    <th>Subject</th>
-                                                    <th>Category</th>
-                                                    <th>Sub-Category</th>
-                                                    <th>Status</th>
-                                                    <th width="20%">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive p-2">
+                                            <table id="ticketresolvedTable" class="table table-hover" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ticket No.</th>
+                                                        <th>Requester</th>
+                                                        <th>Subject</th>
+                                                        <th>Category</th>
+                                                        <th>Sub-Category</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th>Resolved By</th>
+                                                        <th>Date Created</th>
+                                                        <th>Date Resolved</th>
+                                                        <th>Duration</th>
+                                                        <th width="20%">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -147,22 +160,25 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
-                                        <table id="ticketclosedTable" class="table table-hover" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ticket No.</th>
-                                                    <th>Requester</th>
-                                                    <th>Subject</th>
-                                                    <th>Category</th>
-                                                    <th>Sub-Category</th>
-                                                    <th>Status</th>
-                                                    <th width="10%">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive p-2">
+                                            <table id="ticketclosedTable" class="table table-hover" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ticket No.</th>
+                                                        <th>Requester</th>
+                                                        <th>Subject</th>
+                                                        <th>Category</th>
+                                                        <th>Sub-Category</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th width="10%">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -177,8 +193,8 @@
     @include('pages.request.modals.editticketmodal')
 
     <div class="modal fade" id="submitfeedTicketModal" tabindex="-1" aria-labelledby="submitfeedTicketModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
-            <div class="modal-content border-0 p-2" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 60%, #15803d 100%); border-radius: 22px;">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 p-2">
                 <div class="bg-white px-4 pt-4 pb-3" style="border-radius: 16px;">
                     <!-- Modal Header -->
                     <div class="d-flex justify-content-between align-items-start border-0 p-0 mb-1">
@@ -197,22 +213,40 @@
                         <input type="hidden" name="rating" id="feedback_rating" value="">
 
                         <!-- Emoji rating -->
-                        <div class="d-flex justify-content-center align-items-center gap-2 my-3" id="emojiRatingGroup">
-                            <button type="button" class="emoji-btn" data-value="1" title="Very Dissatisfied" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">😣</button>
-                            <button type="button" class="emoji-btn" data-value="2" title="Dissatisfied" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">😟</button>
-                            <button type="button" class="emoji-btn" data-value="3" title="Neutral" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">😐</button>
-                            <button type="button" class="emoji-btn" data-value="4" title="Satisfied" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">🙂</button>
-                            <button type="button" class="emoji-btn" data-value="5" title="Very Satisfied" style="font-size: 2rem; background: none; border: none; filter: grayscale(0); transition: transform .15s; line-height: 1;">😁</button>
+                        <div class="d-flex justify-content-center align-items-start gap-2 my-3" id="emojiRatingGroup">
+                            <button type="button" class="emoji-btn" data-value="1" title="Very Poor">
+                                <span class="emoji-icon">😣</span>
+                                <span class="emoji-label">Very Poor</span>
+                            </button>
+                            <button type="button" class="emoji-btn" data-value="2" title="Poor">
+                                <span class="emoji-icon">😟</span>
+                                <span class="emoji-label">Poor</span>
+                            </button>
+                            <button type="button" class="emoji-btn" data-value="3" title="Average">
+                                <span class="emoji-icon">😊</span>
+                                <span class="emoji-label">Average</span>
+                            </button>
+                            <button type="button" class="emoji-btn" data-value="4" title="Good">
+                                <span class="emoji-icon">😄</span>
+                                <span class="emoji-label">Good</span>
+                            </button>
+                            <button type="button" class="emoji-btn" data-value="5" title="Excellent">
+                                <span class="emoji-icon">🤩</span>
+                                <span class="emoji-label">Excellent</span>
+                            </button>
                         </div>
-                        <p class="text-center small mb-3" id="emojiRatingLabel" style="color: #e5b8c4;">Choose your experience</p>
+                        <p class="text-center small mb-3">Choose your experience</p>
 
                         <!-- Suggestion -->
                         <div class="mb-3">
                             <textarea class="form-control border-0" id="feedback_text" name="feedback" rows="3" placeholder="Suggest anything we can improve.." style="background: #f3f6ff; border-radius: 12px; resize: none;"></textarea>
                         </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Your input helps us enhance our service. Tap the emoji that best represents your experience and share any comments.</small>
+                        </div>
 
                         <!-- Submit -->
-                        <button type="submit" class="btn w-100 text-white fw-semibold" style="background: #2f7bff; border-radius: 999px; padding: 10px 0;">
+                        <button type="submit" class="btn btn-success w-100 text-white fw-semibold" style="border-radius: 999px; padding: 10px 0;">
                             Send Feedback
                         </button>
                     </form>
@@ -225,15 +259,41 @@
         #emojiRatingGroup .emoji-btn {
             cursor: pointer;
             opacity: .55;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 0 2px;
+            background: none;
+            border: none;
+            transition: transform .15s;
+        }
+        #emojiRatingGroup .emoji-icon {
+            font-size: 2.75rem;
+            line-height: 1;
+            filter: grayscale(0);
+        }
+        #emojiRatingGroup .emoji-label {
+            font-size: .72rem;
+            font-weight: 600;
+            line-height: 1.2;
+            white-space: nowrap;
+            color: #6c757d;
         }
         #emojiRatingGroup .emoji-btn:hover {
-            transform: scale(1.2);
+            transform: scale(1.15);
             opacity: 1;
         }
+        #emojiRatingGroup .emoji-btn:hover .emoji-label {
+            color: #111;
+        }
         #emojiRatingGroup .emoji-btn.active {
-            transform: scale(1.35);
+            transform: scale(1.25);
             opacity: 1;
             filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)) !important;
+        }
+        #emojiRatingGroup .emoji-btn.active .emoji-label {
+            color: #111;
         }
     </style>
 
@@ -259,6 +319,7 @@
         var ticketFeedbackSubmitRoute = "{{ route('ticketsrequester.feedback.submit') }}";
         var ticketEditBase = "{{ url('/tickets/requester/tickets/edit') }}";
         var ticketUpdateRoute = "{{ route('ticketsrequester.update') }}";
+        var ticketReopenRoute = "{{ route('ticketsrequester.reopen') }}";
 
         function previewImage(event) {
             var reader = new FileReader();

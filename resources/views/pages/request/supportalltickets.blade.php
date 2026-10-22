@@ -71,22 +71,25 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
-                                        <table id="ticketpendingTable" class="table table-hover" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ticket No.</th>
-                                                    <th>Requester</th>
-                                                    <th>Subject</th>
-                                                    <th>Category</th>
-                                                    <th>Sub-Category</th>
-                                                    <th>Status</th>
-                                                    <th width="10%">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive p-2">
+                                            <table id="ticketpendingTable" class="table table-hover" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ticket No.</th>
+                                                        <th>Requester</th>
+                                                        <th>Subject</th>
+                                                        <th>Category</th>
+                                                        <th>Sub-Category</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th width="10%">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -98,22 +101,25 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
-                                        <table id="ticketprogressTable" class="table table-hover" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ticket No.</th>
-                                                    <th>Requester</th>
-                                                    <th>Subject</th>
-                                                    <th>Category</th>
-                                                    <th>Sub-Category</th>
-                                                    <th>Status</th>
-                                                    <th width="10%">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive p-2">
+                                            <table id="ticketprogressTable" class="table table-hover" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ticket No.</th>
+                                                        <th>Requester</th>
+                                                        <th>Subject</th>
+                                                        <th>Category</th>
+                                                        <th>Sub-Category</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th width="10%">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -125,22 +131,29 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
-                                        <table id="ticketresolvedTable" class="table table-hover" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ticket No.</th>
-                                                    <th>Requester</th>
-                                                    <th>Subject</th>
-                                                    <th>Category</th>
-                                                    <th>Sub-Category</th>
-                                                    <th>Status</th>
-                                                    <th width="10%">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive p-2">
+                                            <table id="ticketresolvedTable" class="table table-hover" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ticket No.</th>
+                                                        <th>Requester</th>
+                                                        <th>Subject</th>
+                                                        <th>Category</th>
+                                                        <th>Sub-Category</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th>Resolved By</th>
+                                                        <th>Date Created</th>
+                                                        <th>Date Resolved</th>
+                                                        <th>Duration</th>
+                                                        <th width="10%">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -152,22 +165,25 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
-                                        <table id="ticketclosedTable" class="table table-hover" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ticket No.</th>
-                                                    <th>Requester</th>
-                                                    <th>Subject</th>
-                                                    <th>Category</th>
-                                                    <th>Sub-Category</th>
-                                                    <th>Status</th>
-                                                    <th width="10%">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive p-2">
+                                            <table id="ticketclosedTable" class="table table-hover" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ticket No.</th>
+                                                        <th>Requester</th>
+                                                        <th>Subject</th>
+                                                        <th>Category</th>
+                                                        <th>Sub-Category</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th width="10%">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

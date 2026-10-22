@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -29,6 +28,12 @@ use App\Services\LanguageDetectionService;
 
 class RequesterTicketRequestController extends Controller
 {
+    /**
+     * A resolved ticket can only be reopened within this many days
+     * after it was resolved (1 week).
+     */
+    public const REOPEN_WINDOW_DAYS = 7;
+
     protected LanguageDetectionService $languageDetection;
 
     public function __construct(LanguageDetectionService $languageDetection)
@@ -203,7 +208,10 @@ class RequesterTicketRequestController extends Controller
             DB::commit();
 
             Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
-            broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'));
+            \App\Helpers\Realtime::broadcast(
+                new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'),
+                'ticket ' . $ticket->ticket_number
+            );
 
             // Notify support users of the ticket's handling office only (office_id = ticket off_id)
             $supportUsers = User::where('role', '!=', 'Requester')
@@ -220,8 +228,7 @@ class RequesterTicketRequestController extends Controller
                     title: 'New Pending Ticket #' . $ticketNumber,
                     message: $requesterName . ' submitted a new ticket: ' . Str::limit($request->issue_description, 80),
                 );
-                Notification::send($supportUsers, $notif);
-                \App\Events\UserNotified::dispatchFor($supportUsers, $notif); // realtime Reverb ping
+                \App\Helpers\Realtime::notify($supportUsers, $notif, 'ticket ' . $ticket->ticket_number);
             }
 
             // 5. Log Audit
@@ -341,7 +348,10 @@ class RequesterTicketRequestController extends Controller
             DB::commit();
 
             Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
-            broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'updated'));
+            \App\Helpers\Realtime::broadcast(
+                new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'updated'),
+                'ticket ' . $ticket->ticket_number
+            );
 
             // Log Audit
             $this->logAudit($request, 'Update_DailyTicket', $ticket->toArray());
@@ -365,7 +375,7 @@ class RequesterTicketRequestController extends Controller
     {
         $authuserID = Auth::user()->id;
 
-        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
+        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Pending')
             ->where('user_id', $authuserID)
             ->orderBy('id', 'DESC')
@@ -378,7 +388,7 @@ class RequesterTicketRequestController extends Controller
     {
         $authuserID = Auth::user()->id;
 
-        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
+        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'In Progress')
             ->where('user_id', $authuserID)
             ->orderBy('id', 'DESC')
@@ -391,7 +401,7 @@ class RequesterTicketRequestController extends Controller
     {
         $authuserID = Auth::user()->id;
 
-        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
+        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Resolved')
             ->where('user_id', $authuserID)
             ->orderBy('id', 'DESC')
@@ -405,16 +415,174 @@ class RequesterTicketRequestController extends Controller
 
         $data->each(function ($ticket) use ($submittedTicketIds) {
             $ticket->has_feedback = in_array($ticket->id, $submittedTicketIds);
+            $ticket->can_reopen = $this->canReopen($ticket);
+            $ticket->reopen_deadline = $this->reopenDeadline($ticket)?->toIso8601String();
         });
 
         return response()->json(['data' => $data]);
+    }
+
+    /**
+     * The last moment a resolved ticket may be reopened:
+     * 1 week after it was resolved.
+     */
+    private function reopenDeadline(DailyTicketRequest $ticket): ?Carbon
+    {
+        $resolvedAt = $ticket->resolved_at ?: $ticket->updated_at ?: $ticket->created_at;
+
+        return $resolvedAt ? Carbon::parse($resolvedAt)->addDays(self::REOPEN_WINDOW_DAYS) : null;
+    }
+
+    /**
+     * A ticket may only be reopened while it is still Resolved and the
+     * 1-week reopen window has not lapsed yet.
+     */
+    private function canReopen(DailyTicketRequest $ticket): bool
+    {
+        if ($ticket->status !== 'Resolved') {
+            return false;
+        }
+
+        $deadline = $this->reopenDeadline($ticket);
+
+        return $deadline !== null && Carbon::now()->lessThanOrEqualTo($deadline);
+    }
+
+    /**
+     * Reopen a resolved ticket.
+     *
+     * The ticket number and every other detail stay exactly the same — only
+     * the status moves from Resolved back to Pending because the requester is
+     * not satisfied with the resolution. A ticket can only be reopened within
+     * 1 week of being resolved; after that the window has lapsed.
+     */
+    public function reopen(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ticket_id' => 'required|integer|exists:dailyticketrequest,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $ticket = DailyTicketRequest::where('id', $request->ticket_id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$ticket) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ticket not found.'
+            ], 404);
+        }
+
+        if ($ticket->status !== 'Resolved') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only resolved tickets can be reopened.'
+            ], 403);
+        }
+
+        $deadline = $this->reopenDeadline($ticket);
+
+        if ($deadline === null || Carbon::now()->greaterThan($deadline)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The 1-week reopen window for this ticket has lapsed and it can no longer be reopened.'
+            ], 403);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Only the status changes — the ticket number stays the same
+            $ticket->status = 'Pending';
+            $ticket->save();
+
+            DB::commit();
+
+            Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
+            \App\Helpers\Realtime::broadcast(
+                new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'reopened'),
+                'ticket ' . $ticket->ticket_number
+            );
+            // Also refresh an open chat page (the chat re-opens with the ticket)
+            \App\Helpers\Realtime::broadcast(
+                new \App\Events\TicketStatusUpdated($ticket->fresh()),
+                'ticket ' . $ticket->ticket_number
+            );
+
+            // Let the support personnel know the requester is not satisfied
+            $this->notifySupportOfReopen($ticket);
+
+            // Log Audit
+            $this->logAudit($request, 'Reopen_DailyTicket', $ticket->toArray());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket #' . $ticket->ticket_number . ' has been reopened and is now Pending.',
+                'data'    => $ticket
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reopen ticket: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Notify the personnel handling the ticket (or the support office when
+     * nobody is assigned) that the requester reopened it.
+     */
+    private function notifySupportOfReopen(DailyTicketRequest $ticket): void
+    {
+        $assignedIds = collect(explode(',', (string) $ticket->assigned_to))
+            ->map(fn ($id) => (int) trim($id))
+            ->filter()
+            ->unique()
+            ->reject(fn ($id) => $id === (int) Auth::id())
+            ->values();
+
+        if ($assignedIds->isNotEmpty()) {
+            $recipients = User::whereIn('id', $assignedIds)->where('ustatus', '!=', 3)->get();
+        } else {
+            $recipients = User::where('office_id', $ticket->off_id)
+                ->where('role', '!=', 'Requester')
+                ->where('ustatus', '!=', 3)
+                ->where('id', '!=', Auth::id())
+                ->get();
+        }
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        $requesterName = trim((Auth::user()->fname ?? '') . ' ' . (Auth::user()->lname ?? '')) ?: 'A requester';
+
+        $notif = new \App\Notifications\TicketEventNotification(
+            ticketId: $ticket->id,
+            ticketNumber: $ticket->ticket_number,
+            event: 'reopened',
+            title: 'Ticket #' . $ticket->ticket_number . ' was reopened',
+            message: $requesterName . ' reopened this ticket: ' . Str::limit($ticket->issue_description, 80),
+        );
+
+        // Realtime fan-out must never fail the reopen itself (Reverb may be down)
+        \App\Helpers\Realtime::notify($recipients, $notif, 'ticket ' . $ticket->ticket_number);
     }
 
     public function showreqclosed()
     {
         $authuserID = Auth::user()->id;
 
-        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
+        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Cancelled')
             ->where('user_id', $authuserID)
             ->orderBy('id', 'DESC')

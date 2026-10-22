@@ -103,6 +103,76 @@
             });
         });
 
+        /* ================= Shared ticket column renderers ================= */
+
+        function escapeHtml(text) {
+            return String(text ?? '')
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Subject — the issue description the requester typed in
+        function renderTicketSubject(data) {
+            var text = String(data ?? '').trim();
+
+            if (!text) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            var short = text.length > 45 ? text.substring(0, 45) + '…' : text;
+
+            return `<span class="d-block text-truncate" style="max-width: 200px;" title="${escapeHtml(text)}">${escapeHtml(short)}</span>`;
+        }
+
+        // Resolved By — the staff member who marked the ticket as Resolved
+        function renderResolvedBy(data) {
+            if (!data) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            return '<span class="fw-semibold small">' + escapeHtml(data) + '</span>';
+        }
+
+        // Date Created
+        function renderDateCreated(data) {
+            if (!data) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            return '<span class="small text-muted">' + moment(data).format('MMM DD, YYYY h:mm A') + '</span>';
+        }
+
+        // Date Resolved — only meaningful while the ticket is Resolved
+        function renderDateResolved(data, type, row) {
+            if (row.status !== 'Resolved' || !data) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            return '<span class="small text-muted">' + moment(data).format('MMM DD, YYYY h:mm A') + '</span>';
+        }
+
+        // Duration — how long the ticket took, or has been running so far
+        function renderDuration(data, type, row) {
+            if (!data) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            var badgeClass = 'bg-light text-dark border';
+
+            if (row.status === 'Resolved') {
+                badgeClass = 'bg-success text-white';
+            } else if (row.status === 'Cancelled') {
+                badgeClass = 'bg-secondary text-white';
+            } else if (row.status === 'In Progress') {
+                badgeClass = 'bg-warning text-dark';
+            }
+
+            return '<span class="badge ' + badgeClass + '">' + escapeHtml(data) + '</span>';
+        }
+
         var dataTablePending = $('#ticketpendingTable').DataTable({
             "ajax": {
                 "url": ticketPendingReadRoute,
@@ -164,21 +234,26 @@
                             </div>`;
                     }
                 },
-                // 3. Category
+                // 3. Subject
+                {
+                    data: 'issue_description',
+                    render: renderTicketSubject
+                },
+                // 4. Category
                 {
                     data: 'category',
                     render: function(data, type, row) {
                         return row.category ? row.category.ticketcatname : '-';
                     }
                 },
-                // 4. Sub-Category
+                // 5. Sub-Category
                 {
                     data: 'subcategory',
                     render: function(data, type, row) {
                         return row.subcategory ? row.subcategory.ticketsubcatname : '-';
                     }
                 },
-                // 5. Priority Badge
+                // 6. Priority Badge
                 {
                     data: 'priority',
                     render: function(data) {
@@ -190,7 +265,7 @@
                         return `<span class="badge ${badgeClass} rounded-pill">${data ?? 'Medium'}</span>`;
                     }
                 },
-                // 6. Status Badge
+                // 7. Status Badge
                 {
                     data: 'status',
                     render: function(data) {
@@ -203,7 +278,7 @@
                         return `<span class="badge ${statusClass}">${data ?? 'Pending'}</span>`;
                     }
                 },
-                // 7. Actions (View / Edit / Delete)
+                // 8. Actions (View / Edit / Delete)
                 {
                     data: 'id',
                     render: function(data, type, row) {
@@ -289,21 +364,26 @@
                             </div>`;
                     }
                 },
-                // 3. Category
+                // 3. Subject
+                {
+                    data: 'issue_description',
+                    render: renderTicketSubject
+                },
+                // 4. Category
                 {
                     data: 'category',
                     render: function(data, type, row) {
                         return row.category ? row.category.ticketcatname : '-';
                     }
                 },
-                // 4. Sub-Category
+                // 5. Sub-Category
                 {
                     data: 'subcategory',
                     render: function(data, type, row) {
                         return row.subcategory ? row.subcategory.ticketsubcatname : '-';
                     }
                 },
-                // 5. Priority Badge
+                // 6. Priority Badge
                 {
                     data: 'priority',
                     render: function(data) {
@@ -315,7 +395,7 @@
                         return `<span class="badge ${badgeClass} rounded-pill">${data ?? 'Medium'}</span>`;
                     }
                 },
-                // 6. Status Badge
+                // 7. Status Badge
                 {
                     data: 'status',
                     render: function(data) {
@@ -328,7 +408,7 @@
                         return `<span class="badge ${statusClass}">${data ?? 'Pending'}</span>`;
                     }
                 },
-                // 7. Actions (View / Edit / Delete)
+                // 8. Actions (View / Edit / Delete)
                 {
                     data: 'id',
                     render: function(data, type, row) {
@@ -412,21 +492,26 @@
                             </div>`;
                     }
                 },
-                // 3. Category
+                // 3. Subject
+                {
+                    data: 'issue_description',
+                    render: renderTicketSubject
+                },
+                // 4. Category
                 {
                     data: 'category',
                     render: function(data, type, row) {
                         return row.category ? row.category.ticketcatname : '-';
                     }
                 },
-                // 4. Sub-Category
+                // 5. Sub-Category
                 {
                     data: 'subcategory',
                     render: function(data, type, row) {
                         return row.subcategory ? row.subcategory.ticketsubcatname : '-';
                     }
                 },
-                // 5. Priority Badge
+                // 6. Priority Badge
                 {
                     data: 'priority',
                     render: function(data) {
@@ -438,7 +523,7 @@
                         return `<span class="badge ${badgeClass} rounded-pill">${data ?? 'Medium'}</span>`;
                     }
                 },
-                // 6. Status Badge
+                // 7. Status Badge
                 {
                     data: 'status',
                     render: function(data) {
@@ -451,7 +536,27 @@
                         return `<span class="badge ${statusClass}">${data ?? 'Pending'}</span>`;
                     }
                 },
-                // 7. Actions (View / Feedback)
+                // 8. Resolved By
+                {
+                    data: 'resolved_by_name',
+                    render: renderResolvedBy
+                },
+                // 9. Date Created
+                {
+                    data: 'created_at',
+                    render: renderDateCreated
+                },
+                // 10. Date Resolved
+                {
+                    data: 'resolved_at',
+                    render: renderDateResolved
+                },
+                // 11. Duration
+                {
+                    data: 'duration',
+                    render: renderDuration
+                },
+                // 12. Actions (View / Feedback / Reopen)
                 {
                     data: 'id',
                     render: function(data, type, row) {
@@ -464,7 +569,16 @@
                             feedbackBtn = `<button type="button" class="btn btn-sm btn-success text-white btn-submitfeedback me-1 text-nowrap" data-id="${data}" data-bs-toggle="tooltip" title="Submit Feedback"><i class="ti ti-forms me-1"></i>Submit Feedback</button>`;
                         }
 
-                        return `<div class="text-nowrap">` + viewBtn + feedbackBtn + `</div>`;
+                        // Reopen: the requester can send a resolved ticket back to
+                        // Pending while the 1-week reopen window is still open.
+                        var reopenBtn;
+                        if (row.can_reopen) {
+                            reopenBtn = `<button type="button" class="btn btn-sm btn-warning text-white btn-reopenticket me-1 text-nowrap" data-id="${data}" data-bs-toggle="tooltip" title="Reopen this ticket (not satisfied with the resolution)"><i class="ti ti-refresh me-1"></i>Reopen</button>`;
+                        } else {
+                            reopenBtn = `<span data-bs-toggle="tooltip" data-bs-placement="top" title="The 1-week reopen window for this ticket has lapsed"><button type="button" class="btn btn-sm btn-secondary text-white me-1 text-nowrap" disabled><i class="ti ti-lock me-1"></i>Reopen</button></span>`;
+                        }
+
+                        return `<div class="text-nowrap">` + viewBtn + reopenBtn + feedbackBtn + `</div>`;
                     }
                 }
             ],
@@ -541,21 +655,26 @@
                             </div>`;
                     }
                 },
-                // 3. Category
+                // 3. Subject
+                {
+                    data: 'issue_description',
+                    render: renderTicketSubject
+                },
+                // 4. Category
                 {
                     data: 'category',
                     render: function(data, type, row) {
                         return row.category ? row.category.ticketcatname : '-';
                     }
                 },
-                // 4. Sub-Category
+                // 5. Sub-Category
                 {
                     data: 'subcategory',
                     render: function(data, type, row) {
                         return row.subcategory ? row.subcategory.ticketsubcatname : '-';
                     }
                 },
-                // 5. Priority Badge
+                // 6. Priority Badge
                 {
                     data: 'priority',
                     render: function(data) {
@@ -567,7 +686,7 @@
                         return `<span class="badge ${badgeClass} rounded-pill">${data ?? 'Medium'}</span>`;
                     }
                 },
-                // 6. Status Badge
+                // 7. Status Badge
                 {
                     data: 'status',
                     render: function(data) {
@@ -580,7 +699,7 @@
                         return `<span class="badge ${statusClass}">${data ?? 'Pending'}</span>`;
                     }
                 },
-                // 7. Actions (View / Edit / Delete)
+                // 8. Actions (View / Edit / Delete)
                 {
                     data: 'id',
                     render: function(data, type, row) {
@@ -853,11 +972,11 @@
 
     /* ================= Feedback modal (ClientSatisfactory) ================= */
     var feedbackLabels = {
-        1: 'Very Dissatisfied',
-        2: 'Dissatisfied',
-        3: 'Neutral',
-        4: 'Satisfied',
-        5: 'Very Satisfied'
+        1: 'Very Poor',
+        2: 'Poor',
+        3: 'Average',
+        4: 'Good',
+        5: 'Excellent'
     };
 
     function setFeedbackRating(value) {
@@ -925,6 +1044,55 @@
                 try { msg = JSON.parse(xhr.responseText).message || msg; } catch (e) {}
                 toastr.error(msg);
             }
+        });
+    });
+
+    /* ================= Reopen ticket (Resolved -> Pending) ================= */
+    // The requester can send a resolved ticket back to Pending when they are
+    // not satisfied with the resolution. Same ticket number, status only.
+    $(document).on('click', '.btn-reopenticket', function() {
+        var ticketId = $(this).data('id');
+        var $btn = $(this);
+
+        Swal.fire({
+            title: 'Reopen this ticket?',
+            text: 'The ticket will go back to Pending so the support team can work on it again. The ticket number stays the same.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reopen it!',
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#6c757d'
+        }).then(function (result) {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            $btn.prop('disabled', true);
+
+            $.ajax({
+                url: ticketReopenRoute,
+                type: 'POST',
+                data: { ticket_id: ticketId },
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        // The ticket moved back to Pending — refresh every list
+                        $(document).trigger('ticketListChanged');
+                        $(document).trigger('ticketResolvedAdded');
+                        $(document).trigger('ticketAdded');
+                    } else {
+                        toastr.error(response.message);
+                        $btn.prop('disabled', false);
+                    }
+                },
+                error: function (xhr) {
+                    var msg = 'An error occurred';
+                    try { msg = JSON.parse(xhr.responseText).message || msg; } catch (e) {}
+                    toastr.error(msg);
+                    $btn.prop('disabled', false);
+                }
+            });
         });
     });
 </script>

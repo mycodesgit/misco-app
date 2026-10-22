@@ -32,6 +32,76 @@
             });
         });
 
+        /* ================= Shared ticket column renderers ================= */
+
+        function escapeHtml(text) {
+            return String(text ?? '')
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Subject — the issue description the requester typed in
+        function renderTicketSubject(data) {
+            var text = String(data ?? '').trim();
+
+            if (!text) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            var short = text.length > 45 ? text.substring(0, 45) + '…' : text;
+
+            return `<span class="d-block text-truncate" style="max-width: 200px;" title="${escapeHtml(text)}">${escapeHtml(short)}</span>`;
+        }
+
+        // Resolved By — the staff member who marked the ticket as Resolved
+        function renderResolvedBy(data) {
+            if (!data) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            return '<span class="fw-semibold small">' + escapeHtml(data) + '</span>';
+        }
+
+        // Date Created
+        function renderDateCreated(data) {
+            if (!data) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            return '<span class="small text-muted">' + moment(data).format('MMM DD, YYYY h:mm A') + '</span>';
+        }
+
+        // Date Resolved — only meaningful while the ticket is Resolved
+        function renderDateResolved(data, type, row) {
+            if (row.status !== 'Resolved' || !data) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            return '<span class="small text-muted">' + moment(data).format('MMM DD, YYYY h:mm A') + '</span>';
+        }
+
+        // Duration — how long the ticket took, or has been running so far
+        function renderDuration(data, type, row) {
+            if (!data) {
+                return '<span class="text-muted">-</span>';
+            }
+
+            var badgeClass = 'bg-light text-dark border';
+
+            if (row.status === 'Resolved') {
+                badgeClass = 'bg-success text-white';
+            } else if (row.status === 'Cancelled') {
+                badgeClass = 'bg-secondary text-white';
+            } else if (row.status === 'In Progress') {
+                badgeClass = 'bg-warning text-dark';
+            }
+
+            return '<span class="badge ' + badgeClass + '">' + escapeHtml(data) + '</span>';
+        }
+
         var dataTablePending = $('#ticketpendingTable').DataTable({
             "ajax": {
                 "url": ticketPendingReadRoute,
@@ -93,21 +163,26 @@
                             </div>`;
                     }
                 },
-                // 3. Category
+                // 3. Subject
+                {
+                    data: 'issue_description',
+                    render: renderTicketSubject
+                },
+                // 4. Category
                 {
                     data: 'category',
                     render: function(data, type, row) {
                         return row.category ? row.category.ticketcatname : '-';
                     }
                 },
-                // 4. Sub-Category
+                // 5. Sub-Category
                 {
                     data: 'subcategory',
                     render: function(data, type, row) {
                         return row.subcategory ? row.subcategory.ticketsubcatname : '-';
                     }
                 },
-                // 5. Priority Badge
+                // 6. Priority Badge
                 {
                     data: 'priority',
                     render: function(data) {
@@ -119,7 +194,7 @@
                         return `<span class="badge ${badgeClass} rounded-pill">${data ?? 'Medium'}</span>`;
                     }
                 },
-                // 6. Status Badge
+                // 7. Status Badge
                 {
                     data: 'status',
                     render: function(data) {
@@ -132,7 +207,7 @@
                         return `<span class="badge ${statusClass}">${data ?? 'Pending'}</span>`;
                     }
                 },
-                // 7. Actions (View / Edit / Delete)
+                // 8. Actions (View / Edit / Delete)
                 {
                     data: 'id',
                     render: function(data, type, row) {
@@ -217,21 +292,26 @@
                             </div>`;
                     }
                 },
-                // 3. Category
+                // 3. Subject
+                {
+                    data: 'issue_description',
+                    render: renderTicketSubject
+                },
+                // 4. Category
                 {
                     data: 'category',
                     render: function(data, type, row) {
                         return row.category ? row.category.ticketcatname : '-';
                     }
                 },
-                // 4. Sub-Category
+                // 5. Sub-Category
                 {
                     data: 'subcategory',
                     render: function(data, type, row) {
                         return row.subcategory ? row.subcategory.ticketsubcatname : '-';
                     }
                 },
-                // 5. Priority Badge
+                // 6. Priority Badge
                 {
                     data: 'priority',
                     render: function(data) {
@@ -243,7 +323,7 @@
                         return `<span class="badge ${badgeClass} rounded-pill">${data ?? 'Medium'}</span>`;
                     }
                 },
-                // 6. Status Badge
+                // 7. Status Badge
                 {
                     data: 'status',
                     render: function(data) {
@@ -256,7 +336,7 @@
                         return `<span class="badge ${statusClass}">${data ?? 'Pending'}</span>`;
                     }
                 },
-                // 7. Actions (View / Edit / Delete)
+                // 8. Actions (View / Edit / Delete)
                 {
                     data: 'id',
                     render: function(data, type, row) {
@@ -337,21 +417,26 @@
                             </div>`;
                     }
                 },
-                // 3. Category
+                // 3. Subject
+                {
+                    data: 'issue_description',
+                    render: renderTicketSubject
+                },
+                // 4. Category
                 {
                     data: 'category',
                     render: function(data, type, row) {
                         return row.category ? row.category.ticketcatname : '-';
                     }
                 },
-                // 4. Sub-Category
+                // 5. Sub-Category
                 {
                     data: 'subcategory',
                     render: function(data, type, row) {
                         return row.subcategory ? row.subcategory.ticketsubcatname : '-';
                     }
                 },
-                // 5. Priority Badge
+                // 6. Priority Badge
                 {
                     data: 'priority',
                     render: function(data) {
@@ -363,7 +448,7 @@
                         return `<span class="badge ${badgeClass} rounded-pill">${data ?? 'Medium'}</span>`;
                     }
                 },
-                // 6. Status Badge
+                // 7. Status Badge
                 {
                     data: 'status',
                     render: function(data) {
@@ -376,7 +461,27 @@
                         return `<span class="badge ${statusClass}">${data ?? 'Pending'}</span>`;
                     }
                 },
-                // 7. Actions (View / Edit / Delete)
+                // 8. Resolved By
+                {
+                    data: 'resolved_by_name',
+                    render: renderResolvedBy
+                },
+                // 9. Date Created
+                {
+                    data: 'created_at',
+                    render: renderDateCreated
+                },
+                // 10. Date Resolved
+                {
+                    data: 'resolved_at',
+                    render: renderDateResolved
+                },
+                // 11. Duration
+                {
+                    data: 'duration',
+                    render: renderDuration
+                },
+                // 12. Actions (View / Edit / Delete)
                 {
                     data: 'id',
                     render: function(data, type, row) {
@@ -457,21 +562,26 @@
                             </div>`;
                     }
                 },
-                // 3. Category
+                // 3. Subject
+                {
+                    data: 'issue_description',
+                    render: renderTicketSubject
+                },
+                // 4. Category
                 {
                     data: 'category',
                     render: function(data, type, row) {
                         return row.category ? row.category.ticketcatname : '-';
                     }
                 },
-                // 4. Sub-Category
+                // 5. Sub-Category
                 {
                     data: 'subcategory',
                     render: function(data, type, row) {
                         return row.subcategory ? row.subcategory.ticketsubcatname : '-';
                     }
                 },
-                // 5. Priority Badge
+                // 6. Priority Badge
                 {
                     data: 'priority',
                     render: function(data) {
@@ -483,7 +593,7 @@
                         return `<span class="badge ${badgeClass} rounded-pill">${data ?? 'Medium'}</span>`;
                     }
                 },
-                // 6. Status Badge
+                // 7. Status Badge
                 {
                     data: 'status',
                     render: function(data) {
@@ -496,7 +606,7 @@
                         return `<span class="badge ${statusClass}">${data ?? 'Pending'}</span>`;
                     }
                 },
-                // 7. Actions (View / Edit / Delete)
+                // 8. Actions (View / Edit / Delete)
                 {
                     data: 'id',
                     render: function(data, type, row) {

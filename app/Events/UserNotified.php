@@ -32,11 +32,20 @@ class UserNotified implements ShouldBroadcastNow
     /**
      * Store already handled via Notification::send — this pushes the
      * realtime Reverb ping so the topbar updates + chimes instantly.
+     *
+     * Each ping is guarded on its own: if the socket server is unreachable
+     * the notification must still be delivered to the remaining users.
      */
     public static function dispatchFor(iterable $users, \Illuminate\Notifications\Notification $notification): void
     {
         foreach ($users as $user) {
-            broadcast(new self((int) $user->id, $notification->toDatabase($user)));
+            try {
+                broadcast(new self((int) $user->id, $notification->toDatabase($user)));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning(
+                    'Realtime notification ping failed for user ' . $user->id . ': ' . $e->getMessage()
+                );
+            }
         }
     }
 }

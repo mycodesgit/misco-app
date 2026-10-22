@@ -1,9 +1,46 @@
 <script>
+    // A resolved ticket has its chat closed: the inputs are disabled and the
+    // message cannot be sent. Reopening the ticket (back to Pending) re-opens it.
+    function setChatLocked(locked) {
+        const $form = $('#chatOnlyForm');
+        const $input = $('#chatMessageInput');
+        const $file = $('#chatAttachment');
+        const $send = $('#sendChatBtn');
+        const $badge = $('#chat-status-badge');
+        const $notice = $('#chat-locked-notice');
+        const $hint = $('#chat-attachment-hint');
+        const $attachLabel = $form.find('label[for="chatAttachment"]');
+
+        $form.attr('data-chat-locked', locked ? '1' : '0');
+
+        $input.prop('disabled', locked).attr(
+            'placeholder',
+            locked ? 'Chat is closed for resolved tickets' : 'Type a text message to requester...'
+        );
+
+        $file.prop('disabled', locked);
+        $attachLabel.toggleClass('d-none', locked);
+
+        $send.prop('disabled', locked);
+
+        $notice.toggleClass('d-none', !locked);
+        $hint.toggleClass('d-none', locked);
+
+        if ($badge.length) {
+            $badge.html(locked
+                ? '<i class="ti ti-lock text-danger me-1"></i> Chat Closed'
+                : '<i class="ti ti-circle-filled text-success me-1"></i> Chat Active');
+        }
+    }
+
     $(document).ready(function () {
         const ticketId = $('#ticket_id').val();
         const currentUserId = {{ auth()->id() }};
         const fetchUrl = "{{ route('ticket.chat.fetch', ['ticketId' => ':ticketId']) }}".replace(':ticketId', ticketId);
         const sendUrl = "{{ route('ticket.chat.send') }}";
+
+        // Apply the initial lock state (resolved tickets start with a closed chat)
+        setChatLocked($('#chatOnlyForm').attr('data-chat-locked') === '1');
 
         // Track scroll position to prevent interrupting user if they scrolled up to read history
         let userHasScrolledUp = false;
@@ -146,6 +183,12 @@
         // Handle send form submit
         $('#chatOnlyForm').on('submit', function (e) {
             e.preventDefault();
+
+            // Resolved tickets have a closed chat — nothing can be sent
+            if ($('#chatOnlyForm').attr('data-chat-locked') === '1') {
+                toastr.warning('This ticket is already resolved, so the chat is closed.');
+                return;
+            }
 
             const messageInput = $('#chatMessageInput');
             const fileInput = $('#chatAttachment')[0];
@@ -376,6 +419,9 @@
         if ($container.length) {
             $container.html(renderActionButtons(lower, ticketId));
         }
+
+        // 3. Lock / unlock the chat — a resolved ticket has a closed chat
+        setChatLocked(lower === 'resolved');
     }
 
     function escapeHtmlTicketStatus(text) {

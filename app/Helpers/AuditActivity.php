@@ -80,6 +80,8 @@ class AuditActivity
             case 'Edit_DailyTicket':
             case 'Update_DailyTicket':
                 return "{$actor} updated Ticket '" . self::str($data, 'ticket_number') . "'";
+            case 'Reopen_DailyTicket':
+                return "{$actor} reopened Ticket '" . self::str($data, 'ticket_number') . "' back to Pending";
 
             case 'Submit_ClientFeedback':
                 $rating = $data['rating'] ?? '?';

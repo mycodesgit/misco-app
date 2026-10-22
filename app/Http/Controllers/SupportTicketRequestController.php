@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -38,7 +36,7 @@ class SupportTicketRequestController extends Controller
     {
         $authuseroffice = Auth::user()->office_id;
 
-        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
+        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Pending')
             ->where('off_id', $authuseroffice)
             ->orderBy('id', 'DESC')
@@ -51,7 +49,7 @@ class SupportTicketRequestController extends Controller
     {
         $authuseroffice = Auth::user()->office_id;
 
-        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
+        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'In Progress')
             ->where('off_id', $authuseroffice)
             ->orderBy('id', 'DESC')
@@ -64,7 +62,7 @@ class SupportTicketRequestController extends Controller
     {
         $authuseroffice = Auth::user()->office_id;
 
-        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
+        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Resolved')
             ->where('off_id', $authuseroffice)
             ->orderBy('id', 'DESC')
@@ -77,7 +75,7 @@ class SupportTicketRequestController extends Controller
     {
         $authuseroffice = Auth::user()->office_id;
 
-        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory'])
+        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Cancelled')
             ->where('off_id', $authuseroffice)
             ->orderBy('id', 'DESC')
@@ -144,7 +142,10 @@ class SupportTicketRequestController extends Controller
             DB::commit();
 
             Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
-            broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'));
+            \App\Helpers\Realtime::broadcast(
+                new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'created'),
+                'ticket ' . $ticket->ticket_number
+            );
 
             return response()->json([
                 'success' => true,
@@ -180,7 +181,23 @@ class SupportTicketRequestController extends Controller
             ])
             ->findOrFail($ticketId);
 
+        // Opening a pending ticket picks it up: it flips to "In Progress" on its
+        // own, so there is no need to press "Mark as In Progress" afterwards.
+        // Only support staff trigger this — a requester viewing the same page
+        // must never change the status.
+        if ($this->isSupportUser() && $ticket->status === 'Pending') {
+            $this->applyStatus($ticket, 'in_progress');
+        }
+
         return view('pages.request.supportshowticket', compact('ticket'));
+    }
+
+    /**
+     * True when the logged-in user is IT support staff (not a requester).
+     */
+    private function isSupportUser(): bool
+    {
+        return (string) Auth::user()->role !== 'Requester';
     }
 
     // Send Message
@@ -198,6 +215,17 @@ class SupportTicketRequestController extends Controller
                 'success' => false,
                 'message' => 'Please enter a message or select an image.'
             ], 422);
+        }
+
+        // The chat is closed once the ticket is resolved (or cancelled),
+        // so nothing can be sent anymore.
+        $ticket = DailyTicketRequest::find($request->ticket_id);
+
+        if ($ticket && in_array(strtolower((string) $ticket->status), ['resolved', 'cancelled'], true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This ticket is already ' . $ticket->status . ', so the chat is closed and no more messages can be sent.'
+            ], 403);
         }
 
         $attachmentPath = null;
@@ -228,14 +256,12 @@ class SupportTicketRequestController extends Controller
         // notification store is misconfigured (e.g. new server), the message
         // is already saved — log and still return success. Polling fallback
         // on the client keeps delivery live without refresh.
-        try {
-            broadcast(new \App\Events\MessageSent($chat))->toOthers();
-        } catch (\Throwable $e) {
-            Log::warning('Reverb broadcast failed for chat ' . $chat->id . ': ' . $e->getMessage());
-        }
+        \App\Helpers\Realtime::broadcastToOthers(
+            new \App\Events\MessageSent($chat),
+            'chat ' . $chat->id
+        );
 
         // Notify ticket participants (except the sender) of the new chat message
-        $ticket = DailyTicketRequest::find($request->ticket_id);
         if ($ticket) {
             $participantIds = collect(explode(',', (string) $ticket->assigned_to))
                 ->map(fn ($id) => (int) trim($id))
@@ -247,22 +273,17 @@ class SupportTicketRequestController extends Controller
 
             $recipients = User::whereIn('id', $participantIds)->get();
             if ($recipients->isNotEmpty()) {
-                try {
-                    $senderName = trim((auth()->user()->fname ?? '') . ' ' . (auth()->user()->lname ?? '')) ?: 'User';
-                    $excerpt = $request->filled('message')
-                        ? Str::limit($request->message, 80)
-                        : 'sent an attachment';
-                    $chatNotif = new \App\Notifications\ChatMessageNotification(
-                        ticketId: $ticket->id,
-                        ticketNumber: $ticket->ticket_number,
-                        senderName: $senderName,
-                        excerpt: $excerpt,
-                    );
-                    Notification::send($recipients, $chatNotif);
-                    \App\Events\UserNotified::dispatchFor($recipients, $chatNotif); // realtime Reverb ping
-                } catch (\Throwable $e) {
-                    Log::warning('Chat notification fan-out failed for ticket ' . $ticket->id . ': ' . $e->getMessage());
-                }
+                $senderName = trim((auth()->user()->fname ?? '') . ' ' . (auth()->user()->lname ?? '')) ?: 'User';
+                $excerpt = $request->filled('message')
+                    ? Str::limit($request->message, 80)
+                    : 'sent an attachment';
+                $chatNotif = new \App\Notifications\ChatMessageNotification(
+                    ticketId: $ticket->id,
+                    ticketNumber: $ticket->ticket_number,
+                    senderName: $senderName,
+                    excerpt: $excerpt,
+                );
+                \App\Helpers\Realtime::notify($recipients, $chatNotif, 'ticket ' . $ticket->ticket_number);
             }
         }
 
@@ -311,6 +332,31 @@ class SupportTicketRequestController extends Controller
         $ticket = DailyTicketRequest::findOrFail($id);
         $status = $request->input('status');
 
+        $message = $this->applyStatus($ticket, $status);
+
+        if ($message === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid status provided.'
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'ticket'  => $ticket
+        ]);
+    }
+
+    /**
+     * Move a ticket to another status.
+     *
+     * Updates the record, refreshes the dashboard cache, broadcasts the change
+     * to the other open screens and notifies the requester. Returns a short
+     * message, or null when the status is not a known one.
+     */
+    private function applyStatus(DailyTicketRequest $ticket, string $status): ?string
+    {
         if ($status === 'in_progress') {
             $ticket->update([
                 'status'     => 'In Progress',
@@ -333,17 +379,20 @@ class SupportTicketRequestController extends Controller
             ]);
             $message = 'Ticket marked as Cancelled.';
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid status provided.'
-            ], 400);
+            return null;
         }
 
         $ticket->refresh();
 
         Cache::forever('dashboard_version', time()); // invalidate dashboard cache (atomic, no flush race)
-        broadcast(new \App\Events\TicketStatusUpdated($ticket))->toOthers();
-        broadcast(new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'status_changed'));
+        \App\Helpers\Realtime::broadcastToOthers(
+            new \App\Events\TicketStatusUpdated($ticket),
+            'ticket ' . $ticket->ticket_number
+        );
+        \App\Helpers\Realtime::broadcast(
+            new \App\Events\TicketListUpdated($ticket->id, $ticket->status, 'status_changed'),
+            'ticket ' . $ticket->ticket_number
+        );
 
         // Notify the requester (own ticket status changed)
         if ($ticket->user_id && (int) $ticket->user_id !== (int) auth()->id()) {
@@ -354,21 +403,17 @@ class SupportTicketRequestController extends Controller
                     'Resolved'    => 'resolved',
                     'Cancelled'   => 'cancelled',
                 ];
-                $requester->notify($notif = new \App\Notifications\TicketEventNotification(
+                $notif = new \App\Notifications\TicketEventNotification(
                     ticketId: $ticket->id,
                     ticketNumber: $ticket->ticket_number,
                     event: $eventMap[$ticket->status] ?? 'updated',
                     title: 'Ticket #' . $ticket->ticket_number . ' is now ' . $ticket->status,
                     message: 'Your ticket "' . Str::limit($ticket->issue_description, 80) . '" was marked as ' . $ticket->status . '.',
-                ));
-                broadcast(new \App\Events\UserNotified((int) $requester->id, $notif->toDatabase($requester))); // realtime Reverb ping
+                );
+                \App\Helpers\Realtime::notify([$requester], $notif, 'ticket ' . $ticket->ticket_number);
             }
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => $message,
-            'ticket'  => $ticket
-        ]);
+        return $message;
     }
 }

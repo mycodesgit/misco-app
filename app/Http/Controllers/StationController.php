@@ -37,7 +37,10 @@ class StationController extends Controller
 
         $name = trim(($user->fname ?? '') . ' ' . ($user->lname ?? '')) ?: $user->email;
 
-        broadcast(new \App\Events\UserStationUpdated($user->id, $name, $user->station));
+        \App\Helpers\Realtime::broadcast(
+            new \App\Events\UserStationUpdated($user->id, $name, $user->station),
+            'user ' . $user->id
+        );
 
         return response()->json([
             'success' => true,

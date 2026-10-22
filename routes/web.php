@@ -68,6 +68,7 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::post('/requester/tickets/submit/ticket', [RequesterTicketRequestController::class, 'create'])->name('ticketsrequester.create');
         Route::get('/requester/tickets/edit/{id}', [RequesterTicketRequestController::class, 'edit'])->name('ticketsrequester.edit');
         Route::post('/requester/tickets/update', [RequesterTicketRequestController::class, 'update'])->name('ticketsrequester.update');
+        Route::post('/requester/tickets/reopen', [RequesterTicketRequestController::class, 'reopen'])->name('ticketsrequester.reopen');
         Route::get('/requester/view/all/fetch/pending',[RequesterTicketRequestController::class,'showreqpending'])->name('tickets.showreqpending');
         Route::get('/requester/view/all/fetch/progress',[RequesterTicketRequestController::class,'showreqprogress'])->name('tickets.showreqprogress');
         Route::get('/requester/view/all/fetch/resolved',[RequesterTicketRequestController::class,'showreqresolved'])->name('tickets.showreqresolved');
