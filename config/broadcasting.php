@@ -41,9 +41,13 @@ return [
                 'scheme' => env('REVERB_SCHEME', 'https'),
                 'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
                 'path' => env('REVERB_SERVER_PATH', ''),
+                // Fail fast instead of hanging the request for the Pusher
+                // default of 30 seconds when the Reverb server is down.
+                'timeout' => (int) env('REVERB_TIMEOUT', 2),
             ],
             'client_options' => [
-                // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
+                'timeout'         => (int) env('REVERB_TIMEOUT', 2),
+                'connect_timeout' => (int) env('REVERB_CONNECT_TIMEOUT', 2),
             ],
         ],
 

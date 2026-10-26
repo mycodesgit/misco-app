@@ -42,9 +42,11 @@ class UserNotified implements ShouldBroadcastNow
             try {
                 broadcast(new self((int) $user->id, $notification->toDatabase($user)));
             } catch (\Throwable $e) {
+                \App\Helpers\Realtime::markUnreachable();
                 \Illuminate\Support\Facades\Log::warning(
                     'Realtime notification ping failed for user ' . $user->id . ': ' . $e->getMessage()
                 );
+                return;
             }
         }
     }

@@ -170,7 +170,8 @@ class SupportTicketRequestController extends Controller
         $ticket = DailyTicketRequest::select([
                 'id', 'ticket_number', 'user_id', 'reqoff_id', 'off_id', 'cat_id', 'subcat_id',
                 'assigned_to', 'priority', 'contactno', 'issue_description',
-                'remarks', 'attachment', 'status', 'created_at'
+                'remarks', 'attachment', 'status', 'created_at',
+                'resolution_remarks', 'resolved_at', 'started_at'
             ])
             ->with([
                 'category:id,ticketcatname', // replace 'ticketcatname' with your actual column name
@@ -332,7 +333,23 @@ class SupportTicketRequestController extends Controller
         $ticket = DailyTicketRequest::findOrFail($id);
         $status = $request->input('status');
 
-        $message = $this->applyStatus($ticket, $status);
+        $rules = [
+            'status'              => 'required|in:in_progress,resolved,cancelled',
+            'resolution_remarks'  => $status === 'resolved'
+                ? 'required|string|max:2000'
+                : 'nullable|string|max:2000',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $message = $this->applyStatus($ticket, $status, $request->input('resolution_remarks'));
 
         if ($message === null) {
             return response()->json([
@@ -355,7 +372,7 @@ class SupportTicketRequestController extends Controller
      * to the other open screens and notifies the requester. Returns a short
      * message, or null when the status is not a known one.
      */
-    private function applyStatus(DailyTicketRequest $ticket, string $status): ?string
+    private function applyStatus(DailyTicketRequest $ticket, string $status, ?string $resolutionRemarks = null): ?string
     {
         if ($status === 'in_progress') {
             $ticket->update([
@@ -365,9 +382,10 @@ class SupportTicketRequestController extends Controller
             $message = 'Ticket marked as In Progress.';
         } elseif ($status === 'resolved') {
             $ticket->update([
-                'status'      => 'Resolved',
-                'resolved_at' => Carbon::now(), // Sets resolved_at timestamp
-                'resolved_by' => Auth::id(), // Staff who resolved it
+                'status'             => 'Resolved',
+                'resolved_at'        => Carbon::now(), // Sets resolved_at timestamp
+                'resolved_by'        => Auth::id(), // Staff who resolved it
+                'resolution_remarks' => $resolutionRemarks, // How the issue was resolved
             ]);
             // Carry the resolver onto the feedback row so reports show who it's for
             ClientFeedback::where('ticket_id', $ticket->id)

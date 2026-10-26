@@ -47,7 +47,7 @@
                         @endphp
 
                         <span class="badge {{ $priorityConfig['class'] }} rounded-pill px-3 py-2">
-                            <i class="ti {{ $priorityConfig['icon'] }} me-1"></i> {{ ucfirst($ticket->priority) }}
+                            <i class="ti {{ $priorityConfig['icon'] }} me-1"></i> Priority Level: {{ ucfirst($ticket->priority) }}
                         </span>
 
                         @php
@@ -61,7 +61,7 @@
                         @endphp
 
                         <span class="badge {{ $statusConfig['class'] }} rounded-pill px-3 py-2" id="ticket-status-badge">
-                            <i class="ti {{ $statusConfig['icon'] }} me-1"></i> {{ $ticket->status }}
+                            <i class="ti {{ $statusConfig['icon'] }} me-1"></i> Status: {{ $ticket->status }}
                         </span>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                 <div class="row g-3 mb-5">
                     <!-- LEFT COLUMN: Problem Details & Attached Screenshot (col-md-5) -->
                     <div class="col-md-5">
-                        <div class="card h-100">
+                        <div class="card">
                             <div class="card-header p-3 border-bottom d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
                                     <h6 class="mb-0 fw-bold"><i class="ti ti-file-description me-1 text-primary"></i> Ticket Details</h6>
@@ -163,6 +163,20 @@
                                         $currentStatus = strtolower($ticket->status);
                                     @endphp
 
+                                    @if(in_array($currentStatus, ['pending', 'in progress'], true))
+                                        {{-- Resolution remarks are captured before the ticket is marked resolved --}}
+                                        <div class="mb-3" id="resolution-remarks-wrapper">
+                                            <label for="resolutionRemarks" class="form-label fw-bold small">
+                                                Resolution Remarks <span class="text-danger">*</span>
+                                            </label>
+                                            <textarea id="resolutionRemarks" class="form-control" rows="3" maxlength="2000"
+                                                placeholder="Describe how the issue was resolved..."></textarea>
+                                            <div class="form-text">
+                                                Required before the ticket can be marked as <strong>Resolved</strong>.
+                                            </div>
+                                        </div>
+                                    @endif
+
                                     <div class="d-flex align-items-center gap-2" id="ticket-action-container">
                                         @if($currentStatus === 'cancelled')
                                             {{-- Information alert when ticket is cancelled/closed --}}
@@ -173,9 +187,17 @@
 
                                         @elseif($currentStatus === 'resolved')
                                             {{-- Resolved state: Option to close or show resolution info --}}
-                                            <div class="alert alert-success w-100 mb-0 d-flex align-items-center" role="alert">
-                                                <i class="ti ti-circle-check fs-4 me-2"></i>
-                                                <div>This ticket has been marked as <strong>Resolved</strong>.</div>
+                                            <div class="alert alert-success w-100 mb-0" role="alert">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="ti ti-circle-check fs-4 me-2"></i>
+                                                    <div>This ticket has been marked as <strong>Resolved</strong>.</div>
+                                                </div>
+                                                @if(!empty($ticket->resolution_remarks))
+                                                    <div class="mt-2 pt-2 border-top border-success-subtle">
+                                                        <span class="fw-bold small">Resolution Remarks:</span>
+                                                        <div class="small">{{ $ticket->resolution_remarks }}</div>
+                                                    </div>
+                                                @endif
                                             </div>
 
                                         @elseif($currentStatus === 'in progress')
@@ -221,9 +243,17 @@
 
                                         @elseif($currentReqStatus === 'resolved')
                                             {{-- Resolved state: Option to close or show resolution info --}}
-                                            <div class="alert alert-success w-100 mb-0 d-flex align-items-center" role="alert">
-                                                <i class="ti ti-circle-check fs-4 me-2"></i>
-                                                <div>This ticket has been marked as <strong>Resolved</strong>.</div>
+                                            <div class="alert alert-success w-100 mb-0" role="alert">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="ti ti-circle-check fs-4 me-2"></i>
+                                                    <div>This ticket has been marked as <strong>Resolved</strong>.</div>
+                                                </div>
+                                                @if(!empty($ticket->resolution_remarks))
+                                                    <div class="mt-2 pt-2 border-top border-success-subtle">
+                                                        <span class="fw-bold small">Resolution Remarks:</span>
+                                                        <div class="small">{{ $ticket->resolution_remarks }}</div>
+                                                    </div>
+                                                @endif
                                             </div>
                                         @elseif($currentReqStatus === 'in progress')
                                             {{-- In Progress state: Can mark resolved or close --}}
@@ -241,7 +271,7 @@
                     <!-- RIGHT COLUMN: Pure Message Chat Area (col-md-7) -->
                     <div class="col-md-7">
 
-                        <div class="card h-100 d-flex flex-column">
+                        <div class="card d-flex flex-column">
 
                             <!-- Chat Box Header -->
                             <div class="card-header p-3 border-bottom d-flex align-items-center justify-content-between">

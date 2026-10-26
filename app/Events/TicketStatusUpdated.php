@@ -32,6 +32,7 @@ class TicketStatusUpdated implements ShouldBroadcastNow
         return [
             'ticket_id' => $this->ticket->id,
             'status'    => $this->ticket->status,
+            'resolution_remarks' => $this->ticket->resolution_remarks,
         ];
     }
 }

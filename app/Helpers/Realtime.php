@@ -11,22 +11,41 @@ use Illuminate\Support\Facades\Notification;
  *
  * When the socket server is unreachable (server down, wrong host/port, not
  * started yet) the database change is already saved — the request would
- * otherwise die with a "Pusher error: cURL error 7" even though the ticket
- * was updated. Every broadcast is therefore wrapped: the failure is logged
- * and the caller carries on. The browser falls back to polling/refreshing.
+ * otherwise wait for the HTTP client timeout and then die with a
+ * "Pusher error: cURL error 28/7" even though the ticket was updated.
+ *
+ * Every broadcast is therefore:
+ *   - deferred until after the HTTP response is sent, so the browser never
+ *     waits for the socket server;
+ *   - stopped for the rest of the request as soon as one connection fails,
+ *     so three broadcasts cannot cost three timeouts;
+ *   - logged and swallowed; the browser falls back to reloading.
  */
 class Realtime
 {
+    /**
+     * Set once a broadcast fails so the remaining broadcasts in the same
+     * request are skipped instead of waiting for their own timeout.
+     */
+    private static bool $unreachable = false;
+
     /**
      * Broadcast an event, swallowing (and logging) connection failures.
      */
     public static function broadcast($event, string $context = ''): void
     {
-        try {
-            broadcast($event);
-        } catch (\Throwable $e) {
-            self::log('broadcast', $context, $e);
-        }
+        self::defer(function () use ($event, $context) {
+            if (self::$unreachable) {
+                return;
+            }
+
+            try {
+                broadcast($event);
+            } catch (\Throwable $e) {
+                self::$unreachable = true;
+                self::log('broadcast', $context, $e);
+            }
+        });
     }
 
     /**
@@ -34,11 +53,18 @@ class Realtime
      */
     public static function broadcastToOthers($event, string $context = ''): void
     {
-        try {
-            broadcast($event)->toOthers();
-        } catch (\Throwable $e) {
-            self::log('broadcast', $context, $e);
-        }
+        self::defer(function () use ($event, $context) {
+            if (self::$unreachable) {
+                return;
+            }
+
+            try {
+                broadcast($event)->toOthers();
+            } catch (\Throwable $e) {
+                self::$unreachable = true;
+                self::log('broadcast', $context, $e);
+            }
+        });
     }
 
     /**
@@ -46,6 +72,8 @@ class Realtime
      */
     public static function notify(iterable $users, $notification, string $context = ''): void
     {
+        $users = is_array($users) ? $users : collect($users)->all();
+
         try {
             Notification::send($users, $notification);
         } catch (\Throwable $e) {
@@ -53,7 +81,41 @@ class Realtime
             return;
         }
 
-        \App\Events\UserNotified::dispatchFor($users, $notification);
+        self::defer(function () use ($users, $notification, $context) {
+            if (self::$unreachable) {
+                return;
+            }
+
+            try {
+                \App\Events\UserNotified::dispatchFor($users, $notification);
+            } catch (\Throwable $e) {
+                self::$unreachable = true;
+                self::log('notification ping', $context, $e);
+            }
+        });
+    }
+
+    /**
+     * Let UserNotified stop the remaining pings after its first failure.
+     */
+    public static function markUnreachable(): void
+    {
+        self::$unreachable = true;
+    }
+
+    /**
+     * Run socket work after the response has been sent. In console/queue
+     * processes there is no response to wait for, so run it immediately.
+     */
+    private static function defer(callable $callback): void
+    {
+        if (app()->runningInConsole()) {
+            $callback();
+
+            return;
+        }
+
+        app()->terminating($callback);
     }
 
     private static function log(string $kind, string $context, \Throwable $e): void

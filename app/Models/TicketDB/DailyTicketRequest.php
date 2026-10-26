@@ -29,6 +29,7 @@ class DailyTicketRequest extends Model
         'status',
         'started_at',
         'resolved_at',
+        'resolution_remarks',
     ];
 
     /**

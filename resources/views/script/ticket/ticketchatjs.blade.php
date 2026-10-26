@@ -36,6 +36,7 @@
     $(document).ready(function () {
         const ticketId = $('#ticket_id').val();
         const currentUserId = {{ auth()->id() }};
+        const currentUserName = @json(trim((auth()->user()->fname ?? '') . ' ' . (auth()->user()->lname ?? '')) ?: 'User');
         const fetchUrl = "{{ route('ticket.chat.fetch', ['ticketId' => ':ticketId']) }}".replace(':ticketId', ticketId);
         const sendUrl = "{{ route('ticket.chat.send') }}";
 
@@ -72,29 +73,60 @@
         // (wrong host, server down, blocked port), chat still updates live
         // without refresh. loadMessages() re-renders safely (no duplicates).
         var echoConnected = false;
+        var pollTimer = null;
+
         function startPollingFallback() {
-            setInterval(function() {
-                // Stop polling once live socket is working
-                if (echoConnected) return;
+            if (pollTimer) return;
+
+            pollTimer = setInterval(function () {
                 loadMessages(false);
             }, 3000);
+        }
+
+        function stopPollingFallback() {
+            if (pollTimer) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+            }
         }
 
         if (typeof Echo === 'undefined') {
             startPollingFallback();
         } else {
             // If no successful socket connection in 6s, fall back to polling
-            setTimeout(function() {
+            setTimeout(function () {
                 if (!echoConnected) startPollingFallback();
             }, 6000);
-        }
 
-        if (typeof Echo !== 'undefined') {
             try {
-                Echo.connector.pusher.connection.bind('connected', function () {
+                var connection = Echo.connector.pusher.connection;
+
+                connection.bind('connected', function () {
+                    var wasDisconnected = !echoConnected;
                     echoConnected = true;
+                    stopPollingFallback();
+
+                    // Catch up on anything missed while the socket was down.
+                    if (wasDisconnected) loadMessages(false);
                 });
+
+                // Socket lost (server restart, network change) — switch back to
+                // polling until Reverb reconnects.
+                connection.bind('disconnected', function () {
+                    echoConnected = false;
+                    startPollingFallback();
+                });
+
+                connection.bind('unavailable', function () {
+                    echoConnected = false;
+                    startPollingFallback();
+                });
+
+                if (connection.state === 'connected') {
+                    echoConnected = true;
+                }
             } catch (e) { /* pusher internals unavailable — timeout fallback covers it */ }
+
             Echo.private(`ticket.${ticketId}`)
                 .listen('MessageSent', (e) => {
                     // Skip if sent by the logged-in user (already handled by AJAX submit response)
@@ -118,7 +150,7 @@
                 .listen('TicketStatusUpdated', (e) => {
                     // Other browser changed status — update left card + badge live
                     if (e.status) {
-                        updateTicketUI(e.status, e.ticket_id || ticketId);
+                        updateTicketUI(e.status, e.ticket_id || ticketId, e.resolution_remarks);
                     }
                 });
         }
@@ -209,6 +241,28 @@
                 formData.append('attachment', fileInput.files[0]);
             }
 
+            // Show the message immediately (optimistic UI) so sending feels
+            // instant even on a slow connection. It is replaced by the saved
+            // record when the server responds.
+            const typedMessage = messageInput.val();
+            const selectedFile = fileInput.files[0] || null;
+            const optimisticId = 'temp-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+            const optimisticMessage = {
+                id: optimisticId,
+                message: typedMessage,
+                attachment: selectedFile ? URL.createObjectURL(selectedFile) : null,
+                sender_name: currentUserName,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                is_me: true
+            };
+
+            appendMessage(optimisticMessage);
+            messageInput.val('');
+            $('#chatAttachment').val('');
+            $('#attachmentPreview').addClass('d-none').removeClass('d-flex');
+            userHasScrolledUp = false;
+            scrollToBottom();
+
             $('#sendChatBtn').prop('disabled', true);
 
             $.ajax({
@@ -222,17 +276,20 @@
                 },
                 success: function (response) {
                     if (response.success) {
-                        messageInput.val('');
-                        $('#chatAttachment').val('');
-                        $('#attachmentPreview').addClass('d-none').removeClass('d-flex');
+                        // Replace the temporary bubble with the saved message.
+                        $('#chat-message-' + optimisticId).remove();
                         appendMessage(response.data);
-                        userHasScrolledUp = false; // Reset user scroll state on new message send
                         scrollToBottom();
                     } else {
+                        $('#chat-message-' + optimisticId).remove();
+                        messageInput.val(typedMessage);
                         alert(response.message || 'Message could not be sent.');
                     }
                 },
                 error: function (xhr) {
+                    $('#chat-message-' + optimisticId).remove();
+                    messageInput.val(typedMessage);
+
                     var msg = 'Message could not be sent.';
                     try {
                         var res = JSON.parse(xhr.responseText);
@@ -259,7 +316,7 @@
             let html = '';
             if (msg.is_me) {
                 html = `
-                    <div class="d-flex mb-3 align-items-start justify-content-end">
+                    <div class="d-flex mb-3 align-items-start justify-content-end" id="chat-message-${msg.id}">
                         <div class="d-flex flex-column align-items-end min-w-0">
                             <div class="d-flex align-items-center gap-2 mb-1">
                                 <small class="text-muted">${msg.time}</small>
@@ -275,7 +332,7 @@
                     </div>`;
             } else {
                 html = `
-                    <div class="d-flex mb-3 align-items-start">
+                    <div class="d-flex mb-3 align-items-start" id="chat-message-${msg.id}">
                         <div class="avatar-circle bg-warning text-white fw-bold me-2 flex-shrink-0">
                             ${getInitials(msg.sender_name)}
                         </div>
@@ -344,6 +401,27 @@
             confirmColor: '#3085d6'
         };
 
+        // The resolver must describe how the issue was resolved before it can
+        // be marked as Resolved.
+        var resolutionRemarks = '';
+        if (action === 'resolved') {
+            var $remarksInput = $('#resolutionRemarks');
+            resolutionRemarks = $remarksInput.length ? $.trim($remarksInput.val()) : '';
+
+            if (!resolutionRemarks) {
+                Swal.fire({
+                    title: 'Resolution Remarks Required',
+                    text: 'Please write how the issue was resolved before marking this ticket as Resolved.',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
+                if ($remarksInput.length) {
+                    $remarksInput.trigger('focus');
+                }
+                return;
+            }
+        }
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -362,11 +440,24 @@
             if (result.isConfirmed) {
                 var url = ticketStatusUpdateRoute.replace(':id', ticketId);
 
+                // The status is saved before realtime broadcasting runs, so
+                // show progress immediately instead of leaving the click with
+                // no visible feedback.
+                Swal.fire({
+                    title: 'Updating Ticket...',
+                    text: 'Please wait while the ticket is updated.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
                 $.ajax({
                     type: "POST",
                     url: url,
+                    timeout: 30000,
                     data: {
-                        status: action
+                        status: action,
+                        resolution_remarks: resolutionRemarks
                     },
                     success: function(response) {
                         if (response.success) {
@@ -379,14 +470,23 @@
                             });
                             // Update left card + badge in place (no reload)
                             if (response.ticket && response.ticket.status) {
-                                updateTicketUI(response.ticket.status, ticketId);
+                                updateTicketUI(
+                                    response.ticket.status,
+                                    ticketId,
+                                    response.ticket.resolution_remarks || resolutionRemarks
+                                );
                             }
                         } else {
                             Swal.fire('Error!', response.message || 'Something went wrong.', 'error');
                         }
                     },
-                    error: function(xhr) {
-                        Swal.fire('Error!', 'An error occurred while updating the ticket.', 'error');
+                    error: function(xhr, textStatus) {
+                        var response = xhr.responseJSON || {};
+                        var message = textStatus === 'timeout'
+                            ? 'The server took too long to respond. The ticket may already be saved — please reload the page to check.'
+                            : (response.message || 'An error occurred while updating the ticket.');
+
+                        Swal.fire('Error!', message, 'error');
                     }
                 });
             }
@@ -396,7 +496,7 @@
     // Mirror of supportshowticket.blade.php left-card if/else — updates in place, no reload
     var isSupportUser = {{ Auth::guard('web')->user()->role != 'Requester' ? 'true' : 'false' }};
 
-    function updateTicketUI(status, ticketId) {
+    function updateTicketUI(status, ticketId, resolutionRemarks) {
         var lower = (status || '').toLowerCase();
 
         // 1. Update top status badge (#ticket-status-badge)
@@ -414,14 +514,51 @@
                 .html('<i class="ti ' + badge.icon + ' me-1"></i> ' + escapeHtmlTicketStatus(status));
         }
 
-        // 2. Re-render left-card action container (#ticket-action-container)
-        var $container = $('#ticket-action-container');
-        if ($container.length) {
-            $container.html(renderActionButtons(lower, ticketId));
+        // 2. Show the remarks box only while the ticket can still be resolved
+        //    (a reopened ticket goes back to Pending and needs it again).
+        var $remarksWrapper = $('#resolution-remarks-wrapper');
+        var canResolve = lower === 'pending' || lower === 'in progress';
+        if (isSupportUser && canResolve && !$remarksWrapper.length) {
+            $('#ticket-action-container').before(renderResolutionRemarks());
+        } else if (!canResolve && $remarksWrapper.length) {
+            $remarksWrapper.remove();
         }
 
-        // 3. Lock / unlock the chat — a resolved ticket has a closed chat
+        // 3. Re-render left-card action container (#ticket-action-container)
+        var $container = $('#ticket-action-container');
+        if ($container.length) {
+            $container.html(renderActionButtons(lower, ticketId, resolutionRemarks));
+        }
+
+        // 4. Lock / unlock the chat — a resolved ticket has a closed chat
         setChatLocked(lower === 'resolved');
+    }
+
+    function renderResolutionRemarks() {
+        return '<div class="mb-3" id="resolution-remarks-wrapper">' +
+                '<label for="resolutionRemarks" class="form-label fw-bold small">' +
+                    'Resolution Remarks <span class="text-danger">*</span></label>' +
+                '<textarea id="resolutionRemarks" class="form-control" rows="3" maxlength="2000" ' +
+                    'placeholder="Describe how the issue was resolved..."></textarea>' +
+                '<div class="form-text">Required before the ticket can be marked as <strong>Resolved</strong>.</div>' +
+            '</div>';
+    }
+
+    function renderResolvedAlert(resolutionRemarks) {
+        var remarksHtml = '';
+        if (resolutionRemarks) {
+            remarksHtml = '<div class="mt-2 pt-2 border-top border-success-subtle">' +
+                    '<span class="fw-bold small">Resolution Remarks:</span>' +
+                    '<div class="small">' + escapeHtmlTicketStatus(resolutionRemarks) + '</div>' +
+                '</div>';
+        }
+
+        return '<div class="alert alert-success w-100 mb-0" role="alert">' +
+                '<div class="d-flex align-items-center">' +
+                    '<i class="ti ti-circle-check fs-4 me-2"></i>' +
+                    '<div>This ticket has been marked as <strong>Resolved</strong>.</div>' +
+                '</div>' + remarksHtml +
+            '</div>';
     }
 
     function escapeHtmlTicketStatus(text) {
@@ -433,7 +570,7 @@
             .replace(/'/g, "&#039;");
     }
 
-    function renderActionButtons(lower, ticketId) {
+    function renderActionButtons(lower, ticketId, resolutionRemarks) {
         if (isSupportUser) {
             if (lower === 'cancelled') {
                 return '<div class="alert alert-danger w-100 mb-0 d-flex align-items-center py-2 px-3">' +
@@ -441,9 +578,7 @@
                     '<span>This ticket has been <strong>Closed / Cancelled</strong>.</span></div>';
             }
             if (lower === 'resolved') {
-                return '<div class="alert alert-success w-100 mb-0 d-flex align-items-center" role="alert">' +
-                    '<i class="ti ti-circle-check fs-4 me-2"></i>' +
-                    '<div>This ticket has been marked as <strong>Resolved</strong>.</div></div>';
+                return renderResolvedAlert(resolutionRemarks);
             }
             if (lower === 'in progress') {
                 return '<button class="btn btn-outline-success ticket-status-btn" data-id="' + ticketId + '" data-action="resolved">' +
@@ -470,9 +605,7 @@
                 '<span>This ticket has been <strong>Closed / Cancelled</strong>.</span></div>';
         }
         if (lower === 'resolved') {
-            return '<div class="alert alert-success w-100 mb-0 d-flex align-items-center" role="alert">' +
-                '<i class="ti ti-circle-check fs-4 me-2"></i>' +
-                '<div>This ticket has been marked as <strong>Resolved</strong>.</div></div>';
+            return renderResolvedAlert(resolutionRemarks);
         }
         if (lower === 'in progress') {
             return '<div class="alert alert-info w-100 mb-0 d-flex align-items-center" role="alert">' +
