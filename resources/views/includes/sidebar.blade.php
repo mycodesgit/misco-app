@@ -10,6 +10,7 @@
     $wifiActive = in_array($current_route, ['wifi.index']) ? 'active' : '';
     $auditActive = in_array($current_route, ['audittrail.index']) ? 'active' : '';
     $accomplishmentActive = in_array($current_route, ['accomplishment-report.index']) ? 'active' : '';
+    $ticketstatusActive = in_array($current_route, ['ticketstatus-report.index']) ? 'active' : '';
     $clientfeedbackActive = in_array($current_route, ['clientfeedback.index']) ? 'active' : '';
     $usersAllActive = in_array($current_route, ['user.index']) ? 'active' : '';
     $requesterAllActive = in_array($current_route, ['requester.index']) ? 'active' : '';
@@ -84,6 +85,11 @@
         <li>
             <a class="nav-link {{ $accomplishmentActive }}" href="{{ route('accomplishment-report.index') }}" data-tooltip="Accomplishment">
                 <i class="ti ti-file-type-pdf"></i><span class="nav-text">Accomplishment</span>
+            </a>
+        </li>
+        <li>
+            <a class="nav-link {{ $ticketstatusActive }}" href="{{ route('ticketstatus-report.index') }}" data-tooltip="Ticket Status">
+                <i class="ti ti-report-analytics"></i><span class="nav-text">Ticket Status</span>
             </a>
         </li>
         <li>

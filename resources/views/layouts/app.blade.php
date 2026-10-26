@@ -343,6 +343,9 @@
     @if (request()->routeIs('clientfeedback.index'))
         @include('script.report.clientfeedbackjs')
     @endif
+    @if (request()->routeIs('ticketstatus-report.index'))
+        @include('script.report.ticketstatusjs')
+    @endif
 
     @include('includes.bottomnav')
 

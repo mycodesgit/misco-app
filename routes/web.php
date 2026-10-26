@@ -11,6 +11,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategorySubController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\AccomplishmentReportController;
+use App\Http\Controllers\TicketStatusReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserRolesController;
 use App\Http\Controllers\LogoutController;
@@ -110,6 +111,8 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::prefix('/reports')->group(function () {
         Route::get('/accomplishment/generate', [AccomplishmentReportController::class, 'index'])->name('accomplishment-report.index');
         Route::get('/accomplishment/preview', [AccomplishmentReportController::class, 'previewPdf'])->name('accomplishment.preview');
+        Route::get('/ticketstatus/view', [TicketStatusReportController::class, 'index'])->name('ticketstatus-report.index');
+        Route::get('/ticketstatus/preview', [TicketStatusReportController::class, 'previewPdf'])->name('ticketstatus-report.preview');
         Route::get('/clientfeedback/view', [ClientFeedbackController::class, 'index'])->name('clientfeedback.index');
         Route::get('/clientfeedback/fetch', [ClientFeedbackController::class, 'show'])->name('clientfeedback.show');
         Route::get('/clientfeedback/users', [ClientFeedbackController::class, 'users'])->name('clientfeedback.users');
