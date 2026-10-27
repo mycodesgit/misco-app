@@ -54,6 +54,13 @@
                             <input class="form-control form-control-sm" id="remarks" name="remarks" value="{{ Auth::guard('web')->user()->email }}">
                         </div>
 
+                        <!-- Contact Number -->
+                        <div class="col-md-12">
+                            <label for="selfreset_contactno" class="form-label fw-semibold">Contact Number: <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="selfreset_contactno" name="contactno" placeholder="e.g. Local 104 / 09123456789"
+                                   value="{{ Auth::guard('web')->user()->contactno }}" maxlength="50" required>
+                        </div>
+
                     </div>
                 </div>
 

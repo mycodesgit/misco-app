@@ -16,7 +16,7 @@
                 <div class="modal-body">
                     <div class="alert alert-warning small mb-3">
                         <i class="fas fa-triangle-exclamation me-1"></i>
-                        You are using the default password. For your account's security, please set a new password before continuing.
+                        You are using the default password. For your account's security, please set a new password and your contact number before continuing.
                     </div>
 
                     <div class="row g-3">
@@ -27,6 +27,12 @@
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Confirm New Password: <span class="text-danger">*</span></label>
                             <input type="password" name="password_confirmation" class="form-control form-control-sm" placeholder="Re-type new password" required minlength="8" autocomplete="new-password">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Contact Number: <span class="text-danger">*</span></label>
+                            <input type="text" name="contactno" class="form-control form-control-sm" placeholder="e.g. Local 104 / 09123456789"
+                                   value="{{ auth()->user()->contactno }}" required maxlength="50" autocomplete="tel">
+                            <div class="form-text">Used to reach you about your ticket requests.</div>
                         </div>
                     </div>
                 </div>
@@ -61,6 +67,15 @@
                 success: function (response) {
                     if (response.success) {
                         toastr.success(response.message);
+
+                        // Pre-fill the ticket forms on this page with the new
+                        // number (defaultValue so a form reset keeps it)
+                        var contactNo = $.trim($('#defaultPasswordForm [name="contactno"]').val());
+                        $('#contactno, #selfreset_contactno').each(function () {
+                            this.value = contactNo;
+                            this.defaultValue = contactNo;
+                        });
+
                         $('#defaultPasswordForm')[0].reset();
                         $('#defaultPasswordModal').modal('hide');
                     } else {

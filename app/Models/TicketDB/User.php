@@ -29,6 +29,7 @@ class User extends Authenticatable
         'mname',
         'ext',
         'email',
+        'contactno',
         'password',
         'role',
         'gender',

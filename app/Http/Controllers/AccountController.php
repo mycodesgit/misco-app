@@ -25,8 +25,11 @@ class AccountController extends Controller
         $validator = Validator::make($request->all(), [
             'current_password' => 'required|string',
             'password'         => 'required|string|min:8|confirmed',
+            // Only sent by the first-login (default password) modal
+            'contactno'        => 'sometimes|required|string|max:50',
         ], [
             'password.confirmed' => 'New password confirmation does not match.',
+            'contactno.required' => 'Contact Number is required.',
         ]);
 
         if ($validator->fails()) {
@@ -53,13 +56,50 @@ class AccountController extends Controller
             ], 422);
         }
 
-        $user->update(['password' => Hash::make($request->password)]);
+        $changes = ['password' => Hash::make($request->password)];
+        if ($request->has('contactno')) {
+            $changes['contactno'] = trim($request->contactno);
+        }
+
+        $user->update($changes);
 
         $this->logAudit($request, 'Edit_OwnPassword', ['user_id' => $user->id]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Password updated successfully!',
+            'message' => $request->has('contactno')
+                ? 'Password and contact number updated successfully!'
+                : 'Password updated successfully!',
+        ]);
+    }
+
+    public function updateContact(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'contactno' => 'required|string|max:50',
+        ], [
+            'contactno.required' => 'Contact Number is required.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        $user = Auth::user();
+        $contactNo = trim($request->contactno);
+
+        $user->update(['contactno' => $contactNo]);
+
+        $this->logAudit($request, 'Edit_OwnContact', ['user_id' => $user->id, 'contactno' => $contactNo]);
+
+        return response()->json([
+            'success'   => true,
+            'message'   => 'Contact number updated successfully!',
+            'contactno' => $contactNo,
         ]);
     }
 

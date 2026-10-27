@@ -48,6 +48,10 @@
                                         <span class="fw-semibold small">{{ $user->role }}</span>
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between px-0">
+                                        <span class="text-muted small">Contact No.</span>
+                                        <span class="fw-semibold small" id="accountContactDisplay">{{ $user->contactno ?: 'N/A' }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between px-0">
                                         <span class="text-muted small">Gender</span>
                                         <span class="fw-semibold small">{{ $user->gender ?? 'N/A' }}</span>
                                     </li>
@@ -99,6 +103,38 @@
                                 </form>
                             </div>
                         </div>
+
+                        <div class="card card-animate mt-3">
+                            <div class="card-header pt-3">
+                                <h6 class="card-title">
+                                    <i class="ti ti-phone"></i> Contact Number
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="#" id="updateContactForm">
+                                    @csrf
+
+                                    <div class="form-group">
+                                        <div class="row g-3">
+                                            <div class="col-md-12">
+                                                <label class="form-label fw-semibold">Contact Number: <span class="text-danger">*</span></label>
+                                                <input type="text" name="contactno" class="form-control form-control-sm" placeholder="e.g. Local 104 / 09123456789"
+                                                       value="{{ $user->contactno }}" required maxlength="50" autocomplete="tel">
+                                                <div class="form-text">Filled in automatically on your ticket requests so support staff can reach you.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-3">
+                                        <div class="row">
+                                            <div class="col-md-12 d-flex justify-content-end">
+                                                <button type="submit" class="btn btn-success text-white"><i class="ti ti-device-floppy"></i> Save Contact Number</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,5 +143,6 @@
 
     <script>
         var accountPasswordRoute = "{{ route('account.password') }}";
+        var accountContactRoute = "{{ route('account.contact') }}";
     </script>
 @endsection

@@ -122,6 +122,7 @@ Route::group(['middleware'=>['login_auth']],function(){
     // Personal account page — outside /users/* so Requester role can access it
     Route::get('/account', [AccountController::class, 'index'])->name('account.index');
     Route::post('/account/password', [AccountController::class, 'updatePassword'])->name('account.password');
+    Route::post('/account/contact', [AccountController::class, 'updateContact'])->name('account.contact');
 
     Route::prefix('/projects')->group(function () {
         Route::get('/tracker', [ProjectController::class, 'index'])->name('project.index');

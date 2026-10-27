@@ -65,6 +65,9 @@ class AuditActivity
             case 'Edit_OwnPassword':
                 return "{$actor} changed their own password";
 
+            case 'Edit_OwnContact':
+                return "{$actor} updated their contact number";
+
             case 'Add_Role':
                 return "{$actor} added new Role '" . self::str($data, 'rolename') . "'";
             case 'Edit_Role':

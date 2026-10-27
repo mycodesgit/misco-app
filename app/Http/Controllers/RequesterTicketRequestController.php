@@ -137,6 +137,17 @@ class RequesterTicketRequestController extends Controller
             ], 422);
         }
 
+        // Contact number is required: the one typed in the form, or else the
+        // number saved on the requester's profile.
+        $contactNo = trim((string) $request->input('contactno')) ?: (Auth::user()->contactno ?? '');
+        if ($contactNo === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Contact Number is required.',
+                'errors'  => ['contactno' => ['Contact Number is required.']],
+            ], 422);
+        }
+
         try {
             DB::beginTransaction();
 
@@ -195,7 +206,7 @@ class RequesterTicketRequestController extends Controller
                 'issue_description' => $request->issue_description,
                 'remarks'           => $request->remarks,
                 'priority'          => $request->priority,
-                'contactno'         => $request->contactno,
+                'contactno'         => $contactNo,
                 'attachment'        => $attachmentPath,
                 'status'            => 'Pending',
             ]);
