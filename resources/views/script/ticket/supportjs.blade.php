@@ -356,18 +356,10 @@
         });
 
 
-        var dataTableResolved = $('#ticketresolvedTable').DataTable({
-            "ajax": {
-                "url": ticketResolvedRoute,
-                "type": "GET",
-            },
-            destroy: true,
-            info: true,
-            responsive: true,
-            lengthChange: true,
-            searching: true,
-            paging: true,
-            "columns": [
+        // Full detail columns, shared by the Resolved and My Tickets tables.
+        // Returns a fresh array each call so the two tables don't share objects.
+        function ticketDetailColumns() {
+            return [
                 // 1. Ticket Number
                 {
                     data: 'ticket_number',
@@ -491,13 +483,47 @@
                         return viewBtn;
                     }
                 }
-            ],
+            ];
+        }
+
+        var dataTableResolved = $('#ticketresolvedTable').DataTable({
+            "ajax": {
+                "url": ticketResolvedRoute,
+                "type": "GET",
+            },
+            destroy: true,
+            info: true,
+            responsive: true,
+            lengthChange: true,
+            searching: true,
+            paging: true,
+            "columns": ticketDetailColumns(),
             "createdRow": function (row, data, index) {
                 $(row).attr('id', 'tr-' + data.id);
             }
         });
         $(document).on('ticketResolvedAdded', function() {
             dataTableResolved.ajax.reload();
+        });
+
+
+        // My Tickets — Pending / In Progress / Resolved tickets assigned to me
+        var dataTableMine = $('#ticketMyTable').DataTable({
+            "ajax": {
+                "url": ticketMineRoute,
+                "type": "GET",
+            },
+            destroy: true,
+            info: true,
+            responsive: true,
+            lengthChange: true,
+            searching: true,
+            paging: true,
+            order: [], // keep the server order: open tickets first
+            "columns": ticketDetailColumns(),
+            "createdRow": function (row, data, index) {
+                $(row).attr('id', 'tr-' + data.id);
+            }
         });
 
 
@@ -630,6 +656,13 @@
             dataTableProgress.ajax.reload(null, false);
             dataTableResolved.ajax.reload(null, false);
             dataTableClosed.ajax.reload(null, false);
+            dataTableMine.ajax.reload(null, false);
+        });
+
+        // Tables built inside a hidden tab measure their columns as zero wide —
+        // re-measure when a tab is opened
+        $('#pills-tab button[data-bs-toggle="pill"]').on('shown.bs.tab', function () {
+            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust().responsive.recalc();
         });
 
         // Realtime: any ticket DB change (created / status) refreshes all tables

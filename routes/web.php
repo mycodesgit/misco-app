@@ -56,6 +56,7 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/support/view/all/fetch/progress',[SupportTicketRequestController::class,'showprogress'])->name('tickets.showprogress');
         Route::get('/support/view/all/fetch/resolved',[SupportTicketRequestController::class,'showresolved'])->name('tickets.showresolved');
         Route::get('/support/view/all/fetch/closed',[SupportTicketRequestController::class,'showclosed'])->name('tickets.showclosed');
+        Route::get('/support/view/all/fetch/mine',[SupportTicketRequestController::class,'showmine'])->name('tickets.showmine');
         Route::get('/support/view/details',[SupportTicketRequestController::class,'store'])->name('tickets.store');
         Route::post('/ticket-requests/{id}/status', [SupportTicketRequestController::class, 'updateStatus'])->name('tickets.update-status');
 

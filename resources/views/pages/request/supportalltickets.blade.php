@@ -187,6 +187,41 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="tab-pane fade" id="pills-five" role="tabpanel" aria-labelledby="pills-five-tab" tabindex="0">
+                                <div class="card card-animate">
+                                    <div class="card-header pt-3">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-server"></i> List of My Tickets Section
+                                        </h6>
+                                        <p class="text-muted small mb-0">Pending, In Progress and Resolved tickets assigned to you.</p>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive p-2">
+                                            <table id="ticketMyTable" class="table table-hover" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ticket No.</th>
+                                                        <th>Requester</th>
+                                                        <th>Subject</th>
+                                                        <th>Category</th>
+                                                        <th>Sub-Category</th>
+                                                        <th>Priority</th>
+                                                        <th>Status</th>
+                                                        <th>Resolved By</th>
+                                                        <th>Date Created</th>
+                                                        <th>Date Resolved</th>
+                                                        <th>Duration</th>
+                                                        <th width="10%">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -211,6 +246,7 @@
         var ticketProgressRoute = "{{ route('tickets.showprogress') }}";
         var ticketResolvedRoute = "{{ route('tickets.showresolved') }}";
         var ticketClosedRoute = "{{ route('tickets.showclosed') }}";
+        var ticketMineRoute = "{{ route('tickets.showmine') }}";
         var ticketCreateRoute = "";
     </script>
 @endsection

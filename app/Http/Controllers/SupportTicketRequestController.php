@@ -74,6 +74,23 @@ class SupportTicketRequestController extends Controller
         return response()->json(['data' => $data]);
     }
 
+    /**
+     * My Tickets — every Pending, In Progress and Resolved ticket the logged-in
+     * user is assigned to (assigned_to is a comma-separated list of user ids).
+     * Open tickets come first, newest first within each status.
+     */
+    public function showmine()
+    {
+        $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
+            ->whereRaw('FIND_IN_SET(?, REPLACE(assigned_to, " ", ""))', [Auth::id()])
+            ->whereIn('status', ['Pending', 'In Progress', 'Resolved'])
+            ->orderByRaw("FIELD(status, 'Pending', 'In Progress', 'Resolved')")
+            ->orderBy('id', 'DESC')
+            ->get();
+
+        return response()->json(['data' => $data]);
+    }
+
     public function showclosed()
     {
         $authuseroffice = Auth::user()->office_id;
