@@ -80,7 +80,7 @@ class User extends Authenticatable
     public const TASK_OFFICE_ID = 36;
 
     /**
-     * The only user who manages Wifi Vouchers.
+     * The one non-admin user who manages Wifi Vouchers (Administrators can too).
      */
     public const WIFI_VOUCHER_USER_ID = 5;
 
@@ -96,7 +96,7 @@ class User extends Authenticatable
 
     public function hasWifiVoucherAccess(): bool
     {
-        return (int) $this->id === self::WIFI_VOUCHER_USER_ID;
+        return $this->isAdmin() || (int) $this->id === self::WIFI_VOUCHER_USER_ID;
     }
 
     /**

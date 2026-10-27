@@ -72,7 +72,7 @@
     @endif
 
     {{-- Administrators manage everything here; each desk manages its own
-         categories; Wifi Vouchers belong to one user only --}}
+         categories; Wifi Vouchers: Administrators + one user --}}
     @if($isDeskStaff || $hasWifiVoucherAccess)
         <li class="nav-section px-4 py-2">
             <small class="nav-text text-muted">Control Management</small>
