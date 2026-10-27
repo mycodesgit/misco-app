@@ -204,4 +204,28 @@ class DailyTicketRequest extends Model
     {
         return $this->belongsTo(Subcategory::class, 'subcat_id');
     }
+
+    /**
+     * The client's feedback/rating for this ticket.
+     */
+    public function feedback()
+    {
+        return $this->hasOne(ClientFeedback::class, 'ticket_id');
+    }
+
+    // --- SATISFACTION ---
+
+    /**
+     * Average client rating (1-5) of tickets, optionally limited to the
+     * tickets created between $from and $to. Returns 0 when nothing is rated.
+     */
+    public static function averageRating($from = null, $to = null): float
+    {
+        $avg = self::join('clientfeedback', 'clientfeedback.ticket_id', '=', 'dailyticketrequest.id')
+            ->whereNotNull('clientfeedback.rating')
+            ->when($from && $to, fn($q) => $q->whereBetween('dailyticketrequest.created_at', [$from, $to]))
+            ->avg('clientfeedback.rating');
+
+        return round((float) $avg, 2);
+    }
 }

@@ -282,6 +282,63 @@
                                     <!-- Rendered via JS -->
                                 </div>
                             </div>
+
+                            <!-- Client Satisfaction Card -->
+                            <div class="card card-animate mt-3">
+                                <div class="card-header bg-transparent pt-3 border-bottom d-flex justify-content-between align-items-center">
+                                    <h6 class="fw-bold small mb-0">
+                                        <i class="ti ti-mood-smile me-1"></i> Client Satisfaction
+                                    </h6>
+                                    <span class="badge bg-light text-dark border">Out of 5</span>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row g-0 text-center">
+                                        <!-- Overall Satisfaction Rate (selected year) -->
+                                        <div class="col-6 px-2 satisfaction-divider">
+                                            <div class="small fw-semibold text-muted mb-2">Overall Satisfaction Rate</div>
+                                            <div class="satisfaction-gauge">
+                                                <svg viewBox="0 0 120 66" aria-hidden="true">
+                                                    <path class="gauge-track" d="M 12 60 A 48 48 0 0 1 108 60" pathLength="100" />
+                                                    <path class="gauge-fill" id="sat-overall-fill" d="M 12 60 A 48 48 0 0 1 108 60" pathLength="100" stroke-dasharray="0 100" />
+                                                </svg>
+                                                <div class="gauge-value">
+                                                    <span class="fw-bold" id="sat-overall-value">0.00</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Satisfaction Score vs Last Month -->
+                                        <div class="col-6 px-2">
+                                            <div class="small fw-semibold text-muted mb-2">Satisfaction Score vs Last Month</div>
+                                            <div class="satisfaction-gauge">
+                                                <svg viewBox="0 0 120 66" aria-hidden="true">
+                                                    <path class="gauge-track" d="M 12 60 A 48 48 0 0 1 108 60" pathLength="100" />
+                                                    <path class="gauge-fill" id="sat-month-fill" d="M 12 60 A 48 48 0 0 1 108 60" pathLength="100" stroke-dasharray="0 100" />
+                                                </svg>
+                                                <div class="gauge-value">
+                                                    <span class="fw-bold" id="sat-month-value">0.00</span>
+                                                    <small class="d-block text-muted">
+                                                        <span id="sat-month-trend" class="text-success">&rarr;</span>
+                                                        from <span id="sat-month-last">0.00</span>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Average Ticket Performance Card -->
+                            <div class="card card-animate mt-3">
+                                <div class="card-header pt-3">
+                                    <h6 class="card-title">
+                                        <i class="ti ti-user-check"></i> Average Ticket Performance of MIS Personnel
+                                    </h6>
+                                </div>
+                                <div class="card-body" id="personnel-performance-container">
+                                    <!-- Dynamically populated -->
+                                </div>
+                            </div>
                         </div>
 
                         <!-- IT Ticketing Metric Cards (col-md-8 container) -->
@@ -475,20 +532,6 @@
                                         </div>
                                         <div class="card-body" id="top-offices-container" style="height: 340px; position: relative;">
                                             <canvas id="topOfficesBarChart"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Average Ticket Performance Card -->
-                                <div class="col-md-12">
-                                    <div class="card card-animate">
-                                        <div class="card-header pt-3">
-                                            <h6 class="card-title">
-                                                <i class="ti ti-user-check"></i> Average Ticket Performance of MIS Personnel
-                                            </h6>
-                                        </div>
-                                        <div class="card-body" id="personnel-performance-container">
-                                            <!-- Dynamically populated -->
                                         </div>
                                     </div>
                                 </div>
@@ -997,6 +1040,41 @@
             align-items: center;
             justify-content: center;
             font-size: 0.65rem;
+        }
+
+        /* Client Satisfaction Gauges */
+        .satisfaction-divider {
+            border-right: 1px solid var(--bs-border-color);
+        }
+        .satisfaction-gauge {
+            position: relative;
+            max-width: 180px;
+            margin: 0 auto;
+        }
+        .satisfaction-gauge svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .satisfaction-gauge path {
+            fill: none;
+            stroke-width: 22;
+        }
+        .satisfaction-gauge .gauge-track {
+            stroke: #4f6462;
+        }
+        .satisfaction-gauge .gauge-fill {
+            stroke: var(--bs-warning);
+        }
+        .satisfaction-gauge .gauge-value {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            line-height: 1.1;
+        }
+        .satisfaction-gauge .gauge-value > span {
+            font-size: 1.6rem;
         }
 
         /* List Group Item */

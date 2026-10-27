@@ -230,6 +230,36 @@
             $('#personnel-performance-container').html(html);
         }
 
+        function renderSatisfaction(satisfaction) {
+            if (!satisfaction) return;
+
+            // Arc length is 100, so a 1-5 score fills (score / 5) * 100 of it
+            function fill(score) {
+                var pct = Math.min(100, Math.max(0, (parseFloat(score) || 0) / 5 * 100));
+                return pct + ' 100';
+            }
+
+            var overall = parseFloat(satisfaction.overall) || 0;
+            var thisMonth = parseFloat(satisfaction.thisMonth) || 0;
+            var lastMonth = parseFloat(satisfaction.lastMonth) || 0;
+
+            $('#sat-overall-fill').attr('stroke-dasharray', fill(overall));
+            $('#sat-overall-value').text(overall.toFixed(2));
+
+            $('#sat-month-fill').attr('stroke-dasharray', fill(thisMonth));
+            $('#sat-month-value').text(thisMonth.toFixed(2));
+            $('#sat-month-last').text(lastMonth.toFixed(2));
+
+            var $trend = $('#sat-month-trend').removeClass('text-success text-danger');
+            if (thisMonth > lastMonth) {
+                $trend.html('&uarr;').addClass('text-success');
+            } else if (thisMonth < lastMonth) {
+                $trend.html('&darr;').addClass('text-danger');
+            } else {
+                $trend.html('&rarr;').addClass('text-success');
+            }
+        }
+
         function updateDashboard(year, timeframe = null) {
             if (!timeframe) {
                 timeframe = $('#timeframeTabs .timeframe-btn.active').data('timeframe') || 'daily';
@@ -268,6 +298,7 @@
                     // Render Cards
                     renderLeaderboard(data.leaderboard);
                     renderTopCategories(data.topCategories);
+                    renderSatisfaction(data.satisfaction);
                     renderMonitoring(data.monitoring);
                     renderTopOffices(data.topOffices);
                     renderPersonnelPerformance(data.personnelPerformance);
@@ -415,6 +446,7 @@
             renderMonitoring(@json($monitoring ?? []));
             renderTopOffices(@json($topOffices ?? []));
             renderPersonnelPerformance(@json($personnelPerformance ?? []));
+            renderSatisfaction(@json($satisfaction ?? null));
 
             // Beautify tooltips on the initial server-rendered heatmaps (bubble + arrow)
             initHeatmapTooltips('#supportprogress');

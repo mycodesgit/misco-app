@@ -48,8 +48,11 @@ class DashboardController extends Controller
             return $this->getDashboardData($selectedYear, $timeframe, $user);
         });
 
+        $satisfaction = $this->getSatisfactionData((int) $selectedYear);
+
         if ($request->ajax()) {
             return response()->json(array_merge($dashboardData, [
+                'satisfaction' => $satisfaction,
                 'summary' => [
                     'pendingCount'       => $pendingCount,
                     'inProgressCount'    => $inProgressCount,
@@ -90,6 +93,7 @@ class DashboardController extends Controller
 
         return view('pages.home.dashboard', array_merge([
             'mustChangePassword' => $mustChangePassword,
+            'satisfaction' => $satisfaction,
             'selectedYear' => $selectedYear,
             'selectedTimeframe' => $timeframe,
             'pendingCount'       => $pendingCount,
@@ -101,6 +105,25 @@ class DashboardController extends Controller
             'selfresetsubcat' => $selfresetsubcat,
             'selfresetpersonnel' => $selfresetpersonnel
         ], $dashboardData));
+    }
+
+    /**
+     * Client satisfaction (1-5) for the selected year: the year's average,
+     * plus the latest month vs the month before. For past years the latest
+     * month is December.
+     */
+    private function getSatisfactionData(int $year): array
+    {
+        $month = $year < now()->year
+            ? Carbon::create($year, 12, 1)
+            : now()->startOfMonth();
+        $prevMonth = $month->copy()->subMonthNoOverflow();
+
+        return [
+            'overall'   => DailyTicketRequest::averageRating(Carbon::create($year, 1, 1)->startOfYear(), Carbon::create($year, 1, 1)->endOfYear()),
+            'thisMonth' => DailyTicketRequest::averageRating($month->copy()->startOfMonth(), $month->copy()->endOfMonth()),
+            'lastMonth' => DailyTicketRequest::averageRating($prevMonth->copy()->startOfMonth(), $prevMonth->copy()->endOfMonth()),
+        ];
     }
 
     private function getDashboardData($year, $timeframe, $user)
