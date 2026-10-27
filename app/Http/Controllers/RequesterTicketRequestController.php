@@ -461,6 +461,7 @@ class RequesterTicketRequestController extends Controller
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Resolved')
             ->where('user_id', $authuserID)
+            ->notArchived() // past years live in the Archive
             ->orderBy('id', 'DESC')
             ->get();
 
@@ -642,6 +643,7 @@ class RequesterTicketRequestController extends Controller
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Cancelled')
             ->where('user_id', $authuserID)
+            ->notArchived() // past years live in the Archive
             ->orderBy('id', 'DESC')
             ->get();
 

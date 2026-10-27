@@ -68,6 +68,7 @@ class SupportTicketRequestController extends Controller
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Resolved')
             ->where('off_id', $authuseroffice)
+            ->notArchived() // past years live in the Archive
             ->orderBy('id', 'DESC')
             ->get();
 
@@ -84,6 +85,7 @@ class SupportTicketRequestController extends Controller
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->whereRaw('FIND_IN_SET(?, REPLACE(assigned_to, " ", ""))', [Auth::id()])
             ->whereIn('status', ['Pending', 'In Progress', 'Resolved'])
+            ->notArchived() // past years live in the Archive
             ->orderByRaw("FIELD(status, 'Pending', 'In Progress', 'Resolved')")
             ->orderBy('id', 'DESC')
             ->get();
@@ -98,6 +100,7 @@ class SupportTicketRequestController extends Controller
         $data = DailyTicketRequest::with(['requester.office', 'category', 'subcategory', 'resolver:id,fname,lname,ext'])
             ->where('status', 'Cancelled')
             ->where('off_id', $authuseroffice)
+            ->notArchived() // past years live in the Archive
             ->orderBy('id', 'DESC')
             ->get();
 

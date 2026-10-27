@@ -29,6 +29,7 @@
     $rolesAllActive = in_array($current_route, ['roles.index']) ? 'active' : '';
 
     $ticketsrequesterActive = ($current_route === 'ticketsrequester.index' || $viewingOwnTicket) ? 'active' : '';
+    $archiveActive = $current_route === 'tickets.archive' ? 'active' : '';
 @endphp
 
 <ul class="nav flex-column">
@@ -52,6 +53,12 @@
     <li>
         <a class="nav-link {{ $ticketsrequesterActive }}" href="{{ route('ticketsrequester.index') }}">
             <i class="ti ti-send"></i><span class="nav-text">My Requests</span>
+        </a>
+    </li>
+    {{-- Finished tickets from past years — every role --}}
+    <li>
+        <a class="nav-link {{ $archiveActive }}" href="{{ route('tickets.archive') }}">
+            <i class="ti ti-archive"></i><span class="nav-text">Archive</span>
         </a>
     </li>
     @if($isDeskStaff)

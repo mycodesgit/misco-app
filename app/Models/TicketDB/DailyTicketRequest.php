@@ -213,6 +213,51 @@ class DailyTicketRequest extends Model
         return $this->hasOne(ClientFeedback::class, 'ticket_id');
     }
 
+    // --- ARCHIVE ---
+    //
+    // A ticket is archived once the year it was created in has passed AND it
+    // is finished (Resolved / Cancelled). Nothing is moved or copied: on
+    // January 1 the previous year's finished tickets simply start matching
+    // archived(). Tickets still Pending / In Progress stay in the active lists
+    // until they are finished, then they move to the archive on their own.
+
+    public const ARCHIVED_STATUSES = ['Resolved', 'Cancelled'];
+
+    public function scopeArchived($query)
+    {
+        return $query->whereYear('created_at', '<', now()->year)
+            ->whereIn('status', self::ARCHIVED_STATUSES);
+    }
+
+    public function scopeNotArchived($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereYear('created_at', '>=', now()->year)
+                ->orWhereNotIn('status', self::ARCHIVED_STATUSES);
+        });
+    }
+
+    /**
+     * Tickets the user may see — same rule as User::canViewTicket(): their
+     * own requests, plus (desk staff) their office's desk and tickets they are
+     * assigned to. Administrators see all.
+     */
+    public function scopeVisibleTo($query, User $user)
+    {
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+
+            if ($user->isDeskStaff()) {
+                $q->orWhere('off_id', $user->office_id)
+                    ->orWhereRaw('FIND_IN_SET(?, REPLACE(assigned_to, " ", ""))', [$user->id]);
+            }
+        });
+    }
+
     // --- SATISFACTION ---
 
     /**

@@ -25,6 +25,7 @@ use App\Http\Controllers\WifiVoucherController;
 use App\Http\Controllers\AuditTrailController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectKanbanController;
+use App\Http\Controllers\TicketArchiveController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -57,6 +58,10 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::get('/support/view/all/fetch/resolved',[SupportTicketRequestController::class,'showresolved'])->name('tickets.showresolved');
         Route::get('/support/view/all/fetch/closed',[SupportTicketRequestController::class,'showclosed'])->name('tickets.showclosed');
         Route::get('/support/view/all/fetch/mine',[SupportTicketRequestController::class,'showmine'])->name('tickets.showmine');
+
+        // Archive: finished tickets from past years — every role
+        Route::get('/archive', [TicketArchiveController::class, 'index'])->name('tickets.archive');
+        Route::get('/archive/fetch', [TicketArchiveController::class, 'show'])->name('tickets.archive.show');
         Route::get('/support/view/details',[SupportTicketRequestController::class,'store'])->name('tickets.store');
         Route::post('/ticket-requests/{id}/status', [SupportTicketRequestController::class, 'updateStatus'])->name('tickets.update-status');
 
