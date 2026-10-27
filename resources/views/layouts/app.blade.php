@@ -158,7 +158,9 @@
             <div class="row">
                 <div class="col-12">
                     <footer class="text-center py-2 mt-6 text-secondary fixed-bottom bg-white" style="z-index: 99">
-                        <p class="mb-0"></p>
+                        <p class="mb-0 small">
+                            &copy; {{ date('Y') }} <strong>ServiceNow Ticketing System</strong>
+                        </p>
                     </footer>
                 </div>
             </div>
