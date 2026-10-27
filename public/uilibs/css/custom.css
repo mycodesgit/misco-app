@@ -1,51 +1,84 @@
 
-.sidebar.collapsed .nav-link[data-tooltip]::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-0%) translateX(6px);
-    background-color: #ffffff;
-    color: #2b3035;
-    font-family: "Poppins", sans-serif;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    font-weight: 500;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1050;
+/* ===== Sidebar alignment: icons stay in the same spot collapsed/expanded =====
+   12px margin + 9px padding puts every 18px icon at 21px from the left, i.e.
+   centered in the 60px collapsed bar, and keeps it there while it widens. */
+.sidebar .nav-link,
+.sidebar.collapsed .nav-link {
+    margin: 1px 12px;
+    padding: 8px 9px;
 }
-[data-bs-theme="dark"] .sidebar.collapsed .nav-link[data-tooltip]::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-0%) translateX(6px);
-    background-color: #2b3035;
-    color: #ffffff;
-    font-family: "Poppins", sans-serif;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
+.sidebar .logo-area {
+    padding-left: 18px; /* 24px logo centered in the 60px bar, like the icons */
+}
+/* Section headers ("Main Navigation", ...) keep their height when collapsed:
+   the label is only made invisible, not removed, so the menus below sit at
+   the same height collapsed and expanded and don't jump on expand. */
+.sidebar .nav-section {
+    position: relative;
     white-space: nowrap;
-    opacity: 0;
+}
+.sidebar.collapsed .nav-section .nav-text {
+    display: inline-block;
     visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1050;
+}
+/* In its place, a short divider centered under the icons */
+.sidebar.collapsed:not(.hover-expand) .nav-section::before {
+    content: "";
+    position: absolute;
+    left: 18px;
+    width: 24px;
+    top: 50%;
+    border-top: 1px solid #e5e5e5;
+}
+[data-bs-theme="dark"] .sidebar.collapsed:not(.hover-expand) .nav-section::before {
+    border-top-color: #495057;
 }
 
-/* Tooltip Hover State */
-.sidebar.collapsed .nav-link[data-tooltip]:hover::after {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(-50%) translateX(3px);
+/* Clip the labels while the width animates instead of letting them spill out */
+.sidebar,
+.sidebar.collapsed {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+/* ===== Collapsed sidebar expands while hovered (desktop) =====
+   .hover-expand is toggled by the layout script. The sidebar floats over the
+   page instead of pushing the content, so nothing shifts on hover. */
+@media (min-width: 993px) {
+    .sidebar.collapsed.hover-expand {
+        width: 240px;
+        box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
+    }
+    .sidebar.collapsed.hover-expand .nav-text,
+    .sidebar.collapsed.hover-expand .logo-text {
+        display: inline-block; /* transform needs a block box to slide */
+        animation: sidebarLabelIn 0.25s ease 0.05s both;
+    }
+    .sidebar.collapsed.hover-expand .nav-section .nav-text {
+        visibility: visible;
+    }
+    .sidebar.collapsed.hover-expand .nav-link:hover,
+    .sidebar.collapsed.hover-expand .nav-link.active {
+        color: #000000 !important;
+        background-color: #65ac86 !important;
+    }
+    [data-bs-theme="dark"] .sidebar.collapsed.hover-expand {
+        box-shadow: 4px 0 16px rgba(0, 0, 0, 0.4);
+    }
+    [data-bs-theme="dark"] .sidebar.collapsed.hover-expand .nav-link:hover {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+    }
+    [data-bs-theme="dark"] .sidebar.collapsed.hover-expand .nav-link.active {
+        background-color: #65ac86 !important;
+        color: #ffffff !important;
+    }
+}
+
+/* Labels fade/slide in as the sidebar opens */
+@keyframes sidebarLabelIn {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
 /*vertivcal scrollable*/

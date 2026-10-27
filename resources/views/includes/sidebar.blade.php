@@ -20,101 +20,101 @@
 @endphp
 
 <ul class="nav flex-column">
-    <li class="px-4 py-2">
+    <li class="nav-section px-4 py-2">
         <small class="nav-text text-muted">Main Navigation</small>
     </li>
     <li>
-        <a class="nav-link {{ $dashActive }}" href="{{ route('dashboard.index') }}" data-tooltip="Dashboard">
+        <a class="nav-link {{ $dashActive }}" href="{{ route('dashboard.index') }}">
             <i class="ti ti-layout-grid"></i><span class="nav-text">Dashboard</span>
         </a>
     </li>
     @if(Auth::guard('web')->user()->role != 'Requester')
         <li>
-            <a class="nav-link {{ $ticketsActive }}" href="{{ route('tickets.index') }}" data-tooltip="All Tickets">
+            <a class="nav-link {{ $ticketsActive }}" href="{{ route('tickets.index') }}">
                 <i class="ti ti-ticket"></i><span class="nav-text">All Tickets</span>
             </a>
         </li>
         <li>
-            <a class="nav-link {{ $dailyTaskActive }}" href="{{ route('daily-task.index') }}" data-tooltip="Daily Task">
+            <a class="nav-link {{ $dailyTaskActive }}" href="{{ route('daily-task.index') }}">
                 <i class="ti ti-calendar"></i><span class="nav-text">Daily Task</span>
             </a>
         </li>
         <li>
-            <a class="nav-link {{ $projectActive }}" href="{{ route('project.index') }}" data-tooltip="Work Progress">
+            <a class="nav-link {{ $projectActive }}" href="{{ route('project.index') }}">
                 <i class="ti ti-chart-line"></i><span class="nav-text">Work Progress</span>
             </a>
         </li>
     @else
         <li>
-            <a class="nav-link {{ $ticketsrequesterActive }}" href="{{ route('ticketsrequester.index') }}" data-tooltip="My Tickets">
+            <a class="nav-link {{ $ticketsrequesterActive }}" href="{{ route('ticketsrequester.index') }}">
                 <i class="ti ti-ticket"></i><span class="nav-text">My Tickets</span>
             </a>
         </li>
     @endif
 
     @if(Auth::guard('web')->user()->role == 'Administrator')
-        <li class="px-4 py-2">
+        <li class="nav-section px-4 py-2">
             <small class="nav-text text-muted">Control Management</small>
         </li>
         <li>
-            <a class="nav-link {{ $officeActive }}" href="{{ route('office.index') }}" data-tooltip="Offices">
+            <a class="nav-link {{ $officeActive }}" href="{{ route('office.index') }}">
                 <i class="ti ti-building"></i><span class="nav-text">Offices</span>
             </a>
         </li>
         <li>
-            <a class="nav-link {{ $categoryActive }}" href="{{ route('category.index') }}" data-tooltip="Categories">
+            <a class="nav-link {{ $categoryActive }}" href="{{ route('category.index') }}">
                 <i class="ti ti-server"></i><span class="nav-text">Categories</span>
             </a>
         </li>
         <li>
-            <a class="nav-link {{ $wifiActive }}" href="{{ route('wifi.index') }}" data-tooltip="Wifi Vouchers">
+            <a class="nav-link {{ $wifiActive }}" href="{{ route('wifi.index') }}">
                 <i class="ti ti-wifi"></i><span class="nav-text">Wifi Vouchers</span>
             </a>
         </li>
         <li>
-            <a class="nav-link {{ $auditActive }}" href="{{ route('audittrail.index') }}" data-tooltip="Audit Trail">
+            <a class="nav-link {{ $auditActive }}" href="{{ route('audittrail.index') }}">
                 <i class="ti ti-history"></i><span class="nav-text">Audit Trail</span>
             </a>
         </li>
     @endif
 
     @if(Auth::guard('web')->user()->role != 'Requester')
-        <li class="px-4 py-2">
+        <li class="nav-section px-4 py-2">
             <small class="nav-text text-muted">Reports Generation</small>
         </li>
         <li>
-            <a class="nav-link {{ $accomplishmentActive }}" href="{{ route('accomplishment-report.index') }}" data-tooltip="Accomplishment">
+            <a class="nav-link {{ $accomplishmentActive }}" href="{{ route('accomplishment-report.index') }}">
                 <i class="ti ti-file-type-pdf"></i><span class="nav-text">Accomplishment</span>
             </a>
         </li>
         <li>
-            <a class="nav-link {{ $ticketstatusActive }}" href="{{ route('ticketstatus-report.index') }}" data-tooltip="Ticket Status">
+            <a class="nav-link {{ $ticketstatusActive }}" href="{{ route('ticketstatus-report.index') }}">
                 <i class="ti ti-report-analytics"></i><span class="nav-text">Ticket Status</span>
             </a>
         </li>
         <li>
-            <a class="nav-link" href="#" data-tooltip="Client Satisfactory">
+            <a class="nav-link" href="#">
                 <i class="ti ti-forms"></i><span class="nav-text">Client Satisfactory</span>
             </a>
         </li>
         <li>
-            <a class="nav-link {{ $clientfeedbackActive }}" href="{{ route('clientfeedback.index') }}" data-tooltip="Client Feedback">
+            <a class="nav-link {{ $clientfeedbackActive }}" href="{{ route('clientfeedback.index') }}">
                 <i class="ti ti-file-report"></i><span class="nav-text">Client Feedback</span>
             </a>
         </li>
     @endif
 
     @if(Auth::guard('web')->user()->role == 'Administrator')
-        <li class="px-4 py-2">
+        <li class="nav-section px-4 py-2">
             <small class="nav-text text-muted">User Management</small>
         </li>
         <li>
-            <a class="nav-link {{$usersAllActive}}" href="{{ route('user.index') }}" data-tooltip="{{ auth()->user()->pageTitle(' Support Team') }}">
+            <a class="nav-link {{$usersAllActive}}" href="{{ route('user.index') }}">
                 <i class="ti ti-user-cog"></i><span class="nav-text">{{ auth()->user()->pageTitle(' Support Team') }}</span>
             </a>
         </li>
         <li>
-            <a class="nav-link {{ $requesterAllActive }}" href="{{ route('requester.index') }}" data-tooltip="Requester">
+            <a class="nav-link {{ $requesterAllActive }}" href="{{ route('requester.index') }}">
                 <i class="ti ti-users"></i><span class="nav-text">Requester</span>
             </a>
         </li>

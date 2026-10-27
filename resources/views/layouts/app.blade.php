@@ -204,6 +204,42 @@
     <!-- Theme -->
     <script src="{{ asset('uilibs/js/theme.js') }}"></script>
     <script src="{{ asset('uilibs/js/contextmenu.js') }}"></script>
+    <script>
+        // Collapsed sidebar: expand while hovered (desktop only). Short delays
+        // stop it flashing open when the mouse just passes over it.
+        (function () {
+            var sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+
+            var desktop = window.matchMedia('(min-width: 993px)');
+            var openTimer = null;
+            var closeTimer = null;
+
+            sidebar.addEventListener('mouseenter', function () {
+                clearTimeout(closeTimer);
+                if (!desktop.matches || !sidebar.classList.contains('collapsed')) return;
+                openTimer = setTimeout(function () {
+                    sidebar.classList.add('hover-expand');
+                }, 150);
+            });
+
+            sidebar.addEventListener('mouseleave', function () {
+                clearTimeout(openTimer);
+                closeTimer = setTimeout(function () {
+                    sidebar.classList.remove('hover-expand');
+                }, 250);
+            });
+
+            // The toggle button pins it open/closed — drop the hover state
+            var toggleBtn = document.getElementById('toggleBtn');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function () {
+                    clearTimeout(openTimer);
+                    sidebar.classList.remove('hover-expand');
+                });
+            }
+        })();
+    </script>
     @include('script.notify.topbarnotifyjs')
 
     <script>
