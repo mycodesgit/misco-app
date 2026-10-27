@@ -25,6 +25,9 @@ use App\Models\TicketDB\AuditTrailCategory;
 use App\Models\TicketDB\AuditTrailCategorySub;
 use App\Models\TicketDB\AuditTrailDailyTicketRequest;
 
+use App\Mail\TicketResolvedMail;
+use App\Helpers\BackgroundMail;
+
 class SupportTicketRequestController extends Controller
 {
     public function index()
@@ -358,11 +361,33 @@ class SupportTicketRequestController extends Controller
             ], 400);
         }
 
-        return response()->json([
+        if ($status === 'resolved') {
+            $this->emailRequesterResolved($ticket);
+        }
+
+        // Respond right away so the UI updates while the email sends
+        return BackgroundMail::respondNow(response()->json([
             'success' => true,
             'message' => $message,
             'ticket'  => $ticket
-        ]);
+        ]));
+    }
+
+    /**
+     * Send the "Ticket Resolved" email (with the resolution remarks) to the
+     * requester who submitted the ticket. It goes out after the response.
+     */
+    private function emailRequesterResolved(DailyTicketRequest $ticket): void
+    {
+        $requester = User::find($ticket->user_id);
+
+        if (!$requester || empty($requester->email)) {
+            return;
+        }
+
+        $mailTicket = $ticket->fresh(['category', 'subcategory', 'resolver']);
+
+        BackgroundMail::send($requester->email, new TicketResolvedMail($mailTicket, $requester), 'resolved ticket ' . $ticket->ticket_number);
     }
 
     /**

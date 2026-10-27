@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -29,6 +27,7 @@ use App\Models\TicketDB\AuditTrailClientFeedback;
 use App\Services\LanguageDetectionService;
 
 use App\Mail\TicketRequestMail;
+use App\Helpers\BackgroundMail;
 
 class RequesterTicketRequestController extends Controller
 {
@@ -242,20 +241,12 @@ class RequesterTicketRequestController extends Controller
             $userPayload = $ticket->toArray();
             $this->logAudit($request, 'Add_DailyTicket', $userPayload);
 
-            $response = response()->json([
+            // Respond right away so the modal closes while the emails send
+            return BackgroundMail::respondNow(response()->json([
                 'success' => true,
                 'message' => 'Ticket #' . $ticketNumber . ' created successfully!',
                 'data'    => $ticket
-            ], 201);
-
-            // Tell the browser the response is complete so the modal closes
-            // right away, while the emails keep sending in the background
-            // (needed when the server is not running PHP-FPM).
-            ignore_user_abort(true);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
-            $response->headers->set('Connection', 'close');
-
-            return $response;
+            ], 201));
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -288,15 +279,9 @@ class RequesterTicketRequestController extends Controller
 
         $ticket->load(['requester', 'requesteroffice', 'category', 'subcategory']);
 
-        app()->terminating(function () use ($ticket, $recipients) {
-            foreach ($recipients as $recipient) {
-                try {
-                    Mail::to($recipient->email)->send(new TicketRequestMail($ticket, $recipient));
-                } catch (\Throwable $e) {
-                    Log::warning('Ticket email failed for ticket ' . $ticket->ticket_number . ' to ' . $recipient->email . ': ' . $e->getMessage());
-                }
-            }
-        });
+        foreach ($recipients as $recipient) {
+            BackgroundMail::send($recipient->email, new TicketRequestMail($ticket, $recipient), 'ticket ' . $ticket->ticket_number);
+        }
     }
 
     /**
