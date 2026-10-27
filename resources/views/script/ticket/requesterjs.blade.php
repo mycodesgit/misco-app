@@ -70,12 +70,21 @@
 
             var formData = new FormData(this);
 
+            // Lock the button right away so the ticket can't be submitted twice
+            var $btn = $(this).find('button[type="submit"]');
+            if ($btn.prop('disabled')) return false;
+            var btnHtml = $btn.html();
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Submitting...');
+
             $.ajax({
                 url: ticketCreateRoute,
                 type: "POST",
                 data: formData,
                 processData: false,
                 contentType: false,
+                complete: function() {
+                    $btn.prop('disabled', false).html(btnHtml);
+                },
                 success: function(response) {
                     if(response.success) {
                         toastr.success(response.message);

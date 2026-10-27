@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -25,6 +27,8 @@ use App\Models\TicketDB\AuditTrailDailyTicketRequest;
 use App\Models\TicketDB\AuditTrailClientFeedback;
 
 use App\Services\LanguageDetectionService;
+
+use App\Mail\TicketRequestMail;
 
 class RequesterTicketRequestController extends Controller
 {
@@ -231,15 +235,27 @@ class RequesterTicketRequestController extends Controller
                 \App\Helpers\Realtime::notify($supportUsers, $notif, 'ticket ' . $ticket->ticket_number);
             }
 
+            // Email every staff member listed in assigned_to
+            $this->emailAssignedStaff($ticket);
+
             // 5. Log Audit
             $userPayload = $ticket->toArray();
             $this->logAudit($request, 'Add_DailyTicket', $userPayload);
 
-            return response()->json([
+            $response = response()->json([
                 'success' => true,
                 'message' => 'Ticket #' . $ticketNumber . ' created successfully!',
                 'data'    => $ticket
             ], 201);
+
+            // Tell the browser the response is complete so the modal closes
+            // right away, while the emails keep sending in the background
+            // (needed when the server is not running PHP-FPM).
+            ignore_user_abort(true);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+            $response->headers->set('Connection', 'close');
+
+            return $response;
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -249,6 +265,38 @@ class RequesterTicketRequestController extends Controller
                 'message' => 'Failed to create ticket: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Send the "New Ticket Request" email to each user in the ticket's
+     * comma-separated assigned_to list. Emails go out after the response is
+     * sent so SMTP never slows down (or fails) the ticket submission.
+     */
+    private function emailAssignedStaff(DailyTicketRequest $ticket): void
+    {
+        $ids = array_filter(array_map('trim', explode(',', (string) $ticket->assigned_to)));
+
+        $recipients = User::whereIn('id', $ids)
+            ->where('ustatus', '!=', 3)
+            ->whereNotNull('email')
+            ->where('email', '!=', '')
+            ->get();
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        $ticket->load(['requester', 'requesteroffice', 'category', 'subcategory']);
+
+        app()->terminating(function () use ($ticket, $recipients) {
+            foreach ($recipients as $recipient) {
+                try {
+                    Mail::to($recipient->email)->send(new TicketRequestMail($ticket, $recipient));
+                } catch (\Throwable $e) {
+                    Log::warning('Ticket email failed for ticket ' . $ticket->ticket_number . ' to ' . $recipient->email . ': ' . $e->getMessage());
+                }
+            }
+        });
     }
 
     /**
