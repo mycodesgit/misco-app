@@ -123,6 +123,16 @@
                     echoConnected = states.current === 'connected';
                     syncPolling();
                 });
+
+                // Reverb refuses client events (typing) with these codes
+                connection.bind('error', function (err) {
+                    var code = err && err.data && err.data.code;
+                    if (code === 4301) {
+                        console.warn('[chat realtime] Reverb has client events disabled — set REVERB_APP_ACCEPT_CLIENT_EVENTS_FROM=members in the server .env, then restart Reverb.');
+                    } else if (code === 4009) {
+                        console.warn('[chat realtime] Reverb says this browser is not a member of the ticket channel, so typing was rejected.');
+                    }
+                });
             } catch (e) { /* pusher internals unavailable — keep polling */ }
 
             ticketChannel = Echo.private(`ticket.${ticketId}`);
@@ -134,10 +144,12 @@
                     syncPolling();
                     loadMessages(false);
                 })
-                .error(function () {
+                .error(function (err) {
                     // Channel authorization failed — stay on polling
                     channelSubscribed = false;
                     syncPolling();
+                    console.warn('[chat realtime] Could not subscribe to ticket.' + ticketId +
+                        ' (check /broadcasting/auth in the Network tab). Using polling; typing indicator is off.', err);
                 })
                 .listen('MessageSent', (e) => {
                     // Their message arrived, so they are no longer typing
@@ -184,11 +196,32 @@
         );
         $('#chatBox').after($typing);
 
+        // Ask pusher-js directly whether the channel is subscribed rather
+        // than trusting our own flag (a missed callback would block typing)
+        function canWhisper() {
+            try {
+                return !!(ticketChannel && ticketChannel.subscription && ticketChannel.subscription.subscribed);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        let typingSkipWarned = false;
         function whisperTyping(isTyping) {
-            if (!ticketChannel || !channelSubscribed) return;
+            if (!canWhisper()) {
+                if (!typingSkipWarned) {
+                    typingSkipWarned = true;
+                    console.warn('[chat realtime] Typing not sent: socket state is "' +
+                        (typeof Echo !== 'undefined' ? Echo.connector.pusher.connection.state : 'no Echo') +
+                        '" and the ticket channel is not subscribed.');
+                }
+                return;
+            }
             try {
                 ticketChannel.whisper('typing', { user_id: currentUserId, name: currentUserName, typing: isTyping });
-            } catch (e) { /* socket unavailable — the indicator is optional */ }
+            } catch (e) {
+                console.warn('[chat realtime] Typing whisper failed:', e);
+            }
         }
 
         function stopTyping() {
