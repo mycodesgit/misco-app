@@ -17,7 +17,7 @@
                 <!-- Page Header -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4 pb-2 border-bottom">
                     <div class="d-flex align-items-start gap-2 w-100">
-                        @if(Auth::guard('web')->user()->role != 'Requester')
+                        @if($canHandle)
                             <a href="{{ route('tickets.index') }}" class="btn btn-light btn-sm flex-shrink-0" title="Back to Requests" aria-label="Back to Requests">
                                 <i class="ti ti-arrow-left"></i>
                             </a>
@@ -156,9 +156,9 @@
                                     </div>
                                 </div>
 
-                                <!-- IT Management Action -->
+                                <!-- IT Management Action (only for this ticket's handlers) -->
                                 <hr>
-                                @if(Auth::guard('web')->user()->role != 'Requester')
+                                @if($canHandle)
                                     @php
                                         $currentStatus = strtolower($ticket->status);
                                     @endphp

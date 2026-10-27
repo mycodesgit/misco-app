@@ -27,23 +27,39 @@ class UserController extends Controller
     {
         $users = User::with('office')->get();
         $offices = Office::all();
-        $roles = UserRole::when(Auth::user()->role !== 'Administrator', function ($query) {
-            $query->where('rolename', '!=', 'Administrator');
-        })->get();
-        $cat = Category::where('off_id', Auth::user()->office_id)->where('status', 1)->get();
+        // Add on the Support Team page: service desk roles only (no "Requester")
+        $roles = $this->assignableRoles()->where('rolename', '!=', 'Requester')->values();
+        // Edit: any role, so a user can be moved between desk staff and requester
+        $editRoles = $this->assignableRoles();
+        // Every office's categories: the Assign Task Category modal shows each
+        // staff member only the categories of their own office
+        $cat = Category::where('status', 1)->orderBy('ticketcatname')->get();
 
-        return view('pages.user.list', compact('users', 'offices', 'roles', 'cat'));
+        return view('pages.user.list', compact('users', 'offices', 'roles', 'editRoles', 'cat'));
     }
 
     public function requesterindex()
     {
         $users = User::with('office')->get();
         $offices = Office::all();
+        // Add on the Requester page: requester-only accounts
         $roles = UserRole::where('rolename', '=', 'Requester')->get();
+        // Edit: any role, so a requester can be promoted to desk staff
+        $editRoles = $this->assignableRoles();
 
-        $cat = Category::where('off_id', Auth::user()->office_id)->where('status', 1)->get();
+        $cat = Category::where('status', 1)->orderBy('ticketcatname')->get();
 
-        return view('pages.user.client', compact('users', 'offices', 'roles', 'cat'));
+        return view('pages.user.client', compact('users', 'offices', 'roles', 'editRoles', 'cat'));
+    }
+
+    /**
+     * Roles the logged-in user may give to others (Administrator only by admins).
+     */
+    private function assignableRoles()
+    {
+        return UserRole::when(Auth::user()->role !== 'Administrator', function ($query) {
+            $query->where('rolename', '!=', 'Administrator');
+        })->get();
     }
 
     public function create(Request $request)
@@ -55,6 +71,7 @@ class UserController extends Controller
                 'lname'    => 'required',
                 'password' => 'required|min:6',
                 'role'     => 'required',
+                'contactno' => 'nullable|string|max:50',
             ]);
 
             $userEmail = $request->input('email');
@@ -69,6 +86,7 @@ class UserController extends Controller
                     'fname'          => $request->input('fname'),
                     'mname'          => $request->input('mname'),
                     'email'          => $userEmail,
+                    'contactno'      => $request->input('contactno'),
                     'password'       => Hash::make($request->input('password')),
                     'campus_id'      => $request->input('campus_id'),
                     'office_id'      => $request->input('office_id'),
@@ -164,6 +182,7 @@ class UserController extends Controller
             'fname'  => 'required',
             'role'   => 'required',
             'gender' => 'required',
+            'contactno' => 'nullable|string|max:50',
         ]);
 
         try {
@@ -187,6 +206,7 @@ class UserController extends Controller
                 'fname'     => $request->input('fname'),
                 'mname'     => $request->input('mname'),
                 'email'     => $userEmail,
+                'contactno' => $request->input('contactno'),
                 'office_id' => $request->input('office_id'),
                 'role'      => $request->input('role'),
                 'gender'    => $request->input('gender'),

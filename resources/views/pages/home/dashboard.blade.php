@@ -32,7 +32,7 @@
 
                 <!-- Stats & Welcome Grid -->
                 <div class="row g-3 mb-4">
-                    @if(Auth::guard('web')->user()->role != 'Requester')
+                    @if(Auth::guard('web')->user()->isDeskStaff())
                         <!-- Welcome Hero Card (col-md-6) -->
                         <div class="col-md-4">
                             <div class="card overflow-hidden position-relative welcome-hero-card">
@@ -81,14 +81,22 @@
                                         </div>
                                     </div>
 
+                                    <!-- My Requests: tickets this staff member filed to any desk -->
+                                    <p class="small text-muted mb-2">
+                                        <i class="ti ti-send me-1"></i> My Requests:
+                                        <strong id="myreq-pending">{{ $requesterMetrics['pendingTickets'] ?? 0 }}</strong> pending &bull;
+                                        <strong id="myreq-inprogress">{{ $requesterMetrics['inProgressTickets'] ?? 0 }}</strong> in progress &bull;
+                                        <strong id="myreq-resolved">{{ $requesterMetrics['resolvedTickets'] ?? 0 }}</strong> resolved
+                                    </p>
+
                                     <!-- Action Buttons -->
-                                    <div class="pt-1 d-flex align-items-center gap-2">
-                                        <a href="#" class="btn btn-primary btn-sm rounded-pill px-3">
-                                            <i class="ti ti-ticket me-1"></i> View My Tickets
+                                    <div class="pt-1 d-flex align-items-center gap-2 flex-wrap">
+                                        <a href="{{ route('ticketsrequester.index') }}" class="btn btn-primary btn-sm rounded-pill px-3">
+                                            <i class="ti ti-send me-1"></i> My Requests
                                         </a>
-                                        <a href="#" class="btn btn-secondary btn-sm rounded-pill px-3">
-                                            <i class="ti ti-plus me-1"></i> Create Ticket
-                                        </a>
+                                        <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#createNewTicketModal">
+                                            <i class="ti ti-plus me-1"></i> Request Support
+                                        </button>
                                         <button type="button" class="btn btn-success btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#stationModal">
                                             <i class="ti ti-map-pin me-1"></i> Station
                                         </button>
@@ -288,6 +296,7 @@
                                 <div class="card-header bg-transparent pt-3 border-bottom d-flex justify-content-between align-items-center">
                                     <h6 class="fw-bold small mb-0">
                                         <i class="ti ti-mood-smile me-1"></i> Client Satisfaction
+                                        <span class="text-muted fw-normal">&middot; {{ auth()->user()->isAdmin() ? 'All Desks' : (auth()->user()->office->office_abbr ?? 'My Office') }}</span>
                                     </h6>
                                     <span class="badge bg-light text-dark border">Out of 5</span>
                                 </div>

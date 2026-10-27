@@ -57,7 +57,10 @@ class CategoryController extends Controller
 
             $categoryName = $request->input('ticketcatname');
             $categoryType = $request->input('cattype');
+            // Duplicates only count inside the same office: MIS and GSO may
+            // both have a category with the same name
             $existingCategory = Category::where('ticketcatname', $categoryName)
+                    ->where('off_id', Auth::user()->office_id)
                     ->where('cattype', $categoryType)
                     ->whereIn('status', [1, 2])
                     ->first();
@@ -93,10 +96,17 @@ class CategoryController extends Controller
             'ticketcatname' => 'required',
         ]);
 
+        // A desk may only change its own office's categories
+        $category = $this->ownCategory($request->input('id'));
+        if (!$category) {
+            return response()->json(['error' => true, 'message' => 'You can only edit your own office\'s categories.'], 403);
+        }
+
         try {
             $categoryName = $request->input('ticketcatname');
             $categoryType = $request->input('cattype');
             $existingCategory = Category::where('ticketcatname', $categoryName)
+                    ->where('off_id', Auth::user()->office_id)
                     ->whereJsonContains('cattype', $categoryType)
                     ->where('id', '!=', $request->input('id'))
                     ->first();
@@ -105,7 +115,6 @@ class CategoryController extends Controller
                 return response()->json(['error' => true, 'message' => 'Category already exists!'], 200);
             }
 
-            $category = Category::findOrFail($request->input('id'));
             $category->update([
                 'user_id' => Auth::user()->id,
                 'ticketcatname' => $categoryName,
@@ -129,7 +138,8 @@ class CategoryController extends Controller
 
     public function delete(Request $request, $id)
     {
-        $category = Category::find($id);
+        // A desk may only delete its own office's categories
+        $category = $this->ownCategory($id);
 
         if (!$category) {
             return response()->json(['success' => false, 'message' => 'Category not found'], 404);
@@ -149,6 +159,16 @@ class CategoryController extends Controller
         $this->logAudit($request, 'Delete_Category', $auditPayload);
 
         return response()->json(['success' => true, 'message' => 'Deleted Successfully']);
+    }
+
+    /**
+     * The category with this id if it belongs to the logged-in user's office.
+     */
+    private function ownCategory($id): ?Category
+    {
+        return Category::where('id', $id)
+            ->where('off_id', Auth::user()->office_id)
+            ->first();
     }
 
     /**

@@ -1,4 +1,4 @@
-@if(Auth::guard('web')->user()->role != 'Requester')
+@if(Auth::guard('web')->user()->isDeskStaff())
     <script>
         let dailyTicketsChart = null;
         let topOfficesChart = null;
@@ -278,6 +278,13 @@
                     $('#card-resolved-tickets').text(data.metrics.resolvedTickets);
                     $('#card-closed-tickets').text(data.metrics.closedTickets);
                     $('#card-total-requests').text(data.metrics.totalRequests);
+
+                    // My Requests line (tickets this staff member filed)
+                    if (data.requesterMetrics) {
+                        $('#myreq-pending').text(data.requesterMetrics.pendingTickets);
+                        $('#myreq-inprogress').text(data.requesterMetrics.inProgressTickets);
+                        $('#myreq-resolved').text(data.requesterMetrics.resolvedTickets);
+                    }
 
                     // Dynamic Ticket Status Summary Bar (welcome hero)
                     if (data.summary) {

@@ -202,23 +202,22 @@ class SupportTicketRequestController extends Controller
             ])
             ->findOrFail($ticketId);
 
+        // Only the ticket's requester and its handling desk may open it
+        abort_unless(Auth::user()->canViewTicket($ticket), 403, 'You do not have access to this ticket.');
+
+        // Support side (status buttons) vs requester side of this ticket.
+        // Desk staff who filed it see the requester side.
+        $canHandle = Auth::user()->canHandle($ticket);
+
         // Opening a pending ticket picks it up: it flips to "In Progress" on its
         // own, so there is no need to press "Mark as In Progress" afterwards.
-        // Only support staff trigger this — a requester viewing the same page
-        // must never change the status.
-        if ($this->isSupportUser() && $ticket->status === 'Pending') {
+        // Only its handlers trigger this — the requester viewing the same page
+        // (even when they are desk staff themselves) must never change it.
+        if ($canHandle && $ticket->status === 'Pending') {
             $this->applyStatus($ticket, 'in_progress');
         }
 
-        return view('pages.request.supportshowticket', compact('ticket'));
-    }
-
-    /**
-     * True when the logged-in user is IT support staff (not a requester).
-     */
-    private function isSupportUser(): bool
-    {
-        return (string) Auth::user()->role !== 'Requester';
+        return view('pages.request.supportshowticket', compact('ticket', 'canHandle'));
     }
 
     // Send Message
@@ -241,6 +240,14 @@ class SupportTicketRequestController extends Controller
         // The chat is closed once the ticket is resolved (or cancelled),
         // so nothing can be sent anymore.
         $ticket = DailyTicketRequest::find($request->ticket_id);
+
+        // Only the ticket's requester and its handling desk take part in its chat
+        if ($ticket && !Auth::user()->canViewTicket($ticket)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have access to this ticket.'
+            ], 403);
+        }
 
         if ($ticket && in_array(strtolower((string) $ticket->status), ['resolved', 'cancelled'], true)) {
             return response()->json([
@@ -326,6 +333,16 @@ class SupportTicketRequestController extends Controller
     // Fetch Messages
     public function fetchMessages($ticketId)
     {
+        $ticket = DailyTicketRequest::find($ticketId, ['id', 'user_id', 'off_id', 'assigned_to', 'status', 'resolution_remarks']);
+
+        // Only the ticket's requester and its handling desk can read its chat
+        if (!$ticket || !Auth::user()->canViewTicket($ticket)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have access to this ticket.'
+            ], 403);
+        }
+
         $messages = TicketChat::with('sender')
             ->where('ticket_id', $ticketId)
             ->orderBy('created_at', 'asc')
@@ -344,15 +361,13 @@ class SupportTicketRequestController extends Controller
 
         // Current status lets the page catch up on a status change it missed
         // while the socket was down (or while it was polling instead).
-        $ticket = DailyTicketRequest::find($ticketId, ['id', 'status', 'resolution_remarks']);
-
         return response()->json([
             'success'  => true,
             'messages' => $messages,
-            'ticket'   => $ticket ? [
+            'ticket'   => [
                 'status'             => $ticket->status,
                 'resolution_remarks' => $ticket->resolution_remarks,
-            ] : null,
+            ],
         ]);
     }
 
@@ -360,6 +375,15 @@ class SupportTicketRequestController extends Controller
     {
         $ticket = DailyTicketRequest::findOrFail($id);
         $status = $request->input('status');
+
+        // Only the ticket's handlers change its status — not its requester,
+        // even when the requester is desk staff
+        if (!Auth::user()->canHandle($ticket)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only the support staff handling this ticket can change its status.'
+            ], 403);
+        }
 
         $rules = [
             'status'              => 'required|in:in_progress,resolved,cancelled',

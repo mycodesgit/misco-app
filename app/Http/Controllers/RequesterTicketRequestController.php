@@ -46,13 +46,9 @@ class RequesterTicketRequestController extends Controller
 
     public function index()
     {
-        $currentUserRole = Auth::user()->role;
-
+        // Service desks anyone can file a ticket to (MIS Support, GSO Support, ...)
         $urole = UserRole::where('status', 1)
             ->whereNotIn('rolename', ['Administrator', 'Requester'])
-            ->when($currentUserRole == 'Administrator', function ($query) use ($currentUserRole) {
-                $query->where('rolename', $currentUserRole);
-            })
             ->get();
 
         $cat = Category::with('user')->where('status', 1)->get();
@@ -148,6 +144,23 @@ class RequesterTicketRequestController extends Controller
             ], 422);
         }
 
+        // Desk staff can file to any desk, including their own — but the person
+        // filing never handles their own ticket, so they are left out of
+        // assigned_to (comma-separated user ids).
+        $assignedTo = collect(is_array($request->assigned_to) ? $request->assigned_to : explode(',', (string) $request->assigned_to))
+            ->map(fn ($id) => (int) trim((string) $id))
+            ->filter()
+            ->unique()
+            ->reject(fn ($id) => $id === (int) Auth::id())
+            ->implode(',');
+
+        if ($assignedTo === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are the only personnel assigned to this category, so the ticket has no one else to handle it. Please contact your administrator.',
+            ], 422);
+        }
+
         try {
             DB::beginTransaction();
 
@@ -202,7 +215,7 @@ class RequesterTicketRequestController extends Controller
                 'cat_id'            => $request->cat_id,
                 'subcat_id'         => $request->subcat_id,
                 'ticket_number'     => $ticketNumber,
-                'assigned_to'       => $request->assigned_to,
+                'assigned_to'       => $assignedTo,
                 'issue_description' => $request->issue_description,
                 'remarks'           => $request->remarks,
                 'priority'          => $request->priority,

@@ -696,7 +696,8 @@
     });
 
     // Mirror of supportshowticket.blade.php left-card if/else — updates in place, no reload
-    var isSupportUser = {{ Auth::guard('web')->user()->role != 'Requester' ? 'true' : 'false' }};
+    // Support side of THIS ticket (desk staff who filed it get the requester side)
+    var isSupportUser = {{ !empty($canHandle) ? 'true' : 'false' }};
 
     // Last status shown on this page (set by the first chat fetch)
     var ticketKnownStatus = null;

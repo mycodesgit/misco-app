@@ -48,7 +48,7 @@ class DashboardController extends Controller
             return $this->getDashboardData($selectedYear, $timeframe, $user);
         });
 
-        $satisfaction = $this->getSatisfactionData((int) $selectedYear);
+        $satisfaction = $this->getSatisfactionData((int) $selectedYear, $user);
 
         if ($request->ajax()) {
             return response()->json(array_merge($dashboardData, [
@@ -61,13 +61,9 @@ class DashboardController extends Controller
             ]));
         }
 
-        $currentUserRole = Auth::user()->role;
-
+        // Service desks anyone can file a ticket to (MIS Support, GSO Support, ...)
         $urole = UserRole::where('status', 1)
             ->whereNotIn('rolename', ['Administrator', 'Requester'])
-            ->when($currentUserRole == 'Administrator', function ($query) use ($currentUserRole) {
-                $query->where('rolename', $currentUserRole);
-            })
             ->get();
         $cat = Category::with('user')->where('status', 1)->get();
 
@@ -111,18 +107,23 @@ class DashboardController extends Controller
      * Client satisfaction (1-5) for the selected year: the year's average,
      * plus the latest month vs the month before. For past years the latest
      * month is December.
+     *
+     * Desk staff see the ratings of their own office's desk (tickets filed
+     * to it); Administrators see every desk.
      */
-    private function getSatisfactionData(int $year): array
+    private function getSatisfactionData(int $year, $user): array
     {
+        $officeId = $user->isAdmin() ? null : (int) $user->office_id;
+
         $month = $year < now()->year
             ? Carbon::create($year, 12, 1)
             : now()->startOfMonth();
         $prevMonth = $month->copy()->subMonthNoOverflow();
 
         return [
-            'overall'   => DailyTicketRequest::averageRating(Carbon::create($year, 1, 1)->startOfYear(), Carbon::create($year, 1, 1)->endOfYear()),
-            'thisMonth' => DailyTicketRequest::averageRating($month->copy()->startOfMonth(), $month->copy()->endOfMonth()),
-            'lastMonth' => DailyTicketRequest::averageRating($prevMonth->copy()->startOfMonth(), $prevMonth->copy()->endOfMonth()),
+            'overall'   => DailyTicketRequest::averageRating(Carbon::create($year, 1, 1)->startOfYear(), Carbon::create($year, 1, 1)->endOfYear(), $officeId),
+            'thisMonth' => DailyTicketRequest::averageRating($month->copy()->startOfMonth(), $month->copy()->endOfMonth(), $officeId),
+            'lastMonth' => DailyTicketRequest::averageRating($prevMonth->copy()->startOfMonth(), $prevMonth->copy()->endOfMonth(), $officeId),
         ];
     }
 
@@ -251,10 +252,11 @@ class DashboardController extends Controller
                 ->pluck('total', 'date')
                 ->toArray();
 
-            // Personal view: only the ticket requests belonging to the logged-in user
+            // Personal view: only the tickets the logged-in user resolved as
+            // support (not the ones they filed as a requester)
             $resolvedTicketsMap = DailyTicketRequest::whereYear('resolved_at', $year)
                 ->where('status', 'Resolved')
-                ->where('user_id', $user->id)
+                ->where('resolved_by', $user->id)
                 ->selectRaw('DATE(resolved_at) as date, COUNT(*) as total')
                 ->groupBy('date')
                 ->pluck('total', 'date')

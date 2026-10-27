@@ -40,6 +40,12 @@ class CategorySubController extends Controller
             ]);
 
             $categoryID = $request->input('cat_id');
+
+            // Subcategories can only be added under the office's own categories
+            if (!$this->isOwnCategory($categoryID)) {
+                return response()->json(['error' => true, 'message' => 'You can only add subcategories to your own office\'s categories.'], 403);
+            }
+
             $subcategoryName = $request->input('ticketsubcatname');
             $existingSubcategory = Subcategory::where('ticketsubcatname', $subcategoryName)
                     ->where('cat_id', $categoryID)
@@ -76,6 +82,12 @@ class CategorySubController extends Controller
             'ticketsubcatname' => 'required',
         ]);
 
+        // Both the subcategory and the category it moves to must be the office's own
+        $subcategory = $this->ownSubcategory($request->input('id'));
+        if (!$subcategory || !$this->isOwnCategory($request->input('cat_id'))) {
+            return response()->json(['error' => true, 'message' => 'You can only edit your own office\'s subcategories.'], 403);
+        }
+
         try {
             $categoryID = $request->input('cat_id');
             $subcategoryName = $request->input('ticketsubcatname');
@@ -88,7 +100,6 @@ class CategorySubController extends Controller
                 return response()->json(['error' => true, 'message' => 'Subcategory already exists!'], 200);
             }
 
-            $subcategory = Subcategory::findOrFail($request->input('id'));
             $subcategory->update([
                 'user_id' => Auth::user()->id,
                 'cat_id' => $categoryID,
@@ -112,7 +123,8 @@ class CategorySubController extends Controller
 
     public function delete(Request $request, $id)
     {
-        $subcategory = Subcategory::find($id);
+        // A desk may only delete its own office's subcategories
+        $subcategory = $this->ownSubcategory($id);
 
         if (!$subcategory) {
             return response()->json(['success' => false, 'message' => 'Subcategory not found'], 404);
@@ -132,6 +144,29 @@ class CategorySubController extends Controller
         $this->logAudit($request, 'Delete_Subcategory', $auditPayload);
 
         return response()->json(['success' => true, 'message' => 'Deleted Successfully']);
+    }
+
+    /**
+     * True when the category belongs to the logged-in user's office.
+     */
+    private function isOwnCategory($categoryId): bool
+    {
+        return Category::where('id', $categoryId)
+            ->where('off_id', Auth::user()->office_id)
+            ->exists();
+    }
+
+    /**
+     * The subcategory with this id if its category belongs to the logged-in
+     * user's office.
+     */
+    private function ownSubcategory($id): ?Subcategory
+    {
+        return Subcategory::where('id', $id)
+            ->whereHas('category', function ($query) {
+                $query->where('off_id', Auth::user()->office_id);
+            })
+            ->first();
     }
 
     /**

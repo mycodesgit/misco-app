@@ -74,8 +74,8 @@
                                 ? row.taskassigned
                                 : [];
 
-                            var buttons = '<button type="button" class="btn btn-sm btn-success btn-useredit text-light" data-id="' + row.id + '" data-fname="' + row.fname + '" data-mname="' + row.mname + '" data-lname="' + row.lname + '" data-ext="' + row.ext + '" data-email="' + row.email + '" data-office="' + row.office_id + '" data-gender="' + row.gender + '" data-role="' + row.role + '" data-campus="' + row.campus_id + '" data-permission="' + row.isAllowed + '" data-toggle="tooltip" data-placement="top" title="Edit User."><i class="ti ti-pencil"></i></button>&nbsp;';
-                                buttons += '<button type="button" class="btn btn-sm btn-secondary btn-assigncategory" data-id="' + row.id + '" data-fullname="' + row.fname + ' ' + row.mname + ' ' + row.lname + (row.ext && row.ext !== 'null' ? ' ' + row.ext : '') + '" data-taskassigned=\'' + JSON.stringify(taskAssigned) + '\'  data-toggle="tooltip" data-placement="top" title="Assign Task Category."><i class="ti ti-server"></i></button>&nbsp;';
+                            var buttons = '<button type="button" class="btn btn-sm btn-success btn-useredit text-light" data-id="' + row.id + '" data-fname="' + row.fname + '" data-mname="' + row.mname + '" data-lname="' + row.lname + '" data-ext="' + row.ext + '" data-email="' + row.email + '" data-contactno="' + (row.contactno || '') + '" data-office="' + row.office_id + '" data-gender="' + row.gender + '" data-role="' + row.role + '" data-campus="' + row.campus_id + '" data-permission="' + row.isAllowed + '" data-toggle="tooltip" data-placement="top" title="Edit User."><i class="ti ti-pencil"></i></button>&nbsp;';
+                                buttons += '<button type="button" class="btn btn-sm btn-secondary btn-assigncategory" data-id="' + row.id + '" data-office="' + row.office_id + '" data-fullname="' + row.fname + ' ' + row.mname + ' ' + row.lname + (row.ext && row.ext !== 'null' ? ' ' + row.ext : '') + '" data-taskassigned=\'' + JSON.stringify(taskAssigned) + '\'  data-toggle="tooltip" data-placement="top" title="Assign Task Category."><i class="ti ti-server"></i></button>&nbsp;';
                                 buttons += '<button type="button" class="btn btn-sm btn-light btn-passedit" data-id="' + row.id + '" data-password="' + row.password + '" data-toggle="tooltip" data-placement="top" title="Edit User Password."><i class="ti ti-lock"></i></button>&nbsp;';
                                 buttons += '<button type="button" class="btn btn-sm btn-warning btn-ustatusedit" data-id="' + row.id + '" data-ustatus="' + row.ustatus + '" data-toggle="tooltip" data-placement="top" title="Enabled/Disabled."><i class="ti ti-toggle-left"></i></button>&nbsp;';
                             if (isAdmin || isChecker) {
@@ -142,8 +142,8 @@
                                 ? row.taskassigned
                                 : [];
 
-                            var buttons = '<button type="button" class="btn btn-sm btn-success btn-useredit text-light" data-id="' + row.id + '" data-fname="' + row.fname + '" data-mname="' + row.mname + '" data-lname="' + row.lname + '" data-ext="' + row.ext + '" data-email="' + row.email + '" data-office="' + row.office_id + '" data-gender="' + row.gender + '" data-role="' + row.role + '" data-campus="' + row.campus_id + '" data-permission="' + row.isAllowed + '" data-toggle="tooltip" data-placement="top" title="Edit User."><i class="ti ti-pencil"></i></button>&nbsp;';
-                                buttons += '<button type="button" class="btn btn-sm btn-secondary btn-assigncategory" data-id="' + row.id + '" data-fullname="' + row.fname + ' ' + row.mname + ' ' + row.lname + (row.ext && row.ext !== 'null' ? ' ' + row.ext : '') + '" data-taskassigned=\'' + JSON.stringify(taskAssigned) + '\'  data-toggle="tooltip" data-placement="top" title="Assign Task Category."><i class="ti ti-server"></i></button>&nbsp;';
+                            var buttons = '<button type="button" class="btn btn-sm btn-success btn-useredit text-light" data-id="' + row.id + '" data-fname="' + row.fname + '" data-mname="' + row.mname + '" data-lname="' + row.lname + '" data-ext="' + row.ext + '" data-email="' + row.email + '" data-contactno="' + (row.contactno || '') + '" data-office="' + row.office_id + '" data-gender="' + row.gender + '" data-role="' + row.role + '" data-campus="' + row.campus_id + '" data-permission="' + row.isAllowed + '" data-toggle="tooltip" data-placement="top" title="Edit User."><i class="ti ti-pencil"></i></button>&nbsp;';
+                                buttons += '<button type="button" class="btn btn-sm btn-secondary btn-assigncategory" data-id="' + row.id + '" data-office="' + row.office_id + '" data-fullname="' + row.fname + ' ' + row.mname + ' ' + row.lname + (row.ext && row.ext !== 'null' ? ' ' + row.ext : '') + '" data-taskassigned=\'' + JSON.stringify(taskAssigned) + '\'  data-toggle="tooltip" data-placement="top" title="Assign Task Category."><i class="ti ti-server"></i></button>&nbsp;';
                                 buttons += '<button type="button" class="btn btn-sm btn-light btn-passedit" data-id="' + row.id + '" data-password="' + row.password + '" data-toggle="tooltip" data-placement="top" title="Edit User Password."><i class="ti ti-lock"></i></button>&nbsp;';
                                 buttons += '<button type="button" class="btn btn-sm btn-warning btn-ustatusedit" data-id="' + row.id + '" data-ustatus="' + row.ustatus + '" data-toggle="tooltip" data-placement="top" title="Enabled/Disabled."><i class="ti ti-toggle-left"></i></button>&nbsp;';
                             if (isAdmin || isChecker) {
@@ -169,6 +169,17 @@
         });
     });
 
+    // A service desk role (MIS Support, GSO Support, ...) belongs to an office
+    // (users_role.off_id). Picking the role selects that office, so a desk
+    // staff member's desk and office always match — ticket queues and who can
+    // handle a ticket follow the office.
+    $(document).on('change', '.user-role-select', function () {
+        var offId = $(this).find(':selected').data('off-id');
+        if (!offId) return; // e.g. Requester: keep the office chosen by hand
+
+        $(this).closest('form').find('select[name="office_id"]').val(String(offId)).trigger('change');
+    });
+
     $(document).on('click', '.btn-useredit', function() {
         var id = $(this).data('id');
         var fName = $(this).data('fname');
@@ -176,6 +187,7 @@
         var lName = $(this).data('lname');
         var extension = $(this).data('ext');
         var email = $(this).data('email');
+        var contactno = $(this).data('contactno');
         var office = $(this).data('office');
         var gender = $(this).data('gender');
         var role = $(this).data('role');
@@ -188,6 +200,7 @@
         $('#editlastname').val(lName);
         $('#editextension').val(extension);
         $('#edituseremail').val(email);
+        $('#editcontactno').val(contactno || '');
         $('#editoffice').val(office).trigger('change');
         $('#editgender').val(gender);
         $('#editrole').val(role);
@@ -298,6 +311,9 @@
         });
     });
 
+    // Every office's categories as rendered; the modal shows a filtered copy
+    var allTaskCategoryOptions = $('#assignTaskCategoryName option').clone();
+
     $(document).on('click', '.btn-assigncategory', function () {
         var id = $(this).attr('data-id');
         var taskfullname = $(this).attr('data-fullname');
@@ -317,6 +333,14 @@
 
         $('#assignTaskCategoryId').val(id);
         $('#assignTaskFullname').val(taskfullname);
+
+        // Only offer the categories of this staff member's own office
+        var officeId = String($(this).attr('data-office'));
+        $('#assignTaskCategoryName').empty().append(
+            allTaskCategoryOptions.filter(function () {
+                return String($(this).data('off-id')) === officeId;
+            }).clone()
+        );
 
         // Clear current selections
         $('#assignTaskCategoryName').val(null).trigger('change');

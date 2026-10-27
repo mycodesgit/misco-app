@@ -136,6 +136,11 @@
                                     <option value="Female">Female</option>
                                 </select>
                             </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Contact No.</label>
+                                <input type="text" name="contactno" placeholder="e.g. Local 104 / 09123456789" class="form-control form-control-sm" maxlength="50">
+                            </div>
                         </div>
 
                         <hr class="my-3 text-muted opacity-25">
@@ -176,10 +181,10 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
-                                <select class="form-control form-control-sm" name="role" required>
+                                <select class="form-control form-control-sm user-role-select" name="role" required>
                                     <option value="" selected disabled>--- Select Role ---</option>
                                     @foreach ($roles as $role)
-                                        <option value="{{ $role->rolename }}">
+                                        <option value="{{ $role->rolename }}" data-off-id="{{ $role->off_id }}">
                                             {{ $role->rolename }}
                                         </option>
                                     @endforeach
@@ -273,6 +278,11 @@
                             </div>
 
                             <div class="col-md-12">
+                                <label for="editcontactno" class="form-label fw-semibold">Contact No.</label>
+                                <input type="text" class="form-control form-control-sm" id="editcontactno" name="contactno" placeholder="e.g. Local 104 / 09123456789" maxlength="50">
+                            </div>
+
+                            <div class="col-md-12">
                                 <label for="editoffice" class="form-label fw-semibold">Office <span class="text-danger">*</span></label>
                                 <select name="office_id" id="editoffice" class="form-control form-control-sm select2bs4" required>
                                     <option value="" disabled>--- Select Office ---</option>
@@ -290,10 +300,10 @@
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label for="editrole" class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
-                                <select name="role" class="form-control form-control-sm" id="editrole" required>
+                                <select name="role" class="form-control form-control-sm user-role-select" id="editrole" required>
                                     <option value="">--- Select Role ---</option>
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role->rolename }}">
+                                    @foreach ($editRoles as $role)
+                                        <option value="{{ $role->rolename }}" data-off-id="{{ $role->off_id }}">
                                             {{ $role->rolename }}
                                         </option>
                                     @endforeach
@@ -388,7 +398,7 @@
                                 <label for="assignTaskCategoryName" class="form-label fw-semibold">Select & asssign Task Category: <span class="text-danger">*</span></label>
                                 <select class="form-control select2bs4" id="assignTaskCategoryName" name="usertask[]" multiple="multiple">
                                     @foreach ($cat as $category)
-                                        <option value="{{ $category->id }}">
+                                        <option value="{{ $category->id }}" data-off-id="{{ $category->off_id }}">
                                             {{ $category->ticketcatname }}
                                         </option>
                                     @endforeach

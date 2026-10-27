@@ -80,7 +80,7 @@ Route::group(['middleware'=>['login_auth']],function(){
 
     });
 
-    Route::prefix('/daily-task')->group(function () {
+    Route::prefix('/daily-task')->middleware('feature:daily_task')->group(function () {
         Route::get('/view', [DailyTaskController::class, 'index'])->name('daily-task.index');
         Route::get('/get-subcategories/{categoryId}', [DailyTaskController::class, 'getSubcategories'])->name('daily-task.getSubcategories');
         Route::post('/create', [DailyTaskController::class, 'create'])->name('daily-task.create');
@@ -89,16 +89,19 @@ Route::group(['middleware'=>['login_auth']],function(){
     });
 
     Route::prefix('/manage')->group(function () {
-        Route::get('/category/all',[CategoryController::class,'index'])->name('category.index');
-        Route::get('/category/view/fetch',[CategoryController::class,'show'])->name('category.show');
-        Route::post('/category/view/add',[CategoryController::class,'create'])->name('category.create');
-        Route::post('/category/view/update',[CategoryController::class,'update'])->name('category.update');
-        Route::post('/category/view/delete/{id}', [CategoryController::class, 'delete'])->name('category.delete');
+        // Desk staff manage their own office's categories (scoped in the controllers)
+        Route::middleware('feature:category')->group(function () {
+            Route::get('/category/all',[CategoryController::class,'index'])->name('category.index');
+            Route::get('/category/view/fetch',[CategoryController::class,'show'])->name('category.show');
+            Route::post('/category/view/add',[CategoryController::class,'create'])->name('category.create');
+            Route::post('/category/view/update',[CategoryController::class,'update'])->name('category.update');
+            Route::post('/category/view/delete/{id}', [CategoryController::class, 'delete'])->name('category.delete');
 
-        Route::get('/sub/category/view/fetch',[CategorySubController::class,'show'])->name('subcategory.show');
-        Route::post('/sub/category/view/add',[CategorySubController::class,'create'])->name('subcategory.create');
-        Route::post('/sub/category/view/update',[CategorySubController::class,'update'])->name('subcategory.update');
-        Route::post('/sub/category/view/delete/{id}', [CategorySubController::class, 'delete'])->name('subcategory.delete');
+            Route::get('/sub/category/view/fetch',[CategorySubController::class,'show'])->name('subcategory.show');
+            Route::post('/sub/category/view/add',[CategorySubController::class,'create'])->name('subcategory.create');
+            Route::post('/sub/category/view/update',[CategorySubController::class,'update'])->name('subcategory.update');
+            Route::post('/sub/category/view/delete/{id}', [CategorySubController::class, 'delete'])->name('subcategory.delete');
+        });
 
         Route::get('/office/list', [OfficeController::class, 'index'])->name('office.index');
         Route::get('/office/list/fetch', [OfficeController::class, 'show'])->name('office.show');
@@ -110,8 +113,10 @@ Route::group(['middleware'=>['login_auth']],function(){
     });
 
     Route::prefix('/reports')->group(function () {
-        Route::get('/accomplishment/generate', [AccomplishmentReportController::class, 'index'])->name('accomplishment-report.index');
-        Route::get('/accomplishment/preview', [AccomplishmentReportController::class, 'previewPdf'])->name('accomplishment.preview');
+        Route::middleware('feature:daily_task')->group(function () {
+            Route::get('/accomplishment/generate', [AccomplishmentReportController::class, 'index'])->name('accomplishment-report.index');
+            Route::get('/accomplishment/preview', [AccomplishmentReportController::class, 'previewPdf'])->name('accomplishment.preview');
+        });
         Route::get('/ticketstatus/view', [TicketStatusReportController::class, 'index'])->name('ticketstatus-report.index');
         Route::get('/ticketstatus/preview', [TicketStatusReportController::class, 'previewPdf'])->name('ticketstatus-report.preview');
         Route::get('/clientfeedback/view', [ClientFeedbackController::class, 'index'])->name('clientfeedback.index');
@@ -124,7 +129,7 @@ Route::group(['middleware'=>['login_auth']],function(){
     Route::post('/account/password', [AccountController::class, 'updatePassword'])->name('account.password');
     Route::post('/account/contact', [AccountController::class, 'updateContact'])->name('account.contact');
 
-    Route::prefix('/projects')->group(function () {
+    Route::prefix('/projects')->middleware('feature:work_progress')->group(function () {
         Route::get('/tracker', [ProjectController::class, 'index'])->name('project.index');
         Route::get('/fetch', [ProjectController::class, 'show'])->name('project.show');
         Route::get('/members/{officeId}', [ProjectController::class, 'membersByOffice'])->name('project.members');
@@ -170,7 +175,7 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::post('/update', [StationController::class, 'update'])->name('station.update');
     });
 
-    Route::prefix('/wifi')->group(function () {
+    Route::prefix('/wifi')->middleware('feature:wifi_voucher')->group(function () {
         Route::get('/', [WifiVoucherController::class, 'index'])->name('wifi.index');
         Route::get('/fetch', [WifiVoucherController::class, 'show'])->name('wifi.show');
         Route::post('/upload', [WifiVoucherController::class, 'upload'])->name('wifi.upload');
