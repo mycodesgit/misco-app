@@ -807,6 +807,9 @@
     @include('pages.request.modals.addticketmodal')
     @include('pages.home.modals.selfresetmodal')
     @include('pages.home.modals.stationmodal')
+    @if ($mustChangePassword)
+        @include('pages.home.modals.defaultpasswordmodal')
+    @endif
 
     <!-- Heatmap & Hero Styles -->
     <style>

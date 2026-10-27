@@ -85,9 +85,11 @@ class DashboardController extends Controller
                 'office_id'
             ]);
 
-
+        // Force password change while the user still has the default password
+        $mustChangePassword = Hash::check('12345678', $user->password);
 
         return view('pages.home.dashboard', array_merge([
+            'mustChangePassword' => $mustChangePassword,
             'selectedYear' => $selectedYear,
             'selectedTimeframe' => $timeframe,
             'pendingCount'       => $pendingCount,
