@@ -325,9 +325,17 @@ class SupportTicketRequestController extends Controller
                 ];
             });
 
+        // Current status lets the page catch up on a status change it missed
+        // while the socket was down (or while it was polling instead).
+        $ticket = DailyTicketRequest::find($ticketId, ['id', 'status', 'resolution_remarks']);
+
         return response()->json([
             'success'  => true,
-            'messages' => $messages
+            'messages' => $messages,
+            'ticket'   => $ticket ? [
+                'status'             => $ticket->status,
+                'resolution_remarks' => $ticket->resolution_remarks,
+            ] : null,
         ]);
     }
 

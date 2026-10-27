@@ -26,9 +26,15 @@ window.Pusher = Pusher;
 // comes from the build (it must match the server's REVERB_APP_KEY).
 const reverbUseTLS = window.location.protocol === 'https:';
 
+// Private channels authorize against /broadcasting/auth. Echo defaults to the
+// domain root, which breaks when the app lives in a subfolder (production:
+// /misco-app/public), so take the full URL Laravel generated in the layout.
+const authEndpointMeta = document.querySelector('meta[name="broadcast-auth-endpoint"]');
+
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
+    authEndpoint: authEndpointMeta ? authEndpointMeta.content : '/broadcasting/auth',
     wsHost: window.location.hostname,
     wsPort: reverbUseTLS ? 443 : (import.meta.env.VITE_REVERB_PORT ?? 8080),
     wssPort: 443,

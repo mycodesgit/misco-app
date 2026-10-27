@@ -95,14 +95,19 @@
         }
     }
 
-    // Play a sound for brand-new arrivals (no toaster popup)
+    // Play a sound for brand-new arrivals (no toaster popup). This is the
+    // only place that chimes, so each notification sounds exactly once no
+    // matter how it arrived (socket ping, ticket-list nudge or polling).
     function soundNewNotifs(items, knownSet, kind) {
         if (!items) return;
+        var openTicketId = $('#ticket_id').val();
         var hasNew = false;
         items.forEach(function (n) {
             if (!knownSet.has(n.id)) {
                 knownSet.add(n.id);
-                if (!notifFirstLoad && !n.read) {
+                // Stay silent for the ticket that is open on screen
+                var isOpenTicket = openTicketId && String(n.ticket_id) === String(openTicketId);
+                if (!notifFirstLoad && !n.read && !isOpenTicket) {
                     hasNew = true;
                 }
             }
@@ -129,21 +134,65 @@
         });
     }
 
+    // Realtime events often come in bursts (one ticket write = several
+    // events); fold them into a single fetch.
+    var notifFetchTimer = null;
+    function scheduleNotifFetch() {
+        clearTimeout(notifFetchTimer);
+        notifFetchTimer = setTimeout(fetchNotifications, 300);
+    }
+
+    // Poll slowly while realtime works, quickly while it doesn't
+    var NOTIF_POLL_LIVE = 60000;
+    var NOTIF_POLL_FALLBACK = 10000;
+    var notifPollTimer = null;
+    var notifPollMs = null;
+    function setNotifPolling(ms) {
+        if (notifPollMs === ms) return;
+        notifPollMs = ms;
+        clearInterval(notifPollTimer);
+        notifPollTimer = setInterval(fetchNotifications, ms);
+    }
+
     $(document).ready(function () {
         fetchNotifications();
-        // Polling stays as fallback in case Reverb drops; realtime below is primary
-        setInterval(fetchNotifications, 60000);
+        setNotifPolling(NOTIF_POLL_FALLBACK);
 
         if (typeof Echo !== 'undefined') {
             try {
+                var notifSocketUp = false;
+                var notifChannelUp = false;
+                var syncNotifPolling = function () {
+                    setNotifPolling(notifSocketUp && notifChannelUp ? NOTIF_POLL_LIVE : NOTIF_POLL_FALLBACK);
+                };
+
+                var connection = Echo.connector.pusher.connection;
+                notifSocketUp = connection.state === 'connected';
+                connection.bind('state_change', function (states) {
+                    notifSocketUp = states.current === 'connected';
+                    syncNotifPolling();
+                });
+
                 // Realtime nudge: any ticket write refreshes the dropdowns
                 Echo.channel('tickets').listen('TicketListUpdated', function () {
-                    fetchNotifications();
+                    scheduleNotifFetch();
                 });
+
                 // Reverb per-user pings for BOTH kinds: ticket events + chat messages
                 Echo.private('App.Models.User.' + notifAuthUserId)
+                    .subscribed(function () {
+                        // First subscribe and every reconnect: catch up on
+                        // anything that arrived while the socket was down
+                        notifChannelUp = true;
+                        syncNotifPolling();
+                        scheduleNotifFetch();
+                    })
+                    .error(function () {
+                        notifChannelUp = false;
+                        syncNotifPolling();
+                    })
                     .listen('UserNotified', function (e) {
-                        // Already viewing that ticket -> mark read silently, no sound
+                        // Already viewing that ticket -> mark read silently
                         var openTicketId = $('#ticket_id').val();
                         if (openTicketId && e && String(e.ticket_id) === String(openTicketId)) {
                             $.ajax({
@@ -151,15 +200,22 @@
                                 type: 'POST',
                                 data: { ticket_id: openTicketId },
                                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                                complete: function () { fetchNotifications(); }
+                                complete: function () { scheduleNotifFetch(); }
                             });
                             return;
                         }
-                        playNotifSound(e && e.kind === 'chat' ? 'chat' : 'ticket');
-                        fetchNotifications();
+                        // The fetch spots the new item and chimes once
+                        scheduleNotifFetch();
                     });
             } catch (e) { /* realtime unavailable, polling covers it */ }
         }
+
+        // Background tabs can miss socket events — refresh when visible again
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+                scheduleNotifFetch();
+            }
+        });
 
         // Click a notification -> mark read -> redirect where it belongs (ticket view)
         $(document).on('click', '.notif-item', function (e) {

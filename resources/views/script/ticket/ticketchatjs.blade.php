@@ -69,10 +69,12 @@
             }
         });
 
-        // Fallback polling: if Reverb/Echo is missing or can't connect
-        // (wrong host, server down, blocked port), chat still updates live
-        // without refresh. loadMessages() re-renders safely (no duplicates).
+        // Realtime counts as "live" only when the socket is connected AND the
+        // private ticket channel is subscribed. Until then (Echo missing,
+        // Reverb down, blocked port, channel auth failing) poll instead, so
+        // chat and status still update without a refresh.
         var echoConnected = false;
+        var channelSubscribed = false;
         var pollTimer = null;
 
         function startPollingFallback() {
@@ -90,60 +92,54 @@
             }
         }
 
-        if (typeof Echo === 'undefined') {
-            startPollingFallback();
-        } else {
-            // If no successful socket connection in 6s, fall back to polling
-            setTimeout(function () {
-                if (!echoConnected) startPollingFallback();
-            }, 6000);
+        function syncPolling() {
+            if (echoConnected && channelSubscribed) {
+                stopPollingFallback();
+            } else {
+                startPollingFallback();
+            }
+        }
 
+        // Poll until the socket proves it is working
+        startPollingFallback();
+
+        if (typeof Echo !== 'undefined') {
             try {
                 var connection = Echo.connector.pusher.connection;
+                echoConnected = connection.state === 'connected';
 
-                connection.bind('connected', function () {
-                    var wasDisconnected = !echoConnected;
-                    echoConnected = true;
-                    stopPollingFallback();
-
-                    // Catch up on anything missed while the socket was down.
-                    if (wasDisconnected) loadMessages(false);
+                // Covers connected / connecting / unavailable / failed / disconnected
+                connection.bind('state_change', function (states) {
+                    echoConnected = states.current === 'connected';
+                    syncPolling();
                 });
-
-                // Socket lost (server restart, network change) — switch back to
-                // polling until Reverb reconnects.
-                connection.bind('disconnected', function () {
-                    echoConnected = false;
-                    startPollingFallback();
-                });
-
-                connection.bind('unavailable', function () {
-                    echoConnected = false;
-                    startPollingFallback();
-                });
-
-                if (connection.state === 'connected') {
-                    echoConnected = true;
-                }
-            } catch (e) { /* pusher internals unavailable — timeout fallback covers it */ }
+            } catch (e) { /* pusher internals unavailable — keep polling */ }
 
             Echo.private(`ticket.${ticketId}`)
+                .subscribed(function () {
+                    // Fires on the first subscribe and again after every
+                    // reconnect: catch up on anything sent in between.
+                    channelSubscribed = true;
+                    syncPolling();
+                    loadMessages(false);
+                })
+                .error(function () {
+                    // Channel authorization failed — stay on polling
+                    channelSubscribed = false;
+                    syncPolling();
+                })
                 .listen('MessageSent', (e) => {
-                    // Skip if sent by the logged-in user (already handled by AJAX submit response)
-                    if (e.sender_id == currentUserId) return;
-
-                    const incomingMessage = {
+                    // The sender's own other tabs get it too, shown as "You"
+                    const added = appendMessage({
                         id: e.id,
                         message: e.message,
                         attachment: e.attachment,
                         sender_name: e.sender_name,
                         time: e.time,
-                        is_me: false
-                    };
+                        is_me: e.sender_id == currentUserId
+                    });
 
-                    appendMessage(incomingMessage);
-
-                    if (!userHasScrolledUp) {
+                    if (added && !userHasScrolledUp) {
                         scrollToBottom();
                     }
                 })
@@ -155,31 +151,50 @@
                 });
         }
 
-        // Load messages from controller
+        // Background tabs can miss socket events (sleeping laptop, mobile
+        // browser) — catch up as soon as the tab is visible again.
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+                loadMessages(false);
+            }
+        });
+
+        // Load messages from controller. Only messages not already on screen
+        // are added, so this is safe to call any time (polling, reconnect).
         function loadMessages(isInitialLoad = false) {
             $.ajax({
                 url: fetchUrl,
                 type: 'GET',
                 success: function (response) {
-                    if (response.success) {
-                        const chatBox = $('#chatBox');
+                    if (!response.success) return;
 
-                        // Reset header line
-                        chatBox.html(`
+                    if (isInitialLoad) {
+                        $('#chatBox').html(`
                             <div class="text-center my-2">
                                 <small class="text-muted border px-2 py-1 rounded">
                                     Chat opened for Ticket #{{ $ticket->ticket_number ?? $ticket->id }}
                                 </small>
                             </div>
                         `);
+                    }
 
-                        response.messages.forEach(function (msg) {
-                            appendMessage(msg);
-                        });
+                    let added = false;
+                    response.messages.forEach(function (msg) {
+                        if (appendMessage(msg)) added = true;
+                    });
 
-                        // Scroll to bottom on initial load OR if user hasn't scrolled up manually
-                        if (isInitialLoad || !userHasScrolledUp) {
-                            scrollToBottom();
+                    // Scroll to bottom on initial load OR on new messages if the
+                    // user hasn't scrolled up to read history
+                    if (isInitialLoad || (added && !userHasScrolledUp)) {
+                        scrollToBottom();
+                    }
+
+                    // Apply a status change this page missed
+                    if (response.ticket && response.ticket.status) {
+                        if (ticketKnownStatus === null) {
+                            ticketKnownStatus = response.ticket.status;
+                        } else if (response.ticket.status !== ticketKnownStatus) {
+                            updateTicketUI(response.ticket.status, ticketId, response.ticket.resolution_remarks);
                         }
                     }
                 }
@@ -218,7 +233,12 @@
 
             // Resolved tickets have a closed chat — nothing can be sent
             if ($('#chatOnlyForm').attr('data-chat-locked') === '1') {
-                toastr.warning('This ticket is already resolved, so the chat is closed.');
+                Swal.fire({
+                    title: 'Chat Closed',
+                    text: 'This ticket is already resolved, so the chat is closed.',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
                 return;
             }
 
@@ -227,7 +247,12 @@
 
             // Prevent submission if both inputs are completely empty
             if (messageInput.val().trim() === '' && fileInput.files.length === 0) {
-                alert('Please type a message or select an image attachment.');
+                Swal.fire({
+                    title: 'Empty Message',
+                    text: 'Please type a message or select an image attachment.',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
                 return;
             }
 
@@ -276,14 +301,15 @@
                 },
                 success: function (response) {
                     if (response.success) {
-                        // Replace the temporary bubble with the saved message.
+                        // Replace the temporary bubble with the saved message
+                        // (skipped if the broadcast/poll already added it).
                         $('#chat-message-' + optimisticId).remove();
                         appendMessage(response.data);
                         scrollToBottom();
                     } else {
                         $('#chat-message-' + optimisticId).remove();
                         messageInput.val(typedMessage);
-                        alert(response.message || 'Message could not be sent.');
+                        Swal.fire('Error!', response.message || 'Message could not be sent.', 'error');
                     }
                 },
                 error: function (xhr) {
@@ -295,7 +321,7 @@
                         var res = JSON.parse(xhr.responseText);
                         msg = res.message || msg;
                     } catch (e) {}
-                    alert(msg);
+                    Swal.fire('Error!', msg, 'error');
                 },
                 complete: function () {
                     $('#sendChatBtn').prop('disabled', false);
@@ -303,7 +329,13 @@
             });
         });
 
+        // Adds a message in id order. Returns false when it is already shown,
+        // so the same message arriving by socket, poll and AJAX shows once.
         function appendMessage(msg) {
+            if (document.getElementById('chat-message-' + msg.id)) {
+                return false;
+            }
+
             let attachmentHtml = '';
             if (msg.attachment) {
                 attachmentHtml = `
@@ -347,7 +379,25 @@
                         </div>
                     </div>`;
             }
-            $('#chatBox').append(html);
+            const $html = $($.trim(html)).attr('data-msg-id', msg.id);
+            const numericId = Number(msg.id);
+
+            // Saved messages go before any later saved message, and before
+            // still-sending (temp-*) bubbles, so a late catch-up stays in order.
+            if (!isNaN(numericId)) {
+                const $after = $('#chatBox [data-msg-id]').filter(function () {
+                    const id = $(this).attr('data-msg-id');
+                    return id.indexOf('temp-') === 0 || Number(id) > numericId;
+                }).first();
+
+                if ($after.length) {
+                    $after.before($html);
+                    return true;
+                }
+            }
+
+            $('#chatBox').append($html);
+            return true;
         }
 
         function getInitials(name) {
@@ -496,7 +546,11 @@
     // Mirror of supportshowticket.blade.php left-card if/else — updates in place, no reload
     var isSupportUser = {{ Auth::guard('web')->user()->role != 'Requester' ? 'true' : 'false' }};
 
+    // Last status shown on this page (set by the first chat fetch)
+    var ticketKnownStatus = null;
+
     function updateTicketUI(status, ticketId, resolutionRemarks) {
+        ticketKnownStatus = status;
         var lower = (status || '').toLowerCase();
 
         // 1. Update top status badge (#ticket-status-badge)
