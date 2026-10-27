@@ -1,3 +1,22 @@
+<style>
+    /* Chat typing indicator — three bouncing dots */
+    .chat-typing-indicator .typing-dots span {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-right: 2px;
+        border-radius: 50%;
+        background-color: currentColor;
+        animation: chatTypingBounce 1.2s infinite ease-in-out;
+    }
+    .chat-typing-indicator .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .chat-typing-indicator .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes chatTypingBounce {
+        0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+        40%           { opacity: 1;    transform: translateY(-3px); }
+    }
+</style>
+
 <script>
     // A resolved ticket has its chat closed: the inputs are disabled and the
     // message cannot be sent. Reopening the ticket (back to Pending) re-opens it.
@@ -56,18 +75,8 @@
         // Initial load
         loadMessages(true);
 
-        // Auto mark this ticket's notifications (ticket + chat) as read while viewing it
-        $.ajax({
-            url: "{{ route('notifications.readTicket') }}",
-            type: 'POST',
-            data: { ticket_id: ticketId },
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            complete: function () {
-                if (typeof fetchNotifications === 'function') {
-                    fetchNotifications();
-                }
-            }
-        });
+        // This ticket's notifications are marked as read by topbarnotifyjs
+        // (1 second after they show up while this ticket is on screen).
 
         // Realtime counts as "live" only when the socket is connected AND the
         // private ticket channel is subscribed. Until then (Echo missing,
@@ -75,6 +84,7 @@
         // chat and status still update without a refresh.
         var echoConnected = false;
         var channelSubscribed = false;
+        var ticketChannel = null;
         var pollTimer = null;
 
         function startPollingFallback() {
@@ -115,7 +125,8 @@
                 });
             } catch (e) { /* pusher internals unavailable — keep polling */ }
 
-            Echo.private(`ticket.${ticketId}`)
+            ticketChannel = Echo.private(`ticket.${ticketId}`);
+            ticketChannel
                 .subscribed(function () {
                     // Fires on the first subscribe and again after every
                     // reconnect: catch up on anything sent in between.
@@ -129,6 +140,9 @@
                     syncPolling();
                 })
                 .listen('MessageSent', (e) => {
+                    // Their message arrived, so they are no longer typing
+                    hideTyping(e.sender_id);
+
                     // The sender's own other tabs get it too, shown as "You"
                     const added = appendMessage({
                         id: e.id,
@@ -148,7 +162,111 @@
                     if (e.status) {
                         updateTicketUI(e.status, e.ticket_id || ticketId, e.resolution_remarks);
                     }
-                });
+                })
+                .listenForWhisper('typing', onTypingWhisper);
+        }
+
+        /* ================= Typing indicator ================= */
+        // Sent as Reverb client events ("whisper"): browser to browser over the
+        // ticket's private channel. Nothing is saved; Laravel isn't involved.
+        const TYPING_SEND_EVERY = 2000; // re-announce at most every 2s while typing
+        const TYPING_IDLE = 3000;       // stopped typing after 3s without a key
+        const TYPING_EXPIRE = 4500;     // hide someone's indicator if they go quiet
+        let lastTypingSent = 0;
+        let typingIdleTimer = null;
+        const typers = {}; // user_id -> { name, timer }
+
+        const $typing = $(
+            '<div id="chatTypingIndicator" class="chat-typing-indicator small text-muted px-3 py-1" aria-live="polite" hidden>' +
+                '<span class="typing-dots me-1"><span></span><span></span><span></span></span>' +
+                '<span class="typing-text"></span>' +
+            '</div>'
+        );
+        $('#chatBox').after($typing);
+
+        function whisperTyping(isTyping) {
+            if (!ticketChannel || !channelSubscribed) return;
+            try {
+                ticketChannel.whisper('typing', { user_id: currentUserId, name: currentUserName, typing: isTyping });
+            } catch (e) { /* socket unavailable — the indicator is optional */ }
+        }
+
+        function stopTyping() {
+            clearTimeout(typingIdleTimer);
+            if (lastTypingSent) {
+                lastTypingSent = 0;
+                whisperTyping(false);
+            }
+        }
+
+        $('#chatMessageInput')
+            .on('input', function () {
+                if ($('#chatOnlyForm').attr('data-chat-locked') === '1') return;
+
+                if ($(this).val().trim() === '') {
+                    stopTyping();
+                    return;
+                }
+
+                const now = Date.now();
+                if (now - lastTypingSent > TYPING_SEND_EVERY) {
+                    lastTypingSent = now;
+                    whisperTyping(true);
+                }
+
+                clearTimeout(typingIdleTimer);
+                typingIdleTimer = setTimeout(stopTyping, TYPING_IDLE);
+            })
+            .on('blur', stopTyping);
+
+        function onTypingWhisper(e) {
+            // Ignore our own other tabs
+            if (!e || e.user_id == currentUserId) return;
+
+            if (e.typing) {
+                showTyping(e.user_id, e.name);
+            } else {
+                hideTyping(e.user_id);
+            }
+        }
+
+        function showTyping(userId, name) {
+            if (typers[userId]) clearTimeout(typers[userId].timer);
+
+            typers[userId] = {
+                name: name || 'Someone',
+                timer: setTimeout(function () { hideTyping(userId); }, TYPING_EXPIRE)
+            };
+            renderTyping();
+        }
+
+        function hideTyping(userId) {
+            if (!typers[userId]) return;
+
+            clearTimeout(typers[userId].timer);
+            delete typers[userId];
+            renderTyping();
+        }
+
+        function renderTyping() {
+            const names = Object.values(typers).map(function (t) { return t.name; });
+
+            if (names.length === 0) {
+                $typing.prop('hidden', true);
+                return;
+            }
+
+            let text;
+            if (names.length === 1) {
+                text = names[0] + ' is typing';
+            } else if (names.length === 2) {
+                text = names[0] + ' and ' + names[1] + ' are typing';
+            } else {
+                text = 'Several people are typing';
+            }
+
+            $typing.find('.typing-text').text(text);
+            $typing.prop('hidden', false);
         }
 
         // Background tabs can miss socket events (sleeping laptop, mobile
@@ -282,6 +400,7 @@
             };
 
             appendMessage(optimisticMessage);
+            stopTyping();
             messageInput.val('');
             $('#chatAttachment').val('');
             $('#attachmentPreview').addClass('d-none').removeClass('d-flex');

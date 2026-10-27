@@ -117,6 +117,40 @@
         }
     }
 
+    // While a ticket is open on screen, its notifications (ticket + chat) are
+    // marked as read 1 second after they show up — only while the tab is
+    // actually visible, so nothing is marked read in a background tab.
+    var OPEN_TICKET_READ_DELAY = 1000;
+    var openTicketReadTimer = null;
+    var openTicketHasUnread = false;
+
+    function hasUnreadForOpenTicket(res) {
+        var openTicketId = $('#ticket_id').val();
+        if (!openTicketId) return false;
+
+        return [].concat(res.tickets || [], res.chats || []).some(function (n) {
+            return !n.read && String(n.ticket_id) === String(openTicketId);
+        });
+    }
+
+    function markOpenTicketReadSoon() {
+        var openTicketId = $('#ticket_id').val();
+        if (!openTicketId || document.visibilityState !== 'visible') return;
+
+        clearTimeout(openTicketReadTimer);
+        openTicketReadTimer = setTimeout(function () {
+            if (document.visibilityState !== 'visible') return;
+
+            $.ajax({
+                url: notifReadTicketRoute,
+                type: 'POST',
+                data: { ticket_id: openTicketId },
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                complete: function () { fetchNotifications(); }
+            });
+        }, OPEN_TICKET_READ_DELAY);
+    }
+
     function fetchNotifications() {
         $.ajax({
             url: notifFetchRoute,
@@ -130,6 +164,13 @@
                 soundNewNotifs(res.tickets, knownNotifIds.tickets, 'ticket');
                 soundNewNotifs(res.chats, knownNotifIds.chats, 'chat');
                 notifFirstLoad = false;
+
+                // Covers every way a notification arrives: page load, socket
+                // ping, ticket-list nudge and polling
+                openTicketHasUnread = hasUnreadForOpenTicket(res);
+                if (openTicketHasUnread) {
+                    markOpenTicketReadSoon();
+                }
             }
         });
     }
@@ -191,20 +232,9 @@
                         notifChannelUp = false;
                         syncNotifPolling();
                     })
-                    .listen('UserNotified', function (e) {
-                        // Already viewing that ticket -> mark read silently
-                        var openTicketId = $('#ticket_id').val();
-                        if (openTicketId && e && String(e.ticket_id) === String(openTicketId)) {
-                            $.ajax({
-                                url: notifReadTicketRoute,
-                                type: 'POST',
-                                data: { ticket_id: openTicketId },
-                                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                                complete: function () { scheduleNotifFetch(); }
-                            });
-                            return;
-                        }
-                        // The fetch spots the new item and chimes once
+                    .listen('UserNotified', function () {
+                        // The fetch shows the new item, chimes once, and (if it
+                        // belongs to the open ticket) marks it read after 1s
                         scheduleNotifFetch();
                     });
             } catch (e) { /* realtime unavailable, polling covers it */ }
@@ -214,6 +244,13 @@
         document.addEventListener('visibilitychange', function () {
             if (document.visibilityState === 'visible') {
                 scheduleNotifFetch();
+                // Back on the open ticket with unread items -> read in 1s
+                if (openTicketHasUnread) {
+                    markOpenTicketReadSoon();
+                }
+            } else {
+                // Left the tab before the second passed -> keep them unread
+                clearTimeout(openTicketReadTimer);
             }
         });
 
