@@ -31,6 +31,11 @@ const reverbUseTLS = window.location.protocol === 'https:';
 // /misco-app/public), so take the full URL Laravel generated in the layout.
 const authEndpointMeta = document.querySelector('meta[name="broadcast-auth-endpoint"]');
 
+// Behind the HTTPS reverse proxy the socket lives under this project's own
+// path (e.g. /snow/reverb/app/...) so it can't clash with other projects on
+// the same domain. Direct http connections to :8080 (dev) need no prefix.
+const reverbProxyPath = reverbUseTLS ? (import.meta.env.VITE_REVERB_PATH || '') : '';
+
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
@@ -38,6 +43,7 @@ window.Echo = new Echo({
     wsHost: window.location.hostname,
     wsPort: reverbUseTLS ? 443 : (import.meta.env.VITE_REVERB_PORT ?? 8080),
     wssPort: 443,
+    wsPath: reverbProxyPath,
     forceTLS: reverbUseTLS,
     enabledTransports: ['ws', 'wss'],
 });
