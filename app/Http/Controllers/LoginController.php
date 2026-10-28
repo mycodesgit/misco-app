@@ -18,7 +18,7 @@ class LoginController extends Controller
     {
         $request->validate([
             'email' => 'required',
-            'password' => 'required|min:5|max:12',
+            'password' => 'required|min:5|max:255',
         ]);
 
         $remember = $request->has('remember');
@@ -32,8 +32,8 @@ class LoginController extends Controller
         if (auth()->attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
             $user = auth()->user();
 
-            // Block disabled accounts (ustatus = 2). Log them out immediately.
-            if ((int) $user->ustatus === 2) {
+            // Block disabled (2) and deleted (3) accounts. Log them out immediately.
+            if ($user->isBlocked()) {
                 auth()->logout();
 
                 AuditLog::create([

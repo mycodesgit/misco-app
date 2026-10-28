@@ -44,21 +44,23 @@ Route::group(['middleware'=>['guest']],function(){
     });
 
     Route::get('/login',[LoginController::class,'getLogin'])->name('getLogin');
-    Route::post('/login',[LoginController::class,'postLogin'])->name('postLogin');
+    Route::post('/login',[LoginController::class,'postLogin'])->middleware('throttle:login')->name('postLogin');
 });
 
 Route::group(['middleware'=>['login_auth']],function(){
     Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard.index');
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
-    Route::get('/monitor',[MonitoringDashboardController::class,'index'])->name('monitoring.index');
 
     Route::prefix('/tickets')->group(function () {
-        Route::get('/support/view/all',[SupportTicketRequestController::class,'index'])->name('tickets.index');
-        Route::get('/support/view/all/fetch/pending',[SupportTicketRequestController::class,'showsupportpending'])->name('tickets.showsupportpending');
-        Route::get('/support/view/all/fetch/progress',[SupportTicketRequestController::class,'showprogress'])->name('tickets.showprogress');
-        Route::get('/support/view/all/fetch/resolved',[SupportTicketRequestController::class,'showresolved'])->name('tickets.showresolved');
-        Route::get('/support/view/all/fetch/closed',[SupportTicketRequestController::class,'showclosed'])->name('tickets.showclosed');
-        Route::get('/support/view/all/fetch/mine',[SupportTicketRequestController::class,'showmine'])->name('tickets.showmine');
+        // "All Tickets" of the user's desk — desk staff only
+        Route::middleware('feature:desk_staff')->group(function () {
+            Route::get('/support/view/all',[SupportTicketRequestController::class,'index'])->name('tickets.index');
+            Route::get('/support/view/all/fetch/pending',[SupportTicketRequestController::class,'showsupportpending'])->name('tickets.showsupportpending');
+            Route::get('/support/view/all/fetch/progress',[SupportTicketRequestController::class,'showprogress'])->name('tickets.showprogress');
+            Route::get('/support/view/all/fetch/resolved',[SupportTicketRequestController::class,'showresolved'])->name('tickets.showresolved');
+            Route::get('/support/view/all/fetch/closed',[SupportTicketRequestController::class,'showclosed'])->name('tickets.showclosed');
+            Route::get('/support/view/all/fetch/mine',[SupportTicketRequestController::class,'showmine'])->name('tickets.showmine');
+        });
 
         // Archive: finished tickets from past years — every role
         Route::get('/archive', [TicketArchiveController::class, 'index'])->name('tickets.archive');
@@ -109,13 +111,16 @@ Route::group(['middleware'=>['login_auth']],function(){
             Route::post('/sub/category/view/delete/{id}', [CategorySubController::class, 'delete'])->name('subcategory.delete');
         });
 
-        Route::get('/office/list', [OfficeController::class, 'index'])->name('office.index');
-        Route::get('/office/list/fetch', [OfficeController::class, 'show'])->name('office.show');
-        Route::post('/office/list/add', [OfficeController::class, 'create'])->name('office.create');
-        Route::post('/office/list/update', [OfficeController::class, 'update'])->name('office.update');
+        // Offices and Audit Trail — Administrators only
+        Route::middleware('feature:admin')->group(function () {
+            Route::get('/office/list', [OfficeController::class, 'index'])->name('office.index');
+            Route::get('/office/list/fetch', [OfficeController::class, 'show'])->name('office.show');
+            Route::post('/office/list/add', [OfficeController::class, 'create'])->name('office.create');
+            Route::post('/office/list/update', [OfficeController::class, 'update'])->name('office.update');
 
-        Route::get('/audittrail/view', [AuditTrailController::class, 'index'])->name('audittrail.index');
-        Route::get('/audittrail/fetch', [AuditTrailController::class, 'show'])->name('audittrail.show');
+            Route::get('/audittrail/view', [AuditTrailController::class, 'index'])->name('audittrail.index');
+            Route::get('/audittrail/fetch', [AuditTrailController::class, 'show'])->name('audittrail.show');
+        });
     });
 
     Route::prefix('/reports')->group(function () {
@@ -123,11 +128,13 @@ Route::group(['middleware'=>['login_auth']],function(){
             Route::get('/accomplishment/generate', [AccomplishmentReportController::class, 'index'])->name('accomplishment-report.index');
             Route::get('/accomplishment/preview', [AccomplishmentReportController::class, 'previewPdf'])->name('accomplishment.preview');
         });
-        Route::get('/ticketstatus/view', [TicketStatusReportController::class, 'index'])->name('ticketstatus-report.index');
-        Route::get('/ticketstatus/preview', [TicketStatusReportController::class, 'previewPdf'])->name('ticketstatus-report.preview');
-        Route::get('/clientfeedback/view', [ClientFeedbackController::class, 'index'])->name('clientfeedback.index');
-        Route::get('/clientfeedback/fetch', [ClientFeedbackController::class, 'show'])->name('clientfeedback.show');
-        Route::get('/clientfeedback/users', [ClientFeedbackController::class, 'users'])->name('clientfeedback.users');
+        Route::middleware('feature:desk_staff')->group(function () {
+            Route::get('/ticketstatus/view', [TicketStatusReportController::class, 'index'])->name('ticketstatus-report.index');
+            Route::get('/ticketstatus/preview', [TicketStatusReportController::class, 'previewPdf'])->name('ticketstatus-report.preview');
+            Route::get('/clientfeedback/view', [ClientFeedbackController::class, 'index'])->name('clientfeedback.index');
+            Route::get('/clientfeedback/fetch', [ClientFeedbackController::class, 'show'])->name('clientfeedback.show');
+            Route::get('/clientfeedback/users', [ClientFeedbackController::class, 'users'])->name('clientfeedback.users');
+        });
     });
 
     // Personal account page — outside /users/* so Requester role can access it
@@ -156,7 +163,8 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::post('/calendar/settings', [CalendarController::class, 'update'])->name('calendar.update');
     });
 
-    Route::prefix('/users')->group(function () {
+    // User management and roles — Administrators only
+    Route::prefix('/users')->middleware('feature:admin')->group(function () {
         Route::get('/list/view/all/supports',[UserController::class,'index'])->name('user.index');
         Route::get('/list/view/all/requester',[UserController::class,'requesterindex'])->name('requester.index');
         Route::post('/list/view/add',[UserController::class,'create'])->name('user.create');
@@ -168,19 +176,23 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::post('list/updateTaskassignment', [UserController::class, 'userAssignTaskUpdate'])->name('userAssignTaskUpdate');
     });
 
-    Route::prefix('/roles')->group(function () {
+    Route::prefix('/roles')->middleware('feature:admin')->group(function () {
         Route::get('/user/view/all',[UserRolesController::class,'index'])->name('roles.index');
         Route::post('/user/view/add',[UserRolesController::class,'create'])->name('roles.create');
         Route::get('/user/view/fetch',[UserRolesController::class,'show'])->name('roles.show');
         Route::post('/user/view/update', [UserRolesController::class, 'update'])->name('roles.update');
     });
 
-    Route::get('/dashboard/monitoring',[MonitoringDashboardController::class,'index'])->name('monitoring-dashboard.index');
-    Route::get('/dashboard/monitoring/helpdesk',[MonitoringDashboardController::class,'helpdesk'])->name('monitoring.helpdesk');
-    Route::get('/dashboard/monitoring/personnel',[MonitoringDashboardController::class,'personnel'])->name('monitoring.personnel');
-    Route::get('/dashboard/monitoring/queue',[MonitoringDashboardController::class,'queue'])->name('monitoring.queue');
-    Route::get('/dashboard/monitoring/evaluation',[MonitoringDashboardController::class,'evaluation'])->name('monitoring.evaluation');
-    Route::get('/dashboard/monitoring/wifi',[MonitoringDashboardController::class,'wifi'])->name('monitoring.wifi');
+    // TV monitoring dashboard — desk staff only
+    Route::middleware('feature:desk_staff')->group(function () {
+        Route::get('/monitor',[MonitoringDashboardController::class,'index'])->name('monitoring.index');
+        Route::get('/dashboard/monitoring',[MonitoringDashboardController::class,'index'])->name('monitoring-dashboard.index');
+        Route::get('/dashboard/monitoring/helpdesk',[MonitoringDashboardController::class,'helpdesk'])->name('monitoring.helpdesk');
+        Route::get('/dashboard/monitoring/personnel',[MonitoringDashboardController::class,'personnel'])->name('monitoring.personnel');
+        Route::get('/dashboard/monitoring/queue',[MonitoringDashboardController::class,'queue'])->name('monitoring.queue');
+        Route::get('/dashboard/monitoring/evaluation',[MonitoringDashboardController::class,'evaluation'])->name('monitoring.evaluation');
+        Route::get('/dashboard/monitoring/wifi',[MonitoringDashboardController::class,'wifi'])->name('monitoring.wifi');
+    });
 
     Route::prefix('/station')->group(function () {
         Route::get('/', [StationController::class, 'show'])->name('station.show');

@@ -59,7 +59,7 @@
                     <div class="control">
                         <i class="ti ti-lock" aria-hidden="true"></i>
                         <input type="password" id="password" name="password" placeholder="••••••••"
-                            autocomplete="current-password" required minlength="5" maxlength="12" aria-required="true"
+                            autocomplete="current-password" required minlength="5" maxlength="255" aria-required="true"
                             @error('password') aria-invalid="true" aria-describedby="password-error" @enderror>
                         <button type="button" id="togglePasswordBtn" class="toggle-password"
                             aria-label="Show password" aria-pressed="false" aria-controls="password">

@@ -70,6 +70,14 @@ class User extends Authenticatable
         return $this->role === 'Administrator';
     }
 
+    /**
+     * Disabled (2) and deleted (3) accounts cannot use the system.
+     */
+    public function isBlocked(): bool
+    {
+        return in_array((int) $this->ustatus, [2, 3], true);
+    }
+
     // --- FEATURE ACCESS ---
     // Used by the menus and by the "feature:<name>" route middleware.
 
@@ -110,6 +118,10 @@ class User extends Authenticatable
     public function hasFeatureAccess(string $feature): bool
     {
         return match ($feature) {
+            // User management, roles, offices, audit trail
+            'admin'         => $this->isAdmin(),
+            // Desk-side pages: All Tickets, reports, monitoring
+            'desk_staff'    => $this->isDeskStaff(),
             // Each desk manages the categories of its own office
             'category'      => $this->isDeskStaff(),
             'daily_task'    => $this->hasDailyTaskAccess(),

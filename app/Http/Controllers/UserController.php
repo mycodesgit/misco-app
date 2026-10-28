@@ -70,7 +70,7 @@ class UserController extends Controller
                 'fname'    => 'required',
                 'lname'    => 'required',
                 'password' => 'required|min:6',
-                'role'     => 'required',
+                'role'     => 'required|exists:users_role,rolename',
                 'contactno' => 'nullable|string|max:50',
             ]);
 
@@ -180,7 +180,7 @@ class UserController extends Controller
             'id'     => 'required|exists:users,id',
             'lname'  => 'required',
             'fname'  => 'required',
-            'role'   => 'required',
+            'role'   => 'required|exists:users_role,rolename',
             'gender' => 'required',
             'contactno' => 'nullable|string|max:50',
         ]);
@@ -263,8 +263,8 @@ class UserController extends Controller
         $user = User::find($request->id);
 
         $request->validate([
-            'id' => 'required',
-            'ustatus' => 'required',
+            'id' => 'required|exists:users,id',
+            'ustatus' => 'required|in:1,2,3',
         ]);
 
         try {
@@ -291,7 +291,7 @@ class UserController extends Controller
     public function userAssignTaskUpdate(Request $request)
     {
         $request->validate([
-            'id' => 'required',
+            'id' => 'required|exists:users,id',
             'usertask' => 'required',
         ]);
 

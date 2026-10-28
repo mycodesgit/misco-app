@@ -17,7 +17,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/home';
+    public const HOME = '/dashboard';
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
@@ -26,6 +26,20 @@ class RouteServiceProvider extends ServiceProvider
     {
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        // Login: 5 tries per minute per email + IP, and 20 per minute per IP
+        // (stops guessing passwords across many accounts)
+        RateLimiter::for('login', function (Request $request) {
+            $tooMany = function (Request $request) {
+                return back()->withInput($request->only('email'))
+                    ->with('error_disabled', 'Too many login attempts. Please wait a minute and try again.');
+            };
+
+            return [
+                Limit::perMinute(5)->by(strtolower((string) $request->input('email')) . '|' . $request->ip())->response($tooMany),
+                Limit::perMinute(20)->by($request->ip())->response($tooMany),
+            ];
         });
 
         $this->routes(function () {
