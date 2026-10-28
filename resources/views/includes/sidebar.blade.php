@@ -141,11 +141,6 @@
             </a>
         </li>
         <li>
-            <a class="nav-link" href="#">
-                <i class="ti ti-forms"></i><span class="nav-text">Client Satisfactory</span>
-            </a>
-        </li>
-        <li>
             <a class="nav-link {{ $clientfeedbackActive }}" href="{{ route('clientfeedback.index') }}">
                 <i class="ti ti-file-report"></i><span class="nav-text">Client Feedback</span>
             </a>
