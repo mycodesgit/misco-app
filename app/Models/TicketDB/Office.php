@@ -15,6 +15,7 @@ class Office extends Model
     protected $fillable = [
         'office_name',
         'office_abbr',
+        'google_calendar_id',
         'remember_token',
     ];
 }

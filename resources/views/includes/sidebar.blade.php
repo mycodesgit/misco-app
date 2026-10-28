@@ -8,6 +8,7 @@
     // Feature access, see User::hasFeatureAccess() — the routes enforce the same rules
     $hasDailyTaskAccess = Auth::guard('web')->user()->hasDailyTaskAccess();       // Daily Task + Accomplishment
     $hasWorkProgressAccess = Auth::guard('web')->user()->hasWorkProgressAccess(); // Work Progress
+    $hasCalendarAccess = Auth::guard('web')->user()->hasCalendarAccess();         // Calendar
     $hasWifiVoucherAccess = Auth::guard('web')->user()->hasWifiVoucherAccess();   // Wifi Vouchers
 
     // An open ticket (tickets.store) belongs under "All Tickets" when the user
@@ -30,6 +31,7 @@
 
     $ticketsrequesterActive = ($current_route === 'ticketsrequester.index' || $viewingOwnTicket) ? 'active' : '';
     $archiveActive = $current_route === 'tickets.archive' ? 'active' : '';
+    $calendarActive = $current_route === 'calendar.index' ? 'active' : '';
 @endphp
 
 <ul class="nav flex-column">
@@ -76,6 +78,14 @@
                 </a>
             </li>
         @endif
+    @endif
+    {{-- Office's shared Google Calendar --}}
+    @if($hasCalendarAccess)
+        <li>
+            <a class="nav-link {{ $calendarActive }}" href="{{ route('calendar.index') }}">
+                <i class="ti ti-calendar-event"></i><span class="nav-text">Calendar</span>
+            </a>
+        </li>
     @endif
 
     {{-- Administrators manage everything here; each desk manages its own

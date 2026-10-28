@@ -26,6 +26,7 @@ use App\Http\Controllers\AuditTrailController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectKanbanController;
 use App\Http\Controllers\TicketArchiveController;
+use App\Http\Controllers\CalendarController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -147,6 +148,12 @@ Route::group(['middleware'=>['login_auth']],function(){
         Route::post('/kanban/update', [ProjectKanbanController::class, 'update'])->name('project.kanban.update');
         Route::post('/kanban/reorder', [ProjectKanbanController::class, 'reorder'])->name('project.kanban.reorder');
         Route::delete('/kanban/{id}', [ProjectKanbanController::class, 'destroy'])->name('project.kanban.delete');
+    });
+
+    // Office Calendar (embedded Google Workspace calendar) — office 36 only
+    Route::middleware('feature:calendar')->group(function () {
+        Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+        Route::post('/calendar/settings', [CalendarController::class, 'update'])->name('calendar.update');
     });
 
     Route::prefix('/users')->group(function () {

@@ -49,6 +49,11 @@ class AuditActivity
             case 'Edit_Office':
                 return "{$actor} updated Office '" . self::office($data) . "'";
 
+            case 'Edit_OfficeCalendar':
+                return empty($data['google_calendar_id'])
+                    ? "{$actor} removed their office's Google Calendar"
+                    : "{$actor} set their office's Google Calendar";
+
             case 'Add_DailyTask':
                 return "{$actor} added new Daily Task '" . self::trunc(self::str($data, 'dailytaskdesc')) . "'";
             case 'Edit_DailyTask':

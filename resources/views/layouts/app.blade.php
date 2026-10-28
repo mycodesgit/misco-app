@@ -338,6 +338,9 @@
     @if (request()->routeIs('tickets.archive'))
         @include('script.ticket.archivejs')
     @endif
+    @if (request()->routeIs('calendar.index'))
+        @include('script.calendar.calendarjs')
+    @endif
     @if (request()->routeIs('tickets.store'))
         @include('script.ticket.ticketchatjs')
     @endif

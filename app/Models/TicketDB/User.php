@@ -74,8 +74,8 @@ class User extends Authenticatable
     // Used by the menus and by the "feature:<name>" route middleware.
 
     /**
-     * The only office that uses Daily Task, the Accomplishment report and
-     * Work Progress (projects / kanban).
+     * The only office that uses Daily Task, the Accomplishment report,
+     * Work Progress (projects / kanban) and the Office Calendar.
      */
     public const TASK_OFFICE_ID = 36;
 
@@ -90,6 +90,11 @@ class User extends Authenticatable
     }
 
     public function hasWorkProgressAccess(): bool
+    {
+        return (int) $this->office_id === self::TASK_OFFICE_ID;
+    }
+
+    public function hasCalendarAccess(): bool
     {
         return (int) $this->office_id === self::TASK_OFFICE_ID;
     }
@@ -109,6 +114,7 @@ class User extends Authenticatable
             'category'      => $this->isDeskStaff(),
             'daily_task'    => $this->hasDailyTaskAccess(),
             'work_progress' => $this->hasWorkProgressAccess(),
+            'calendar'      => $this->hasCalendarAccess(),
             'wifi_voucher'  => $this->hasWifiVoucherAccess(),
             default         => false,
         };
