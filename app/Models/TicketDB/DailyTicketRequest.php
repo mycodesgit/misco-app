@@ -4,6 +4,8 @@ namespace App\Models\TicketDB;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Crypt;
 
 class DailyTicketRequest extends Model
 {
@@ -39,6 +41,7 @@ class DailyTicketRequest extends Model
         'resolved_by_name',
         'duration',
         'duration_minutes',
+        'view_token',
     ];
 
     /**
@@ -48,6 +51,50 @@ class DailyTicketRequest extends Model
         'started_at'  => 'datetime',
         'resolved_at' => 'datetime',
     ];
+
+    // --- ENCRYPTED VIEW LINK ---
+    // The ticket page URL carries an encrypted id (?view=<token>) instead of
+    // the plain id, so ids can't be read or guessed from the address bar.
+
+    /**
+     * Encrypted id used in the ticket page URL.
+     */
+    public static function encryptViewId($id): string
+    {
+        return Crypt::encryptString((string) $id);
+    }
+
+    /**
+     * The ticket id inside a view token, or null if the token is invalid or
+     * was tampered with.
+     */
+    public static function decryptViewId(?string $token): ?int
+    {
+        if (!$token) {
+            return null;
+        }
+
+        try {
+            $id = Crypt::decryptString($token);
+        } catch (DecryptException $e) {
+            return null;
+        }
+
+        return ctype_digit($id) ? (int) $id : null;
+    }
+
+    /**
+     * Full URL of the ticket page.
+     */
+    public static function viewUrl($id): string
+    {
+        return route('tickets.store', ['view' => self::encryptViewId($id)]);
+    }
+
+    public function getViewTokenAttribute(): ?string
+    {
+        return $this->id ? self::encryptViewId($this->id) : null;
+    }
 
     // --- COMPUTED ATTRIBUTES ---
 

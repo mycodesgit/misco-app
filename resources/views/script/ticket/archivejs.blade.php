@@ -168,8 +168,8 @@
                 // 12. Actions (View)
                 {
                     data: 'id',
-                    render: function(data) {
-                        return `<a href="${ticketViewRoute}?view=${data}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
+                    render: function(data, type, row) {
+                        return `<a href="${ticketViewRoute}?view=${encodeURIComponent(row.view_token)}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
                     }
                 }
             ],

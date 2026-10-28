@@ -212,7 +212,7 @@
                     data: 'id',
                     render: function(data, type, row) {
                         var baseUrl = "{{ route('tickets.store') }}";
-                        var viewBtn = `<a href="${baseUrl}?view=${data}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
+                        var viewBtn = `<a href="${baseUrl}?view=${encodeURIComponent(row.view_token)}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
                         var deleteBtn = `<button type="button" value="${data}" class="btn btn-sm btn-danger ticket-delete" data-bs-toggle="tooltip" title="Delete Ticket"><i class="ti ti-trash"></i></button>`;
 
                         return viewBtn + (typeof editBtn !== 'undefined' ? editBtn : '') + deleteBtn;
@@ -341,7 +341,7 @@
                     data: 'id',
                     render: function(data, type, row) {
                         var baseUrl = "{{ route('tickets.store') }}";
-                        var viewBtn = `<a href="${baseUrl}?view=${data}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
+                        var viewBtn = `<a href="${baseUrl}?view=${encodeURIComponent(row.view_token)}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
 
                         return viewBtn;
                     }
@@ -478,7 +478,7 @@
                     data: 'id',
                     render: function(data, type, row) {
                         var baseUrl = "{{ route('tickets.store') }}";
-                        var viewBtn = `<a href="${baseUrl}?view=${data}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
+                        var viewBtn = `<a href="${baseUrl}?view=${encodeURIComponent(row.view_token)}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
 
                         return viewBtn;
                     }
@@ -637,7 +637,7 @@
                     data: 'id',
                     render: function(data, type, row) {
                         var baseUrl = "{{ route('tickets.store') }}";
-                        var viewBtn = `<a href="${baseUrl}?view=${data}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
+                        var viewBtn = `<a href="${baseUrl}?view=${encodeURIComponent(row.view_token)}" class="btn btn-sm btn-info text-white me-1" data-bs-toggle="tooltip" title="View Ticket"><i class="ti ti-eye"></i></a>`;
 
                         return viewBtn;
                     }

@@ -25,7 +25,7 @@ class NotificationController extends Controller
                 'ticket_id'     => $n->data['ticket_id'] ?? null,
                 'ticket_number' => $n->data['ticket_number'] ?? null,
                 'event'         => $n->data['event'] ?? null,
-                'url'           => $n->data['url'] ?? null,
+                'url'           => $this->ticketUrl($n),
                 'read'          => !is_null($n->read_at),
                 'time'          => $n->created_at?->diffForHumans(),
             ];
@@ -57,8 +57,21 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'url'     => $notification->data['url'] ?? null,
+            'url'     => $this->ticketUrl($notification),
         ]);
+    }
+
+    /**
+     * Ticket page link with the encrypted id, built fresh so notifications
+     * saved before the ids were encrypted still open the right ticket.
+     */
+    private function ticketUrl($notification): ?string
+    {
+        $ticketId = $notification->data['ticket_id'] ?? null;
+
+        return $ticketId
+            ? \App\Models\TicketDB\DailyTicketRequest::viewUrl($ticketId)
+            : ($notification->data['url'] ?? null);
     }
 
     /**

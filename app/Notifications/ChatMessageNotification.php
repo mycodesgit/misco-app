@@ -30,7 +30,7 @@ class ChatMessageNotification extends Notification
             'title'         => 'New chat on #' . $this->ticketNumber,
             'message'       => $this->senderName . ': ' . $this->excerpt,
             'sender_name'   => $this->senderName,
-            'url'           => route('tickets.store') . '?view=' . $this->ticketId,
+            'url'           => \App\Models\TicketDB\DailyTicketRequest::viewUrl($this->ticketId),
         ];
     }
 }

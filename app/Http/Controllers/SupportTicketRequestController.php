@@ -188,7 +188,9 @@ class SupportTicketRequestController extends Controller
 
     public function store(Request $request)
     {
-        $ticketId = $request->query('view');
+        // ?view= carries the encrypted ticket id; a plain or tampered value is rejected
+        $ticketId = DailyTicketRequest::decryptViewId($request->query('view'));
+        abort_unless($ticketId, 404);
 
         $ticket = DailyTicketRequest::select([
                 'id', 'ticket_number', 'user_id', 'reqoff_id', 'off_id', 'cat_id', 'subcat_id',

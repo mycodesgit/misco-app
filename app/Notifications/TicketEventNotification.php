@@ -31,7 +31,7 @@ class TicketEventNotification extends Notification
             'ticket_number' => $this->ticketNumber,
             'title'         => $this->title,
             'message'       => $this->message,
-            'url'           => route('tickets.store') . '?view=' . $this->ticketId,
+            'url'           => \App\Models\TicketDB\DailyTicketRequest::viewUrl($this->ticketId),
         ];
     }
 }
