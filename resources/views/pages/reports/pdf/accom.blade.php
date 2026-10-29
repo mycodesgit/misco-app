@@ -68,6 +68,9 @@
             font-family: Arial, sans-serif;
             text-align: left;
         }
+        .signatory {
+            page-break-inside: avoid;
+        }
         .footer-logo-container {
             position: absolute;
             left: 0;
@@ -259,20 +262,22 @@
         </table>
     </div>
 
-    <div class="name_person">
-        <p>{{ Auth::user()->fname ?? '' }} {{ Auth::user()->mname ? Auth::user()->mname . '.' : '' }} {{ Auth::user()->lname ?? '' }}</p>
-    </div>
+    <div class="signatory">
+        <div class="name_person">
+            <p>{{ Auth::user()->fname ?? '' }} {{ Auth::user()->mname ? Auth::user()->mname . '.' : '' }} {{ Auth::user()->lname ?? '' }}</p>
+        </div>
 
-    <div class="position_person">
-        <p>MIS Staff</p>
-    </div>
+        <div class="position_person">
+            <p>MIS Staff</p>
+        </div>
 
-    <div class="supervisor_person">
-        <p>&nbsp;&nbsp;ENGR. JEVY F. YEE</p>
-    </div>
+        <div class="supervisor_person">
+            <p>&nbsp;&nbsp;ENGR. JEVY F. YEE</p>
+        </div>
 
-    <div class="supervisor_position">
-        <p>Immediate Supervisor</p>
+        <div class="supervisor_position">
+            <p>Immediate Supervisor</p>
+        </div>
     </div>
 
     <div class="footer-logo-container">
