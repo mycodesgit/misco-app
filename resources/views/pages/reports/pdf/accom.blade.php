@@ -201,8 +201,8 @@
             </tbody>
         </table>
 
-        <p class="title_task" style="font-size: 11pt; text-align: left; margin: 16px 0 6px 0;">Resolved Tickets</p>
-        <table>
+        {{-- <p class="title_task" style="font-size: 11pt; text-align: left; margin: 16px 0 6px 0;">Resolved Tickets</p> --}}
+        {{-- <table>
             <thead>
                 <tr>
                     <th width="5%">No.</th>
@@ -233,10 +233,10 @@
                                 <ul style="margin: 5px 0 0 0; padding-left: 15px;">
                                     @foreach ($group->groupBy(fn ($item) => strtolower(preg_replace('/\s+/', ' ', trim((string) $item->issue_description)))) as $ticketsInGroup)
                                         <li>
-                                            {{-- {{ trim(preg_replace('/\s+/', ' ', (string) $ticketsInGroup->first()->issue_description)) }}
+                                            {{ trim(preg_replace('/\s+/', ' ', (string) $ticketsInGroup->first()->issue_description)) }}
                                             @if ($ticketsInGroup->count() > 1)
                                                 (x{{ $ticketsInGroup->count() }})
-                                            @endif --}}
+                                            @endif
                                             <span style="color: #666;">
                                                 [
                                                 @foreach ($ticketsInGroup as $ticket)
@@ -256,7 +256,7 @@
                     @endforeach
                 @endif
             </tbody>
-        </table>
+        </table> --}}
     </div>
 
     <div class="name_person">
