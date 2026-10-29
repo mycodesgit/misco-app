@@ -86,7 +86,7 @@
 <body>
     <div>
         <center>
-            <img src="{{ public_path('uilibs/images/headerLogoNew1.png') }}" width="95%" height="11%" style="margin-top: -8px;">
+            <img src="{{ public_path('uilibs/images/headerLogoNew1.png') }}" width="95%" height="11%" style="margin-top: -12px;">
         </center>
     </div>
 
