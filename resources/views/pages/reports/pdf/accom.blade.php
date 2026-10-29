@@ -55,7 +55,7 @@
         }
         .supervisor_person {
             padding-left: 30px;
-            padding-top: 20px;
+            padding-top: 30px;
             font-size: 11pt;
             font-weight: bold;
             font-family: Arial, sans-serif;
@@ -86,7 +86,7 @@
 <body>
     <div>
         <center>
-            <img src="{{ public_path('uilibs/images/headerLogoNew1.png') }}" width="95%" height="11%" style="margin-top: -12px;">
+            <img src="{{ public_path('uilibs/images/headerLogoNew1.png') }}" width="95%" height="11%" style="margin-top: -8px;">
         </center>
     </div>
 
@@ -126,11 +126,11 @@
     </div>
 
     <div style="padding-right: 20px; padding-left: 20px;">
-        {{-- <p style="font-family: Arial, sans-serif; font-size: 11px; margin: 0 0 8px 0;">
+        <p style="font-family: Arial, sans-serif; font-size: 11px; margin: 0 0 8px 0;">
             <strong>Summary:</strong> {{ $taskTotal ?? 0 }} completed task(s) + {{ $ticketTotal ?? 0 }} resolved ticket(s)
-        </p> --}}
+        </p>
 
-        {{-- <p class="title_task" style="font-size: 11pt; text-align: left; margin: 12px 0 6px 0;">Daily Tasks</p> --}}
+        <p class="title_task" style="font-size: 11pt; text-align: left; margin: 12px 0 6px 0;">Daily Tasks</p>
         <table>
             <thead>
                 <tr>
@@ -201,8 +201,8 @@
             </tbody>
         </table>
 
-        {{-- <p class="title_task" style="font-size: 11pt; text-align: left; margin: 16px 0 6px 0;">Resolved Tickets</p> --}}
-        {{-- <table>
+        <p class="title_task" style="font-size: 11pt; text-align: left; margin: 16px 0 6px 0;">Resolved Tickets</p>
+        <table>
             <thead>
                 <tr>
                     <th width="5%">No.</th>
@@ -233,10 +233,10 @@
                                 <ul style="margin: 5px 0 0 0; padding-left: 15px;">
                                     @foreach ($group->groupBy(fn ($item) => strtolower(preg_replace('/\s+/', ' ', trim((string) $item->issue_description)))) as $ticketsInGroup)
                                         <li>
-                                            {{ trim(preg_replace('/\s+/', ' ', (string) $ticketsInGroup->first()->issue_description)) }}
+                                            {{-- {{ trim(preg_replace('/\s+/', ' ', (string) $ticketsInGroup->first()->issue_description)) }}
                                             @if ($ticketsInGroup->count() > 1)
                                                 (x{{ $ticketsInGroup->count() }})
-                                            @endif
+                                            @endif --}}
                                             <span style="color: #666;">
                                                 [
                                                 @foreach ($ticketsInGroup as $ticket)
@@ -256,7 +256,7 @@
                     @endforeach
                 @endif
             </tbody>
-        </table> --}}
+        </table>
     </div>
 
     <div class="name_person">
