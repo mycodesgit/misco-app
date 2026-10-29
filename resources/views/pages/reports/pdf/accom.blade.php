@@ -126,9 +126,9 @@
     </div>
 
     <div style="padding-right: 20px; padding-left: 20px;">
-        <p style="font-family: Arial, sans-serif; font-size: 11px; margin: 0 0 8px 0;">
+        {{-- <p style="font-family: Arial, sans-serif; font-size: 11px; margin: 0 0 8px 0;">
             <strong>Summary:</strong> {{ $taskTotal ?? 0 }} completed task(s) + {{ $ticketTotal ?? 0 }} resolved ticket(s)
-        </p>
+        </p> --}}
 
         <p class="title_task" style="font-size: 11pt; text-align: left; margin: 12px 0 6px 0;">Daily Tasks</p>
         <table>
