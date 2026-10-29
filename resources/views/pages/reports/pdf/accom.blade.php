@@ -55,7 +55,7 @@
         }
         .supervisor_person {
             padding-left: 30px;
-            padding-top: 30px;
+            padding-top: 20px;
             font-size: 11pt;
             font-weight: bold;
             font-family: Arial, sans-serif;
